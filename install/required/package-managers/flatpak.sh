@@ -13,7 +13,7 @@ if command -v flatpak &> /dev/null; then
 fi
 
 # Install flatpak
-sudo apt-get update
+# Note: apt-get update already run by main install.sh
 sudo apt-get install -y flatpak
 
 # Add Flathub repository

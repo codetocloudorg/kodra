@@ -56,7 +56,7 @@ That's it. The installer will:
 | Category | Tools |
 |----------|-------|
 | **Terminal** | [Ghostty](https://ghostty.org) + [Starship](https://starship.rs) prompt + Nerd Fonts |
-| **Editor** | VS Code with 12 essential extensions |
+| **Editor** | VS Code with 13 essential extensions |
 | **Cloud** | Azure CLI, azd, Bicep, Terraform, OpenTofu, PowerShell 7 |
 | **Kubernetes** | kubectl, Helm, k9s |
 | **Containers** | Docker CE, lazydocker, Dev Containers support |

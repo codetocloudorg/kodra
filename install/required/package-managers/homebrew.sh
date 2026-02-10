@@ -13,7 +13,7 @@ if command -v brew &> /dev/null; then
 fi
 
 # Install dependencies
-sudo apt-get update
+# Note: apt-get update already run by main install.sh
 sudo apt-get install -y build-essential procps curl file git
 
 # Install Homebrew (non-interactive)

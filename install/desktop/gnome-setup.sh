@@ -19,7 +19,7 @@ fi
 # -----------------------------------------------------------------------------
 echo "📦 Installing GNOME customization tools..."
 
-sudo apt-get update -qq
+# Note: apt-get update already run by main install.sh
 sudo apt-get install -y \
     gnome-tweaks \
     gnome-shell-extension-manager \

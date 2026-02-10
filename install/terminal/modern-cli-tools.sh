@@ -22,7 +22,7 @@ APT_TOOLS=(
     "neofetch"     # System info
 )
 
-sudo apt-get update
+# Note: apt-get update already run by main install.sh
 sudo apt-get install -y "${APT_TOOLS[@]}"
 
 # Create symlinks for tools with different names

@@ -3,7 +3,7 @@
 # Visual Studio Code Installer
 # https://code.visualstudio.com/
 #
-# Installs VS Code with 12 essential extensions for cloud-native development
+# Installs VS Code with 13 essential extensions for cloud-native development
 #
 
 # Don't use set -e globally - we handle errors gracefully for extensions
@@ -20,7 +20,7 @@ else
     code --version
 fi
 
-# Top 12 essential extensions for cloud-native Azure development
+# Top 13 essential extensions for cloud-native Azure development
 # Keep it lean - users can add more as needed
 echo "Installing essential extensions..."
 
@@ -46,6 +46,7 @@ EXTENSIONS=(
     # Languages & Formats
     "ms-python.python"                     # Python (most used for cloud)
     "redhat.vscode-yaml"                   # YAML (K8s manifests, CI/CD)
+    "esbenp.prettier-vscode"               # Code formatter
     
     # Look & Feel
     "github.github-vscode-theme"           # GitHub Dark theme
