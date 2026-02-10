@@ -125,4 +125,22 @@ vim.api.nvim_create_autocmd('FileType', {
     end,
 })
 
+-- Transparent background (works with terminal opacity)
+vim.api.nvim_create_autocmd('ColorScheme', {
+    pattern = '*',
+    callback = function()
+        vim.api.nvim_set_hl(0, 'Normal', { bg = 'none' })
+        vim.api.nvim_set_hl(0, 'NormalFloat', { bg = 'none' })
+        vim.api.nvim_set_hl(0, 'SignColumn', { bg = 'none' })
+        vim.api.nvim_set_hl(0, 'EndOfBuffer', { bg = 'none' })
+        vim.api.nvim_set_hl(0, 'NormalNC', { bg = 'none' })
+    end,
+})
+
+-- Apply transparency on startup
+vim.api.nvim_set_hl(0, 'Normal', { bg = 'none' })
+vim.api.nvim_set_hl(0, 'NormalFloat', { bg = 'none' })
+vim.api.nvim_set_hl(0, 'SignColumn', { bg = 'none' })
+vim.api.nvim_set_hl(0, 'EndOfBuffer', { bg = 'none' })
+
 print('Kodra Neovim loaded! Press <Space> for leader commands.')

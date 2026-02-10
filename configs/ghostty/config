@@ -8,8 +8,9 @@ font-thicken = true
 adjust-cell-height = 10%
 
 # Window
-window-padding-x = 12
-window-padding-y = 8
+window-padding-x = 16
+window-padding-y = 14
+background-opacity = 0.98
 window-decoration = true
 window-theme = ghostty
 confirm-close-surface = false

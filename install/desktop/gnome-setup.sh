@@ -91,6 +91,19 @@ if [ ! -d "$TACTILE_DIR" ]; then
     fi
 fi
 
+# Install Blur my Shell (beautiful blur effects)
+BLUR_DIR="$HOME/.local/share/gnome-shell/extensions/blur-my-shell@aunetx"
+if [ ! -d "$BLUR_DIR" ]; then
+    echo "   Downloading Blur my Shell..."
+    mkdir -p "$BLUR_DIR"
+    curl -sL "https://extensions.gnome.org/extension-data/blur-my-shellaunetx.v66.shell-extension.zip" -o /tmp/blur-my-shell.zip 2>/dev/null || true
+    if [ -f /tmp/blur-my-shell.zip ]; then
+        unzip -qo /tmp/blur-my-shell.zip -d "$BLUR_DIR" 2>/dev/null || true
+        rm -f /tmp/blur-my-shell.zip
+        echo "   ✓ Blur my Shell installed"
+    fi
+fi
+
 # -----------------------------------------------------------------------------
 # Configure GNOME for macOS Feel
 # -----------------------------------------------------------------------------
@@ -391,12 +404,18 @@ echo "🧩 Enabling GNOME extensions..."
 
 # Enable extensions
 gnome-extensions enable dash-to-dock@micxgx.gmail.com 2>/dev/null && echo "  ✓ Dash to Dock" || echo "  ⚠ Dash to Dock (install from Extension Manager)"
+gnome-extensions enable blur-my-shell@aunetx 2>/dev/null && echo "  ✓ Blur my Shell" || true
 gnome-extensions enable user-theme@gnome-shell-extensions.gcampax.github.com 2>/dev/null && echo "  ✓ User Themes" || true
 gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com 2>/dev/null && echo "  ✓ AppIndicator" || true
 
+# Configure Blur my Shell (subtle, not distracting)
+gsettings set org.gnome.shell.extensions.blur-my-shell.overview blur true 2>/dev/null || true
+gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock blur true 2>/dev/null || true
+gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock sigma 30 2>/dev/null || true
+gsettings set org.gnome.shell.extensions.blur-my-shell.panel blur false 2>/dev/null || true
+
 echo ""
 echo "For the best experience, also install from Extension Manager:"
-echo "  • Blur my Shell - beautiful blur effects"
 echo "  • Rounded Window Corners - softer windows"  
 echo "  • Just Perfection - fine-tune the shell"
 echo ""
@@ -418,6 +437,7 @@ echo "  ✓ GNOME Tweaks installed"
 echo "  ✓ Dark mode enabled"
 echo "  ✓ Night Light enabled"
 echo "  ✓ Keyboard shortcuts configured"
+echo "  ✓ Blur my Shell extension installed"
 echo ""
 echo "  Next steps for the FULL macOS experience:"
 echo ""
@@ -425,7 +445,7 @@ echo "  1. Log out and log back in"
 echo ""
 echo "  2. Open Extension Manager and enable:"
 echo "     → Dash to Dock (for bottom-center dock)"
-echo "     → Blur my Shell (frosted glass effect)"
+echo "     → Blur my Shell (frosted glass blur effects)"
 echo ""
 echo "  3. After enabling Dash to Dock, run:"
 echo "     ~/.local/share/kodra/configure-dock.sh"
