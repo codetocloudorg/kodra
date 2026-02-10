@@ -138,13 +138,49 @@ export KODRA_START_TIME
 # -----------------------------------------------------------------------------
 section "Pre-flight Checks" "🔍"
 
-show_info "Checking system requirements..."
-check_ubuntu_version
-show_success "Ubuntu version OK"
-check_internet_connection
-show_success "Internet connection OK"
-check_sudo_access
-show_success "Sudo access OK"
+# Pre-flight checks with visual feedback
+show_preflight
+
+# Ubuntu version
+ubuntu_version=$(lsb_release -rs 2>/dev/null || echo "unknown")
+if check_ubuntu_version 2>/dev/null; then
+    show_check "Ubuntu version" "ok" "$ubuntu_version"
+else
+    show_check "Ubuntu version" "fail" "$ubuntu_version"
+    end_preflight
+    echo -e "    ${C_RED}Kodra requires Ubuntu 24.04 or later${C_RESET}"
+    exit 1
+fi
+
+# Internet connection
+if check_internet_connection 2>/dev/null; then
+    show_check "Internet connection" "ok"
+else
+    show_check "Internet connection" "fail"
+    end_preflight
+    echo -e "    ${C_RED}No internet connection detected${C_RESET}"
+    exit 1
+fi
+
+# Sudo access
+if check_sudo_access 2>/dev/null; then
+    show_check "Sudo access" "ok"
+else
+    show_check "Sudo access" "fail"
+    end_preflight
+    echo -e "    ${C_RED}Sudo access required${C_RESET}"
+    exit 1
+fi
+
+# Disk space (rough check)
+available_gb=$(df -BG "$HOME" | awk 'NR==2 {print $4}' | tr -d 'G')
+if [ "$available_gb" -ge 10 ]; then
+    show_check "Disk space" "ok" "${available_gb}GB available"
+else
+    show_check "Disk space" "warn" "${available_gb}GB (10GB+ recommended)"
+fi
+
+end_preflight
 
 # Start sudo keepalive to avoid repeated password prompts
 start_sudo_keepalive
@@ -188,8 +224,8 @@ section "Backup" "💾"
 source "$KODRA_DIR/lib/backup.sh"
 BACKUP_DIR=$(backup_dotfiles)
 if [ -n "$BACKUP_DIR" ] && [ -d "$BACKUP_DIR" ]; then
-    show_success "Configs backed up to: $BACKUP_DIR"
-    show_info "Run 'kodra restore' to recover if needed"
+    show_success "Configs backed up"
+    show_info "Location: $BACKUP_DIR"
 fi
 
 # -----------------------------------------------------------------------------
@@ -197,18 +233,25 @@ fi
 # -----------------------------------------------------------------------------
 section "System Updates" "📦"
 
+show_tools_group "Preparing system environment"
+
 # Cleanup any broken apt repos from previous failed installs
 if [ -f /etc/apt/sources.list.d/ghostty.list ]; then
-    show_info "Removing broken Ghostty apt repo from previous install..."
+    show_info "Cleaning up previous install artifacts"
     sudo rm -f /etc/apt/sources.list.d/ghostty.list
     sudo rm -f /etc/apt/keyrings/ghostty.asc
 fi
 
-show_info "Updating package lists..."
+show_installing "Updating package lists"
 sudo apt-get update -qq
-show_info "Upgrading installed packages..."
+show_installed "Package lists updated"
+
+show_installing "Upgrading system packages"
 sudo apt-get upgrade -y -qq
-sudo apt-get install -y \
+show_installed "System packages upgraded"
+
+show_installing "Installing build essentials"
+sudo apt-get install -y -qq \
     build-essential \
     curl \
     wget \
@@ -218,7 +261,8 @@ sudo apt-get install -y \
     apt-transport-https \
     ca-certificates \
     gnupg \
-    lsb-release
+    lsb-release >/dev/null 2>&1
+show_installed "Build essentials ready"
 
 # -----------------------------------------------------------------------------
 # Package Managers
@@ -235,7 +279,7 @@ run_installer "$KODRA_DIR/install/required/package-managers/mise.sh"
 # -----------------------------------------------------------------------------
 section "Terminal Setup" "💻"
 
-show_tools_group "Installing modern terminal tools"
+show_tools_group "Installing modern terminal environment"
 for script in "$KODRA_DIR/install/terminal/"*.sh; do
     run_installer "$script"
 done
@@ -245,7 +289,7 @@ done
 # -----------------------------------------------------------------------------
 section "Core Applications" "🛠️"
 
-show_tools_group "Installing development essentials"
+show_tools_group "Development essentials (Brave, VS Code, GitHub)"
 for script in "$KODRA_DIR/install/required/applications/"*.sh; do
     run_installer "$script"
 done
@@ -255,7 +299,7 @@ done
 # -----------------------------------------------------------------------------
 section "Azure & Cloud Tools" "☁️"
 
-show_tools_group "Installing cloud-native toolchain"
+show_tools_group "Cloud-native toolchain (Azure CLI, Terraform, K8s)"
 for script in "$KODRA_DIR/install/required/azure/"*.sh; do
     run_installer "$script"
 done
@@ -265,6 +309,7 @@ done
 # -----------------------------------------------------------------------------
 section "Container Development" "🐳"
 
+show_tools_group "Container runtime and management tools"
 case "$KODRA_CONTAINER_RUNTIME" in
     docker)
         run_installer "$KODRA_DIR/applications/docker-ce.sh"
@@ -282,7 +327,7 @@ run_installer "$KODRA_DIR/applications/lazydocker.sh"
 if [ -n "$OPTIONAL_APPS" ]; then
     section "Optional Applications" "✨"
     
-    show_tools_group "Installing your selected applications"
+    show_tools_group "Your selected applications"
     IFS=',' read -ra APPS <<< "$OPTIONAL_APPS"
     for app in "${APPS[@]}"; do
         app=$(echo "$app" | xargs) # trim whitespace
@@ -297,43 +342,49 @@ fi
 # -----------------------------------------------------------------------------
 section "Desktop Environment" "🎨"
 
-show_tools_group "Configuring beautiful GNOME desktop"
+show_tools_group "Beautiful GNOME desktop with Tokyo Night theme"
 for script in "$KODRA_DIR/install/desktop/"*.sh; do
     run_installer "$script"
 done
 
-show_info "Applying $KODRA_THEME theme..."
+show_installing "Applying $KODRA_THEME theme"
 run_installer "$KODRA_DIR/bin/kodra-sub/theme.sh" "$KODRA_THEME"
-show_success "Theme applied successfully"
+show_success "$KODRA_THEME theme applied"
 
 # -----------------------------------------------------------------------------
 # Finalization
 # -----------------------------------------------------------------------------
 section "Finalizing" "🏁"
 
+show_tools_group "Wrapping up installation"
+
 # Create config directory
+show_installing "Setting up configuration"
 mkdir -p "$KODRA_CONFIG_DIR"
 echo "$KODRA_THEME" > "$KODRA_CONFIG_DIR/theme"
 echo "banner" > "$KODRA_CONFIG_DIR/motd"
 date +%s > "$KODRA_CONFIG_DIR/installed_at"
+show_installed "Configuration saved"
 
 # Add bin to PATH  
 add_to_path "$KODRA_DIR/bin"
 
 # Create symlink in /usr/local/bin so kodra works system-wide
 if [ ! -L /usr/local/bin/kodra ]; then
-    show_info "Creating kodra command symlink..."
+    show_installing "Creating kodra command"
     sudo ln -sf "$KODRA_DIR/bin/kodra" /usr/local/bin/kodra
-    show_success "kodra command available system-wide"
+    show_installed "kodra command available"
 fi
 
 # Add shell integration (aliases, completions, MOTD)
+show_installing "Shell integration"
 add_shell_integration
+show_installed "Shell integration configured"
 
 # Run migrations (for fresh installs, marks all as complete)
-show_info "Running migrations..."
-"$KODRA_DIR/bin/kodra-sub/migrate.sh" --init
-show_success "Setup complete"
+show_installing "Running migrations"
+"$KODRA_DIR/bin/kodra-sub/migrate.sh" --init >/dev/null 2>&1
+show_installed "Migrations complete"
 
 # Show completion message
 show_completion
@@ -341,26 +392,29 @@ show_completion
 # Save permanent log copy
 PERMANENT_LOG="$KODRA_CONFIG_DIR/install.log"
 cp "$KODRA_LOG_FILE" "$PERMANENT_LOG"
-echo ""
-echo "📋 Installation log saved to: $PERMANENT_LOG"
+show_info "Log saved: ~/.config/kodra/install.log"
 
 # Show failure summary if in debug mode
 if [ "$KODRA_DEBUG" = "true" ] && [ -n "$KODRA_FAILED_INSTALLS" ]; then
     echo ""
-    echo "═══════════════════════════════════════════════════════════════════"
-    echo "  ⚠️  INSTALLATION SUMMARY (Debug Mode)"
-    echo "═══════════════════════════════════════════════════════════════════"
-    echo ""
-    echo "  Attempted: $KODRA_INSTALL_COUNT installers"
-    echo "  Failed:    $KODRA_FAIL_COUNT installers"
-    echo ""
-    echo "  Failed components:"
+    printf "    ${C_YELLOW}${BOX_TL}"
+    printf '%0.s─' {1..65}
+    printf "${BOX_TR}${C_RESET}\n"
+    printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_YELLOW}DEBUG: INSTALLATION SUMMARY${C_RESET}%36s${C_YELLOW}${BOX_V}${C_RESET}\n" ""
+    printf "    ${C_YELLOW}${BOX_V}  "
+    printf '%0.s─' {1..63}
+    printf "${BOX_V}${C_RESET}\n"
+    printf "    ${C_YELLOW}${BOX_V}${C_RESET}  Attempted: %-52s${C_YELLOW}${BOX_V}${C_RESET}\n" "$KODRA_INSTALL_COUNT installers"
+    printf "    ${C_YELLOW}${BOX_V}${C_RESET}  Failed:    %-52s${C_YELLOW}${BOX_V}${C_RESET}\n" "$KODRA_FAIL_COUNT installers"
+    printf "    ${C_YELLOW}${BOX_V}${C_RESET}%67s${C_YELLOW}${BOX_V}${C_RESET}\n" ""
     echo -e "$KODRA_FAILED_INSTALLS" | while read -r line; do
-        [ -n "$line" ] && echo "    ❌ $line"
+        [ -n "$line" ] && printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_RED}${BOX_CROSS}${C_RESET} %-60s${C_YELLOW}${BOX_V}${C_RESET}\n" "$line"
     done
-    echo ""
-    echo "  Individual failure logs saved to: /tmp/kodra-install-*.log"
-    echo "═══════════════════════════════════════════════════════════════════"
+    printf "    ${C_YELLOW}${BOX_V}${C_RESET}%67s${C_YELLOW}${BOX_V}${C_RESET}\n" ""
+    printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_DIM}Logs: /tmp/kodra-install-*.log${C_RESET}%30s${C_YELLOW}${BOX_V}${C_RESET}\n" ""
+    printf "    ${C_YELLOW}${BOX_BL}"
+    printf '%0.s─' {1..65}
+    printf "${BOX_BR}${C_RESET}\n"
 fi
 
 # First-run setup (GitHub login, Azure login, etc.)
@@ -370,7 +424,7 @@ if command -v gum &> /dev/null; then
         "$KODRA_DIR/bin/kodra-sub/first-run.sh"
     else
         echo ""
-        echo "  Skipped. Run 'kodra setup' anytime to configure."
+        show_info "Skipped. Run 'kodra setup' anytime to configure."
         "$KODRA_DIR/bin/kodra-sub/first-run.sh" --skip
     fi
 else
