@@ -41,6 +41,7 @@ show_help() {
     echo "  theme [name]      Switch themes (interactive if no name given)"
     echo "  wallpaper [name]  Change wallpaper (interactive if no name given)"
     echo "  desktop [cmd]     Configure desktop (dock, extensions)"
+    echo "  motd [style]      Set terminal banner (banner, minimal, none)"
     echo "  setup             Run first-time setup (GitHub, Azure, Git)"
     echo "  fetch             Show beautiful system info"
     echo "  update            Update Kodra and installed packages"
@@ -120,6 +121,10 @@ case "${1:-help}" in
         ;;
     fetch|info|neofetch)
         bash "$KODRA_DIR/bin/kodra-sub/fetch.sh"
+        ;;
+    motd|banner)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/motd.sh" "$@"
         ;;
     welcome)
         bash "$KODRA_DIR/bin/kodra-sub/welcome.sh"

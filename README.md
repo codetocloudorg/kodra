@@ -71,6 +71,7 @@ That's it. The installer will:
 kodra theme       # Switch themes (tokyo-night, ghostty-blue)
 kodra wallpaper   # Browse and set wallpapers
 kodra desktop     # Configure dock, tiling, login screen
+kodra motd        # Set terminal banner (banner, minimal, none)
 kodra setup       # Re-run first-time setup (GitHub, Azure login)
 kodra fetch       # Show system info
 kodra doctor      # Check system health

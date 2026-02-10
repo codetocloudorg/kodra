@@ -314,6 +314,7 @@ section "Finalizing" "🏁"
 # Create config directory
 mkdir -p "$KODRA_CONFIG_DIR"
 echo "$KODRA_THEME" > "$KODRA_CONFIG_DIR/theme"
+echo "banner" > "$KODRA_CONFIG_DIR/motd"
 date +%s > "$KODRA_CONFIG_DIR/installed_at"
 
 # Add bin to PATH  

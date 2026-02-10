@@ -8,8 +8,8 @@
 if [ -z "$KODRA_MOTD_SHOWN" ]; then
     export KODRA_MOTD_SHOWN=1
     
-    # Quick system info (non-intrusive)
     KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
+    KODRA_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/kodra"
     
     # Colors
     C='\033[0;36m'
@@ -17,13 +17,23 @@ if [ -z "$KODRA_MOTD_SHOWN" ]; then
     G='\033[0;32m'
     Y='\033[0;33m'
     W='\033[0;37m'
+    BR='\033[1;31m'
+    BY='\033[1;33m'
+    BG='\033[1;32m'
+    BC='\033[1;36m'
+    BM='\033[1;35m'
+    BW='\033[1;37m'
     NC='\033[0m'
     
     # Get theme
     THEME="tokyo-night"
-    [ -f "$HOME/.config/kodra/theme" ] && THEME=$(cat "$HOME/.config/kodra/theme")
+    [ -f "$KODRA_CONFIG/theme" ] && THEME=$(cat "$KODRA_CONFIG/theme")
     
-    # One-liner with tips
+    # Check MOTD style preference (banner, minimal, or none)
+    MOTD_STYLE="banner"
+    [ -f "$KODRA_CONFIG/motd" ] && MOTD_STYLE=$(cat "$KODRA_CONFIG/motd")
+    
+    # Tips for the day
     TIPS=(
         "Try ${M}kodra fetch${NC} for system info"
         "Use ${M}Ctrl+R${NC} to search command history with fzf"
@@ -39,13 +49,34 @@ if [ -z "$KODRA_MOTD_SHOWN" ]; then
         "${M}kl pod-name${NC} = kubectl logs"
         "${M}pwsh${NC} for PowerShell 7 with completions"
     )
-    
-    # Pick random tip
     TIP="${TIPS[$RANDOM % ${#TIPS[@]}]}"
     
-    echo ""
-    echo -e "  ${C}☁️  Kodra${NC} ${W}|${NC} Theme: ${M}$THEME${NC} ${W}|${NC} ${G}Tip:${NC} $TIP"
-    echo ""
+    case "$MOTD_STYLE" in
+        banner)
+            # Full ASCII art banner
+            echo ""
+            echo -e "${BR}    ██╗  ██╗${BY} ██████╗ ${BG}██████╗ ${BC}██████╗ ${BM} █████╗ ${NC}"
+            echo -e "${BR}    ██║ ██╔╝${BY}██╔═══██╗${BG}██╔══██╗${BC}██╔══██╗${BM}██╔══██╗${NC}"
+            echo -e "${BR}    █████╔╝ ${BY}██║   ██║${BG}██║  ██║${BC}██████╔╝${BM}███████║${NC}"
+            echo -e "${BR}    ██╔═██╗ ${BY}██║   ██║${BG}██║  ██║${BC}██╔══██╗${BM}██╔══██║${NC}"
+            echo -e "${BR}    ██║  ██╗${BY}╚██████╔╝${BG}██████╔╝${BC}██║  ██║${BM}██║  ██║${NC}"
+            echo -e "${BR}    ╚═╝  ╚═╝${BY} ╚═════╝ ${BG}╚═════╝ ${BC}╚═╝  ╚═╝${BM}╚═╝  ╚═╝${NC}"
+            echo ""
+            echo -e "    ${C}━━━ F R O M   C O D E   T O   C L O U D ━━━${NC}"
+            echo ""
+            echo -e "    ${W}Theme:${NC} ${M}$THEME${NC}  ${W}|${NC}  ${G}Tip:${NC} $TIP"
+            echo ""
+            ;;
+        minimal)
+            # One-liner (original behavior)
+            echo ""
+            echo -e "  ${C}☁️  Kodra${NC} ${W}|${NC} Theme: ${M}$THEME${NC} ${W}|${NC} ${G}Tip:${NC} $TIP"
+            echo ""
+            ;;
+        none)
+            # No MOTD
+            ;;
+    esac
 fi
 
 # Aliases (modern replacements)
