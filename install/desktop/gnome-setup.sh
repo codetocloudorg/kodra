@@ -247,42 +247,57 @@ fi
 # -----------------------------------------------------------------------------
 echo "📌 Setting up dock favorites..."
 
-# Kodra's curated dock apps - only adds if installed
-KODRA_DOCK_APPS=(
-    "org.gnome.Nautilus.desktop"           # File manager
-    "com.brave.Browser.desktop"            # Brave (Flatpak)
-    "brave-browser.desktop"                # Brave (apt)
-    "com.mitchellh.ghostty.desktop"        # Ghostty
-    "ghostty.desktop"                      # Ghostty alternative
-    "code.desktop"                         # VS Code
-    "nvim.desktop"                         # Neovim
-    "io.github.shiftey.Desktop.desktop"    # GitHub Desktop (Flatpak)
-    "github-desktop.desktop"               # GitHub Desktop (apt)
-    "com.spotify.Client.desktop"           # Spotify (Flatpak)
-    "spotify.desktop"                      # Spotify (apt)
-    "com.discordapp.Discord.desktop"       # Discord (Flatpak)
-    "discord.desktop"                      # Discord (apt)
-    "org.gnome.Settings.desktop"           # Settings
-)
-
-# Desktop file locations
+# Desktop file locations (order matters - prefer flatpak)
 DESKTOP_DIRS=(
     "/var/lib/flatpak/exports/share/applications"
+    "$HOME/.local/share/applications"
     "/usr/share/applications"
     "/usr/local/share/applications"
-    "$HOME/.local/share/applications"
 )
 
-# Find installed apps
-INSTALLED_APPS=()
-for app in "${KODRA_DOCK_APPS[@]}"; do
-    for dir in "${DESKTOP_DIRS[@]}"; do
-        if [ -f "$dir/$app" ]; then
-            INSTALLED_APPS+=("$app")
-            break
-        fi
+# Helper: find first existing desktop file from variants
+find_app() {
+    local variants=("$@")
+    for variant in "${variants[@]}"; do
+        for dir in "${DESKTOP_DIRS[@]}"; do
+            if [ -f "$dir/$variant" ]; then
+                echo "$variant"
+                return 0
+            fi
+        done
     done
-done
+    return 1
+}
+
+# Kodra's curated dock apps - grouped by app, picks first found
+INSTALLED_APPS=()
+
+# File Manager
+app=$(find_app "org.gnome.Nautilus.desktop") && INSTALLED_APPS+=("$app")
+
+# Brave Browser
+app=$(find_app "com.brave.Browser.desktop" "brave-browser.desktop") && INSTALLED_APPS+=("$app")
+
+# Ghostty Terminal
+app=$(find_app "com.mitchellh.ghostty.desktop" "ghostty.desktop") && INSTALLED_APPS+=("$app")
+
+# VS Code
+app=$(find_app "code.desktop") && INSTALLED_APPS+=("$app")
+
+# Neovim
+app=$(find_app "nvim.desktop" "neovim.desktop") && INSTALLED_APPS+=("$app")
+
+# GitHub Desktop
+app=$(find_app "io.github.shiftey.Desktop.desktop" "github-desktop.desktop") && INSTALLED_APPS+=("$app")
+
+# Spotify
+app=$(find_app "com.spotify.Client.desktop" "spotify.desktop") && INSTALLED_APPS+=("$app")
+
+# Discord
+app=$(find_app "com.discordapp.Discord.desktop" "discord.desktop") && INSTALLED_APPS+=("$app")
+
+# Settings (always last)
+app=$(find_app "org.gnome.Settings.desktop" "gnome-control-center.desktop") && INSTALLED_APPS+=("$app")
 
 # Set dock favorites if we found any
 if [ ${#INSTALLED_APPS[@]} -gt 0 ]; then

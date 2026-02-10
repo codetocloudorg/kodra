@@ -24,62 +24,56 @@ if ! command -v gnome-shell &> /dev/null; then
     exit 1
 fi
 
-# Kodra's curated dock apps - clean developer setup
-# Only adds apps that are actually installed
-KODRA_DOCK_APPS=(
-    # File manager first
-    "org.gnome.Nautilus.desktop"
-    
-    # Terminal
-    "com.mitchellh.ghostty.desktop"
-    "ghostty.desktop"
-    
-    # Browser
-    "com.brave.Browser.desktop"
-    "brave-browser.desktop"
-    
-    # Editors
-    "code.desktop"
-    "nvim.desktop"
-    "neovim.desktop"
-    
-    # Dev tools
-    "io.github.shiftey.Desktop.desktop"
-    "github-desktop.desktop"
-    
-    # Media & Chat
-    "com.spotify.Client.desktop"
-    "spotify.desktop"
-    "com.discordapp.Discord.desktop"
-    "discord.desktop"
-    
-    # System
-    "org.gnome.Settings.desktop"
-)
-
-# Desktop file locations
+# Desktop file locations (order matters - prefer flatpak)
 DESKTOP_DIRS=(
     "/var/lib/flatpak/exports/share/applications"
+    "$HOME/.local/share/applications"
     "/usr/share/applications"
     "/usr/local/share/applications"
-    "$HOME/.local/share/applications"
 )
+
+# Helper: find first existing desktop file from variants
+find_app() {
+    local variants=("$@")
+    for variant in "${variants[@]}"; do
+        for dir in "${DESKTOP_DIRS[@]}"; do
+            if [ -f "$dir/$variant" ]; then
+                echo "$variant"
+                return 0
+            fi
+        done
+    done
+    return 1
+}
+
+# Helper: add app if found and report
+add_app() {
+    local name="$1"
+    shift
+    local app
+    app=$(find_app "$@")
+    if [ -n "$app" ]; then
+        echo -e "  ${G}✓${NC} $name"
+        INSTALLED_APPS+=("$app")
+        return 0
+    fi
+    return 1
+}
 
 INSTALLED_APPS=()
 echo ""
 echo -e "${W}Finding installed apps...${NC}"
 
-for app in "${KODRA_DOCK_APPS[@]}"; do
-    for dir in "${DESKTOP_DIRS[@]}"; do
-        if [ -f "$dir/$app" ]; then
-            # Extract app name from desktop file
-            APP_NAME=$(grep -m1 "^Name=" "$dir/$app" 2>/dev/null | cut -d'=' -f2 || echo "$app")
-            echo -e "  ${G}✓${NC} $APP_NAME"
-            INSTALLED_APPS+=("$app")
-            break
-        fi
-    done
-done
+# Add apps - only first variant found per app
+add_app "Files" "org.gnome.Nautilus.desktop"
+add_app "Brave" "com.brave.Browser.desktop" "brave-browser.desktop"
+add_app "Ghostty" "com.mitchellh.ghostty.desktop" "ghostty.desktop"
+add_app "VS Code" "code.desktop"
+add_app "Neovim" "nvim.desktop" "neovim.desktop"
+add_app "GitHub Desktop" "io.github.shiftey.Desktop.desktop" "github-desktop.desktop"
+add_app "Spotify" "com.spotify.Client.desktop" "spotify.desktop"
+add_app "Discord" "com.discordapp.Discord.desktop" "discord.desktop"
+add_app "Settings" "org.gnome.Settings.desktop" "gnome-control-center.desktop"
 
 echo ""
 
