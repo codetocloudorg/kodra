@@ -135,11 +135,13 @@ else
     echo -e "    ${C_GRAY}This may take a moment on slower connections...${C_RESET}"
     git clone --progress "$KODRA_REPO" "$KODRA_DIR" < /dev/null 2>&1
     show_done "Repository cloned to $KODRA_DIR"
+    echo -e "    ${C_GRAY}[debug] Clone complete, setting KODRA_EXISTS=false${C_RESET}"
     KODRA_EXISTS=false
 fi
 
 # Action menu
 cd "$KODRA_DIR"
+echo -e "    ${C_GRAY}[debug] Changed to $KODRA_DIR${C_RESET}"
 
 # If action was specified via command line, skip menu (no TTY needed)
 if [ -n "$KODRA_ACTION" ]; then
@@ -164,18 +166,25 @@ if [ -n "$KODRA_ACTION" ]; then
 fi
 
 # Reconnect stdin to terminal for interactive menu (curl/wget pipe consumes stdin)
+echo -e "    ${C_GRAY}[debug] Checking TTY status...${C_RESET}"
 if [ ! -t 0 ]; then
+    echo -e "    ${C_GRAY}[debug] stdin is not a TTY, attempting reconnect...${C_RESET}"
     if ( exec < /dev/tty ) 2>/dev/null; then
+        echo -e "    ${C_GRAY}[debug] TTY test passed, reconnecting...${C_RESET}"
         exec < /dev/tty
+        echo -e "    ${C_GRAY}[debug] TTY reconnected${C_RESET}"
     else
         echo -e "    ${C_RED}Error: Cannot connect to terminal for interactive input${C_RESET}"
         echo -e "    ${C_GRAY}Try running: bash ~/.kodra/boot.sh${C_RESET}"
         echo -e "    ${C_GRAY}Or use: curl -fsSL ... | bash -s -- --install${C_RESET}"
         exit 1
     fi
+else
+    echo -e "    ${C_GRAY}[debug] stdin is already a TTY${C_RESET}"
 fi
 
 echo ""
+echo -e "    ${C_GRAY}[debug] Preparing menu...${C_RESET}"
 echo -e "    ${C_WHITE}What would you like to do?${C_RESET}"
 echo ""
 
