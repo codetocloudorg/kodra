@@ -74,11 +74,12 @@ KODRA_SKIP="spotify,discord" ./install.sh
 | Category | Tools |
 |----------|-------|
 | **Terminal** | Ghostty, Starship prompt, Nerd Fonts |
-| **Editor** | VS Code with 13 extensions |
+| **Editor** | VS Code with 13 extensions, Neovim |
 | **Azure** | Azure CLI, azd, Bicep, PowerShell 7 |
 | **Containers** | Docker CE, lazydocker |
 | **Git** | GitHub CLI, lazygit |
-| **CLI** | bat, eza, fzf, ripgrep, zoxide, jq |
+| **CLI** | bat, eza, fzf, ripgrep, zoxide, fastfetch, btop, jq |
+| **Desktop** | ULauncher, Dash to Dock, Blur my Shell, TopHat, Tactile |
 
 ### Optional Tools
 

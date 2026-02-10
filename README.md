@@ -11,7 +11,7 @@
 
 **Agentic Azure engineering using cloud-native tools—one command to ship.**
 
-[![Version](https://img.shields.io/badge/version-0.2.11-blue?style=flat-square)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.2.14-blue?style=flat-square)](VERSION)
 [![CI](https://img.shields.io/github/actions/workflow/status/codetocloudorg/kodra/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/codetocloudorg/kodra/actions)
 [![Ubuntu 24.04+](https://img.shields.io/badge/Ubuntu-24.04+-E95420?style=flat-square&logo=ubuntu&logoColor=white)](https://releases.ubuntu.com/noble/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
@@ -63,14 +63,14 @@ That's it. The installer will:
 | Category | Tools |
 |----------|-------|
 | **Terminal** | [Ghostty](https://ghostty.org) + [Starship](https://starship.rs) prompt + Nerd Fonts |
-| **Editor** | VS Code with 13 essential extensions |
+| **Editor** | VS Code with 13 essential extensions + Neovim |
 | **Cloud** | Azure CLI, azd, Bicep, Terraform, OpenTofu, PowerShell 7 |
 | **Kubernetes** | kubectl, Helm, k9s |
 | **Containers** | Docker CE, lazydocker, Dev Containers support |
 | **Git** | GitHub CLI, GitHub Desktop, lazygit, GitLens |
 | **AI** | GitHub Copilot + Copilot CLI (`gh copilot suggest`) |
-| **CLI** | bat, eza, fzf, ripgrep, zoxide, btop, jq, yq |
-| **Desktop** | Window tiling (Tactile), macOS-style dock, dark theme |
+| **CLI** | bat, eza, fzf, ripgrep, zoxide, btop, fastfetch, jq, yq |
+| **Desktop** | ULauncher, window tiling, system monitor, blur effects |
 
 ## Commands
 
@@ -78,9 +78,10 @@ That's it. The installer will:
 kodra theme       # Switch themes (tokyo-night, ghostty-blue)
 kodra wallpaper   # Browse and set wallpapers
 kodra desktop     # Configure dock, tiling, login screen
+kodra dock        # Set dock favorites
 kodra motd        # Set terminal banner (banner, minimal, none)
 kodra setup       # Re-run first-time setup (GitHub, Azure login)
-kodra fetch       # Show system info
+kodra fetch       # Show system info (beautiful fastfetch)
 kodra doctor      # Check system health
 kodra update      # Update everything
 ```

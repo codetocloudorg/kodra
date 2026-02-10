@@ -104,6 +104,45 @@ if [ ! -d "$BLUR_DIR" ]; then
     fi
 fi
 
+# Install TopHat (system monitor in top bar)
+TOPHAT_DIR="$HOME/.local/share/gnome-shell/extensions/tophat@fflewddur.github.io"
+if [ ! -d "$TOPHAT_DIR" ]; then
+    echo "   Downloading TopHat (system monitor)..."
+    mkdir -p "$TOPHAT_DIR"
+    curl -sL "https://extensions.gnome.org/extension-data/tophatfflewddur.github.io.v14.shell-extension.zip" -o /tmp/tophat.zip 2>/dev/null || true
+    if [ -f /tmp/tophat.zip ]; then
+        unzip -qo /tmp/tophat.zip -d "$TOPHAT_DIR" 2>/dev/null || true
+        rm -f /tmp/tophat.zip
+        echo "   ✓ TopHat installed (CPU/RAM/Network in top bar)"
+    fi
+fi
+
+# Install Alphabetical App Grid  
+ALPHA_GRID_DIR="$HOME/.local/share/gnome-shell/extensions/AlphabeticalAppGrid@stuarthayhurst"
+if [ ! -d "$ALPHA_GRID_DIR" ]; then
+    echo "   Downloading Alphabetical App Grid..."
+    mkdir -p "$ALPHA_GRID_DIR"
+    curl -sL "https://extensions.gnome.org/extension-data/AlphabeticalAppGridstuarthayhurst.v37.shell-extension.zip" -o /tmp/alpha-grid.zip 2>/dev/null || true
+    if [ -f /tmp/alpha-grid.zip ]; then
+        unzip -qo /tmp/alpha-grid.zip -d "$ALPHA_GRID_DIR" 2>/dev/null || true
+        rm -f /tmp/alpha-grid.zip
+        echo "   ✓ Alphabetical App Grid installed"
+    fi
+fi
+
+# Install Space Bar (workspace indicator)
+SPACE_BAR_DIR="$HOME/.local/share/gnome-shell/extensions/space-bar@luchrioh"
+if [ ! -d "$SPACE_BAR_DIR" ]; then
+    echo "   Downloading Space Bar (workspace indicator)..."
+    mkdir -p "$SPACE_BAR_DIR"
+    curl -sL "https://extensions.gnome.org/extension-data/space-barluchrioh.v28.shell-extension.zip" -o /tmp/space-bar.zip 2>/dev/null || true
+    if [ -f /tmp/space-bar.zip ]; then
+        unzip -qo /tmp/space-bar.zip -d "$SPACE_BAR_DIR" 2>/dev/null || true
+        rm -f /tmp/space-bar.zip
+        echo "   ✓ Space Bar installed (workspace indicator in top bar)"
+    fi
+fi
+
 # -----------------------------------------------------------------------------
 # Configure GNOME for macOS Feel
 # -----------------------------------------------------------------------------
@@ -141,8 +180,9 @@ gsettings set org.gnome.mutter center-new-windows true
 # Workspaces on all monitors (like macOS Spaces)
 gsettings set org.gnome.mutter workspaces-only-on-primary false
 
-# Dynamic workspaces (macOS Spaces style)
-gsettings set org.gnome.mutter dynamic-workspaces true
+# 6 fixed workspaces (more predictable than dynamic)
+gsettings set org.gnome.mutter dynamic-workspaces false
+gsettings set org.gnome.desktop.wm.preferences num-workspaces 6
 
 # Edge tiling (window snapping)
 gsettings set org.gnome.mutter edge-tiling true
@@ -150,6 +190,48 @@ gsettings set org.gnome.mutter edge-tiling true
 # Night Light (like macOS Night Shift)
 gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled true
 gsettings set org.gnome.settings-daemon.plugins.color night-light-schedule-automatic true
+
+# -----------------------------------------------------------------------------
+# Disable Default Ubuntu Extensions (cleaner look)
+# -----------------------------------------------------------------------------
+echo "🧹 Cleaning up default extensions..."
+
+gnome-extensions disable ubuntu-dock@ubuntu.com 2>/dev/null || true
+gnome-extensions disable ubuntu-appindicators@ubuntu.com 2>/dev/null || true
+gnome-extensions disable tiling-assistant@ubuntu.com 2>/dev/null || true
+gnome-extensions disable ding@rastersoft.com 2>/dev/null || true
+
+# -----------------------------------------------------------------------------
+# Clean Up App Grid (remove junk entries)
+# -----------------------------------------------------------------------------
+echo "📱 Organizing app grid..."
+
+# Hide broken/duplicate desktop entries
+HIDDEN_APPS=(
+    "btop.desktop"
+    "nvim.desktop" 
+    "vim.desktop"
+    "org.gnome.Extensions.desktop"
+    "gnome-language-selector.desktop"
+    "software-properties-drivers.desktop"
+    "software-properties-gtk.desktop"
+    "update-manager.desktop"
+    "usb-creator-gtk.desktop"
+    "yelp.desktop"
+    "debian-xterm.desktop"
+    "debian-uxterm.desktop"
+    "display-im6.q16.desktop"
+    "org.gnome.Tour.desktop"
+)
+
+mkdir -p "$HOME/.local/share/applications"
+for app in "${HIDDEN_APPS[@]}"; do
+    if [ -f "/usr/share/applications/$app" ] || [ -f "/var/lib/flatpak/exports/share/applications/$app" ]; then
+        echo "[Desktop Entry]
+Hidden=true" > "$HOME/.local/share/applications/$app"
+    fi
+done
+echo "   ✓ App grid cleaned up"
 
 # -----------------------------------------------------------------------------
 # Configure Dash to Dock (macOS Dock style)
