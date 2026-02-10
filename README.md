@@ -43,13 +43,8 @@ We chose Ubuntu as our foundation for good reasons:
 ## Quick Start
 
 ```bash
-curl -fsSL https://kodra.codetocloud.io/boot.sh | bash -s -- --install
+curl -fsSL https://kodra.codetocloud.io/boot.sh | bash
 ```
-
-> **Interactive mode:** Want to see the menu? Run without `--install`:
-> ```bash
-> bash -c "$(curl -fsSL https://kodra.codetocloud.io/boot.sh)"
-> ```
 
 That's it. The installer will:
 1. Install everything you need for Azure and cloud-native development

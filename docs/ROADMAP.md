@@ -82,11 +82,18 @@
 - [ ] Test on Ubuntu 22.04 LTS
 - [ ] Add CI badge to README
 
+### #10 Interactive Boot Menu 🟡 P1
+- [ ] Implement gum-based interactive menu in boot.sh
+- [ ] Menu options: Install, Update, Change Theme, Uninstall, Exit
+- [ ] Handle TTY detection for piped vs direct execution
+- [ ] Support both `curl | bash` and direct `./boot.sh` execution
+- [ ] Graceful fallback when no TTY available
+
 ---
 
 ## 🎨 Website
 
-### #10 Video Demonstration 🔴 P0
+### #11 Video Demonstration 🔴 P0
 - [ ] Record 2-3 min demo video
 - [ ] Show fresh Ubuntu → themed desktop
 - [ ] Demo Azure CLI, Docker, k9s
@@ -94,7 +101,7 @@
 - [ ] Add "Watch Demo" button to site
 - [ ] Create GIF preview for README
 
-### #11 Screenshot Gallery 🔴 P0
+### #12 Screenshot Gallery 🔴 P0
 - [ ] Screenshots for each theme
 - [ ] Desktop + terminal + VS Code per theme
 - [ ] Azure CLI in action

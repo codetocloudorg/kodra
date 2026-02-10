@@ -142,8 +142,9 @@ echo ""
 # Action menu
 cd "$KODRA_DIR"
 
-# If action was specified via command line, skip menu (no TTY needed)
+# Handle actions - default to install for fresh installs, update for existing
 if [ -n "$KODRA_ACTION" ]; then
+    # Explicit action from command line
     case "$KODRA_ACTION" in
         install)
             echo -e "    ${C_PURPLE}Starting installation...${C_RESET}"
@@ -161,83 +162,14 @@ if [ -n "$KODRA_ACTION" ]; then
             bash ./bin/kodra update
             ;;
     esac
-    exit 0
-fi
-
-# Check if TTY is available for interactive menu
-# Note: We can't use 'exec < /dev/tty' when piped because bash reads script from stdin
-USE_TTY=""
-if [ -c /dev/tty ] && [ -r /dev/tty ]; then
-    if timeout 1 sh -c 'exec 0</dev/tty' 2>/dev/null; then
-        USE_TTY="</dev/tty"
-    fi
-fi
-
-if [ -z "$USE_TTY" ]; then
-    echo -e "    ${C_RED}Error: Cannot connect to terminal for interactive input${C_RESET}" >&2
-    echo -e "    ${C_GRAY}Try running: bash ~/.kodra/boot.sh${C_RESET}" >&2
-    echo -e "    ${C_GRAY}Or use: curl -fsSL ... | bash -s -- --install${C_RESET}" >&2
-    exit 1
-fi
-
-echo ""
-echo -e "    ${C_WHITE}What would you like to do?${C_RESET}"
-echo ""
-
-# Install gum for beautiful menus if not already installed
-if ! command -v gum &> /dev/null; then
-    show_step "Installing gum for beautiful menus..."
-    echo -e "    ${C_GRAY}Setting up Charm repository...${C_RESET}"
-    sudo mkdir -p /etc/apt/keyrings
-    curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/charm.gpg 2>/dev/null
-    echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list > /dev/null
-    echo -e "    ${C_GRAY}Updating package lists (this may take a minute)...${C_RESET}"
-    sudo apt-get update -qq
-    echo -e "    ${C_GRAY}Installing gum...${C_RESET}"
-    sudo apt-get install -y -qq gum
-    show_done "gum installed"
-fi
-
-# Show menu based on installation status - use /dev/tty for input
-if [ "$KODRA_EXISTS" = true ]; then
-    # Kodra already installed - show full menu
-    CHOICE=$(gum choose --height=8 --cursor.foreground="51" \
-        "🚀 Fresh Install    (reinstall everything)" \
-        "🔄 Update           (update Kodra & tools)" \
-        "🎨 Change Theme     (switch themes)" \
-        "🗑️  Uninstall        (remove Kodra)" \
-        "❌ Exit" </dev/tty)
+elif [ "$KODRA_EXISTS" = true ]; then
+    # Existing installation - run update
+    echo -e "    ${C_CYAN}Updating existing installation...${C_RESET}"
+    echo ""
+    bash ./bin/kodra update
 else
-    # Fresh install
-    CHOICE=$(gum choose --height=5 --cursor.foreground="51" \
-        "🚀 Install Kodra    (full installation)" \
-        "❌ Exit" </dev/tty)
+    # Fresh install - go straight to installation
+    echo -e "    ${C_PURPLE}Starting installation...${C_RESET}"
+    echo ""
+    bash ./install.sh "$@"
 fi
-
-echo ""
-
-case "$CHOICE" in
-    *"Fresh Install"*|*"Install Kodra"*)
-        echo -e "    ${C_PURPLE}Starting installation...${C_RESET}"
-        echo ""
-        sleep 1
-        bash ./install.sh "$@"
-        ;;
-    *"Update"*)
-        echo -e "    ${C_CYAN}Updating Kodra...${C_RESET}"
-        echo ""
-        bash ./bin/kodra update
-        ;;
-    *"Change Theme"*)
-        bash ./bin/kodra theme
-        ;;
-    *"Uninstall"*)
-        echo -e "    ${C_YELLOW}Preparing to uninstall...${C_RESET}"
-        echo ""
-        bash ./uninstall.sh
-        ;;
-    *"Exit"*|*)
-        echo -e "    ${C_GRAY}Goodbye! Run again anytime.${C_RESET}"
-        exit 0
-        ;;
-esac
