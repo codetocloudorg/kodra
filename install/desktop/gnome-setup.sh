@@ -243,6 +243,58 @@ if gsettings list-schemas 2>/dev/null | grep -q "org.gnome.shell.extensions.dash
 fi
 
 # -----------------------------------------------------------------------------
+# Configure Dock Favorites (Clean developer apps only)
+# -----------------------------------------------------------------------------
+echo "📌 Setting up dock favorites..."
+
+# Kodra's curated dock apps - only adds if installed
+KODRA_DOCK_APPS=(
+    "org.gnome.Nautilus.desktop"           # File manager
+    "com.brave.Browser.desktop"            # Brave (Flatpak)
+    "brave-browser.desktop"                # Brave (apt)
+    "com.mitchellh.ghostty.desktop"        # Ghostty
+    "ghostty.desktop"                      # Ghostty alternative
+    "code.desktop"                         # VS Code
+    "nvim.desktop"                         # Neovim
+    "io.github.shiftey.Desktop.desktop"    # GitHub Desktop (Flatpak)
+    "github-desktop.desktop"               # GitHub Desktop (apt)
+    "com.spotify.Client.desktop"           # Spotify (Flatpak)
+    "spotify.desktop"                      # Spotify (apt)
+    "com.discordapp.Discord.desktop"       # Discord (Flatpak)
+    "discord.desktop"                      # Discord (apt)
+    "org.gnome.Settings.desktop"           # Settings
+)
+
+# Desktop file locations
+DESKTOP_DIRS=(
+    "/var/lib/flatpak/exports/share/applications"
+    "/usr/share/applications"
+    "/usr/local/share/applications"
+    "$HOME/.local/share/applications"
+)
+
+# Find installed apps
+INSTALLED_APPS=()
+for app in "${KODRA_DOCK_APPS[@]}"; do
+    for dir in "${DESKTOP_DIRS[@]}"; do
+        if [ -f "$dir/$app" ]; then
+            INSTALLED_APPS+=("$app")
+            break
+        fi
+    done
+done
+
+# Set dock favorites if we found any
+if [ ${#INSTALLED_APPS[@]} -gt 0 ]; then
+    FAVORITES_LIST=$(printf "'%s'," "${INSTALLED_APPS[@]}")
+    FAVORITES_LIST="[${FAVORITES_LIST%,}]"
+    gsettings set org.gnome.shell favorite-apps "$FAVORITES_LIST" 2>/dev/null || true
+    echo "   ✓ Dock favorites set (${#INSTALLED_APPS[@]} apps)"
+else
+    echo "   ℹ No dock apps found yet - run 'kodra desktop' after installing apps"
+fi
+
+# -----------------------------------------------------------------------------
 # Configure Tactile (Window Tiling)
 # -----------------------------------------------------------------------------
 echo "🪟 Configuring window tiling..."
