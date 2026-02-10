@@ -141,18 +141,7 @@ fi
 # Action menu
 cd "$KODRA_DIR"
 
-# Reconnect stdin to terminal for interactive prompts (curl/wget pipe consumes stdin)
-if [ ! -t 0 ]; then
-    if ( exec < /dev/tty ) 2>/dev/null; then
-        exec < /dev/tty
-    else
-        echo -e "    ${C_RED}Error: Cannot connect to terminal for interactive input${C_RESET}"
-        echo -e "    ${C_GRAY}Try running: bash ~/.kodra/boot.sh${C_RESET}"
-        exit 1
-    fi
-fi
-
-# If action was specified via command line, skip menu
+# If action was specified via command line, skip menu (no TTY needed)
 if [ -n "$KODRA_ACTION" ]; then
     case "$KODRA_ACTION" in
         install)
@@ -172,6 +161,18 @@ if [ -n "$KODRA_ACTION" ]; then
             ;;
     esac
     exit 0
+fi
+
+# Reconnect stdin to terminal for interactive menu (curl/wget pipe consumes stdin)
+if [ ! -t 0 ]; then
+    if ( exec < /dev/tty ) 2>/dev/null; then
+        exec < /dev/tty
+    else
+        echo -e "    ${C_RED}Error: Cannot connect to terminal for interactive input${C_RESET}"
+        echo -e "    ${C_GRAY}Try running: bash ~/.kodra/boot.sh${C_RESET}"
+        echo -e "    ${C_GRAY}Or use: curl -fsSL ... | bash -s -- --install${C_RESET}"
+        exit 1
+    fi
 fi
 
 echo ""

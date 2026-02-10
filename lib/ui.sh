@@ -4,6 +4,9 @@
 # Beautiful CLI using gum (https://github.com/charmbracelet/gum)
 #
 
+# Ensure TERM is set (needed for clear, tput, etc.)
+export TERM="${TERM:-xterm-256color}"
+
 # Installation progress tracking
 export KODRA_TOTAL_STEPS=10
 export KODRA_CURRENT_STEP=0
@@ -27,7 +30,7 @@ show_banner() {
         version=$(cat "$KODRA_DIR/VERSION" | tr -d '\n')
     fi
     
-    clear
+    clear 2>/dev/null || true
     echo ""
     echo -e "\033[38;5;196m    ██╗  ██╗\033[38;5;208m ██████╗ \033[38;5;226m██████╗ \033[38;5;46m██████╗ \033[38;5;51m █████╗ \033[0m"
     echo -e "\033[38;5;196m    ██║ ██╔╝\033[38;5;208m██╔═══██╗\033[38;5;226m██╔══██╗\033[38;5;46m██╔══██╗\033[38;5;51m██╔══██╗\033[0m"

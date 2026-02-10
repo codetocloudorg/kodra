@@ -59,7 +59,10 @@ check_ubuntu_version() {
 
 # Check internet connection
 check_internet_connection() {
-    if ping -c 1 github.com &> /dev/null; then
+    # Try ping first, then fall back to curl (ping may not work in containers)
+    if ping -c 1 -W 3 github.com &> /dev/null; then
+        log_success "Internet connection available"
+    elif curl -s --max-time 5 https://github.com &> /dev/null; then
         log_success "Internet connection available"
     else
         log_error "No internet connection detected"

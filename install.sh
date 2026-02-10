@@ -86,6 +86,13 @@ trap 'kodra_error_handler $LINENO' ERR
 source "$KODRA_DIR/lib/utils.sh"
 source "$KODRA_DIR/lib/ui.sh"
 
+# Reconnect stdin to terminal for interactive prompts (needed when run via curl | bash)
+if [ ! -t 0 ]; then
+    if [ -e /dev/tty ]; then
+        exec < /dev/tty
+    fi
+fi
+
 # Prevent system sleep during installation
 prevent_sleep() {
     if command -v gsettings &> /dev/null; then
