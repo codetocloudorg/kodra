@@ -49,6 +49,12 @@ if [ -d "$KODRA_DIR" ]; then
     rm -rf "$KODRA_DIR"
 fi
 
+# Remove kodra command symlink
+if [ -L /usr/local/bin/kodra ]; then
+    echo "Removing kodra command..."
+    sudo rm -f /usr/local/bin/kodra
+fi
+
 # Remove config directory
 if [ -d "$KODRA_CONFIG_DIR" ]; then
     echo "Removing $KODRA_CONFIG_DIR..."

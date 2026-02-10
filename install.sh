@@ -320,6 +320,13 @@ date +%s > "$KODRA_CONFIG_DIR/installed_at"
 # Add bin to PATH  
 add_to_path "$KODRA_DIR/bin"
 
+# Create symlink in /usr/local/bin so kodra works system-wide
+if [ ! -L /usr/local/bin/kodra ]; then
+    show_info "Creating kodra command symlink..."
+    sudo ln -sf "$KODRA_DIR/bin/kodra" /usr/local/bin/kodra
+    show_success "kodra command available system-wide"
+fi
+
 # Add shell integration (aliases, completions, MOTD)
 add_shell_integration
 
