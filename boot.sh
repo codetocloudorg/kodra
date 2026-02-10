@@ -167,8 +167,8 @@ fi
 
 # Reconnect stdin to terminal for interactive menu (curl/wget pipe consumes stdin)
 if [ ! -t 0 ]; then
-    # Test if /dev/tty is available with a timeout to avoid hanging
-    if [ -c /dev/tty ] && timeout 2 sh -c 'exec 0</dev/tty' 2>/dev/null; then
+    # Test if /dev/tty is available - use simple check, avoid blocking
+    if [ -c /dev/tty ] && [ -r /dev/tty ]; then
         exec < /dev/tty
     else
         echo -e "    ${C_RED}Error: Cannot connect to terminal for interactive input${C_RESET}" >&2
