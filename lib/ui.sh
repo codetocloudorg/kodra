@@ -8,7 +8,7 @@
 export TERM="${TERM:-xterm-256color}"
 
 # Installation progress tracking
-export KODRA_TOTAL_STEPS=10
+export KODRA_TOTAL_STEPS=12
 export KODRA_CURRENT_STEP=0
 export KODRA_START_TIME=$(date +%s)
 export KODRA_SECTION_START_TIME=$(date +%s)
@@ -88,6 +88,10 @@ show_progress() {
     local current=$1
     local total=$2
     local width=40
+    
+    # Cap at 100% to handle overflow gracefully
+    [ $current -gt $total ] && current=$total
+    
     local percent=$((current * 100 / total))
     local filled=$((current * width / total))
     local empty=$((width - filled))
