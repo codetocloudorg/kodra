@@ -209,6 +209,12 @@ confirm_installation() {
     echo -e "    ${C_GRAY}  • Beautiful GNOME desktop configuration${C_RESET}"
     echo ""
     
+    # Auto-confirm if running non-interactively (KODRA_AUTOCONFIRM=1 or no TTY available)
+    if [ "${KODRA_AUTOCONFIRM:-0}" = "1" ] || [ ! -e /dev/tty ]; then
+        echo -e "    ${C_GREEN}✓ Auto-confirmed (non-interactive mode)${C_RESET}"
+        return 0
+    fi
+    
     if command -v gum &> /dev/null; then
         if ! gum confirm --prompt.foreground="212" "Ready to ship to Azure?"; then
             echo ""
