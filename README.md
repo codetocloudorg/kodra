@@ -57,10 +57,10 @@ That's it. The installer will:
 
 ### See it in action
 
-| Terminal | Desktop | CLI Tools |
-|:--------:|:-------:|:---------:|
-| <img src="assets/kodra-terminal.png" alt="Terminal" width="280"> | <img src="assets/kodra-desktop.png" alt="Desktop" width="280"> | <img src="assets/kodra-tools.png" alt="Tools" width="280"> |
-| Ghostty • fastfetch • Starship | GNOME • Blur • Dash to Dock | bat • eza • btop • lazygit |
+| Desktop | Desktop Manager | CLI Tools |
+|:-------:|:---------------:|:---------:|
+| <img src="assets/kodra-desktop.png" alt="Desktop" width="280"> | <img src="assets/kodra-terminal.png" alt="Desktop Manager" width="280"> | <img src="assets/kodra-tools.png" alt="CLI Tools" width="280"> |
+| GNOME • Blur • Dash to Dock | Ghostty • fastfetch • Starship | bat • eza • btop • lazygit |
 
 <sub>Tokyo Night theme • Nerd Fonts • 40+ cloud-native tools pre-configured</sub>
 
