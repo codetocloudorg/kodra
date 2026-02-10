@@ -30,8 +30,8 @@ echo "Installing Nerd Fonts..."
 for font in "${FONTS[@]}"; do
     echo "  Downloading $font..."
     
-    # Download from Nerd Fonts releases
-    wget -q "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/${font}.zip" -O "/tmp/${font}.zip"
+    # Download from Nerd Fonts releases (use curl for better IPv4/IPv6 handling)
+    curl -fsSL -o "/tmp/${font}.zip" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/${font}.zip"
     
     # Extract to fonts directory
     unzip -qo "/tmp/${font}.zip" -d "$FONT_DIR/${font}" -x "*.md" -x "*.txt" -x "LICENSE*" 2>/dev/null || true

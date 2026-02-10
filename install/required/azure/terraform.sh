@@ -11,8 +11,8 @@ if command -v terraform &> /dev/null; then
     exit 0
 fi
 
-# Add HashiCorp GPG key
-wget -O- https://apt.releases.hashicorp.com/gpg | \
+# Add HashiCorp GPG key (use curl instead of wget for better IPv4/IPv6 handling)
+curl -fsSL https://apt.releases.hashicorp.com/gpg | \
     sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 
 # Add HashiCorp repository
