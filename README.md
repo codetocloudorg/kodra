@@ -38,7 +38,7 @@ We chose Ubuntu as our foundation for good reasons:
 | ☁️ **Azure Native Support** | First-class support in Azure VMs, WSL, and all major cloud tools |
 | 🔒 **LTS Stability** | 5 years of security updates—no surprise breakages mid-project |
 
-> **🚀 Coming Soon:** Fedora (for bleeding-edge users) and Arch (for the customization-obsessed) editions are in active development. [Join our Discord](https://discord.gg/vwfwq2EpXJ) to get notified!
+> **🚀 Coming Soon:** WSL edition for Windows developers! All CLI tools, Azure integrations, and GitHub Copilot—right in Windows Terminal. [Join our Discord](https://discord.gg/vwfwq2EpXJ) to get notified!
 
 ## Quick Start
 
