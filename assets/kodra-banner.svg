@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117"/>
+      <stop offset="100%" style="stop-color:#161b22"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff6b6b"/>
+      <stop offset="20%" style="stop-color:#feca57"/>
+      <stop offset="40%" style="stop-color:#48dbfb"/>
+      <stop offset="60%" style="stop-color:#ff9ff3"/>
+      <stop offset="80%" style="stop-color:#54a0ff"/>
+      <stop offset="100%" style="stop-color:#5f27cd"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="url(#bgGrad)" rx="12"/>
+  
+  <!-- Grid pattern -->
+  <pattern id="grid" patternUnits="userSpaceOnUse" width="40" height="40">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff08" stroke-width="1"/>
+  </pattern>
+  <rect width="100%" height="100%" fill="url(#grid)"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="50" cy="100" r="80" fill="#58a6ff" opacity="0.05"/>
+  <circle cx="750" cy="100" r="100" fill="#bc8cff" opacity="0.05"/>
+  
+  <!-- Main text -->
+  <text x="400" y="95" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="800" fill="url(#textGrad)" filter="url(#glow)">KODRA</text>
+  
+  <!-- Tagline -->
+  <text x="400" y="140" text-anchor="middle" font-family="monospace" font-size="16" fill="#8b949e" letter-spacing="4">FROM CODE TO CLOUD</text>
+  
+  <!-- Version badge -->
+  <rect x="340" y="155" width="120" height="24" rx="12" fill="#238636"/>
+  <text x="400" y="172" text-anchor="middle" font-family="system-ui" font-size="12" fill="white" font-weight="600">v1.0.0 ✨</text>
+  
+  <!-- Corner brackets -->
+  <path d="M 20 20 L 20 50 M 20 20 L 50 20" stroke="#58a6ff" stroke-width="2" fill="none" opacity="0.5"/>
+  <path d="M 780 20 L 780 50 M 780 20 L 750 20" stroke="#58a6ff" stroke-width="2" fill="none" opacity="0.5"/>
+  <path d="M 20 180 L 20 150 M 20 180 L 50 180" stroke="#bc8cff" stroke-width="2" fill="none" opacity="0.5"/>
+  <path d="M 780 180 L 780 150 M 780 180 L 750 180" stroke="#bc8cff" stroke-width="2" fill="none" opacity="0.5"/>
+  
+  <!-- Icons -->
+  <text x="100" y="105" font-size="24" opacity="0.3">☁️</text>
+  <text x="700" y="105" font-size="24" opacity="0.3">⚡</text>
+</svg>

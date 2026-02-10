@@ -1,0 +1,109 @@
+# Kodra Theme: Ghostty Blue - Starship Prompt
+# Electric cyan and deep blue aesthetic
+
+format = """
+[░▒▓](#00d9ff)\
+$os\
+$username\
+[](bg:#00aaff fg:#00d9ff)\
+$directory\
+[](fg:#00aaff bg:#cc66ff)\
+$git_branch\
+$git_status\
+[](fg:#cc66ff bg:#00cc66)\
+$c\
+$rust\
+$golang\
+$nodejs\
+$python\
+$terraform\
+$azure\
+[](fg:#00cc66 bg:#ffcc00)\
+$docker_context\
+$kubernetes\
+[](fg:#ffcc00 bg:#ff3333)\
+$time\
+[ ](fg:#ff3333)\
+$character"""
+
+[os]
+disabled = false
+style = "bg:#00d9ff fg:#0a0e14"
+format = "[ $symbol ]($style)"
+
+[username]
+show_always = true
+style_user = "bg:#00d9ff fg:#0a0e14"
+style_root = "bg:#00d9ff fg:#0a0e14"
+format = '[$user ]($style)'
+
+[directory]
+style = "bg:#00aaff fg:#0a0e14"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = ""
+style = "bg:#cc66ff fg:#0a0e14"
+format = '[ $symbol $branch ]($style)'
+
+[git_status]
+style = "bg:#cc66ff fg:#0a0e14"
+format = '[$all_status$ahead_behind ]($style)'
+
+[c]
+symbol = " "
+style = "bg:#00cc66 fg:#0a0e14"
+format = '[ $symbol ($version) ]($style)'
+
+[rust]
+symbol = ""
+style = "bg:#00cc66 fg:#0a0e14"
+format = '[ $symbol ($version) ]($style)'
+
+[golang]
+symbol = ""
+style = "bg:#00cc66 fg:#0a0e14"
+format = '[ $symbol ($version) ]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:#00cc66 fg:#0a0e14"
+format = '[ $symbol ($version) ]($style)'
+
+[python]
+symbol = ""
+style = "bg:#00cc66 fg:#0a0e14"
+format = '[ $symbol ($version) ]($style)'
+
+[terraform]
+symbol = "󱁢"
+style = "bg:#00cc66 fg:#0a0e14"
+format = '[ $symbol ($version) ]($style)'
+
+[azure]
+symbol = "󰠅 "
+style = "bg:#00cc66 fg:#0a0e14"
+format = '[ $symbol ($subscription) ]($style)'
+
+[docker_context]
+symbol = ""
+style = "bg:#ffcc00 fg:#0a0e14"
+format = '[ $symbol $context ]($style)'
+
+[kubernetes]
+symbol = "󱃾"
+style = "bg:#ffcc00 fg:#0a0e14"
+format = '[ $symbol $context ]($style)'
+disabled = false
+
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:#ff3333 fg:#ffffff"
+format = '[ $time ]($style)'
+
+[character]
+success_symbol = "[❯](bold #00d9ff)"
+error_symbol = "[❯](bold #ff3333)"

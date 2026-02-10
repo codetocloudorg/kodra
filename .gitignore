@@ -1,0 +1,34 @@
+# Kodra .gitignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Local configuration
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.log
+
+# Downloaded binaries (should be fetched fresh)
+*.deb
+*.tar.gz
+*.zip
+
+# Test artifacts
+test-output/
+coverage/tests/results/
+
+# Azure VM testing
+.azure-vm-ip
+.azure-test-config
+*.pem

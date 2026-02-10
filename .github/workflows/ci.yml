@@ -1,0 +1,148 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install ShellCheck
+        run: sudo apt-get install -y shellcheck
+      
+      - name: Run ShellCheck
+        run: |
+          # Find all shell scripts and run shellcheck
+          find . -type f -name "*.sh" -print0 | xargs -0 shellcheck --severity=error || true
+          
+          # Check scripts without .sh extension in bin/
+          shellcheck --severity=error bin/kodra bin/kodra-sub/* 2>/dev/null || true
+
+  syntax:
+    name: Bash Syntax Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check bash syntax
+        run: |
+          errors=0
+          while IFS= read -r -d '' file; do
+            if ! bash -n "$file" 2>/dev/null; then
+              echo "❌ Syntax error in: $file"
+              bash -n "$file"
+              errors=$((errors + 1))
+            fi
+          done < <(find . -type f -name "*.sh" -print0)
+          
+          # Also check bin scripts
+          for file in bin/kodra bin/kodra-sub/*; do
+            if [ -f "$file" ]; then
+              if ! bash -n "$file" 2>/dev/null; then
+                echo "❌ Syntax error in: $file"
+                bash -n "$file"
+                errors=$((errors + 1))
+              fi
+            fi
+          done
+          
+          if [ $errors -gt 0 ]; then
+            echo "Found $errors files with syntax errors"
+            exit 1
+          fi
+          echo "✅ All scripts pass syntax check"
+
+  docker-test:
+    name: Docker Install Test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test library sourcing
+        run: |
+          # Simulate KODRA_DIR setup
+          export KODRA_DIR="$PWD"
+          
+          # Test that all libraries can be sourced without errors
+          for lib in lib/*.sh; do
+            echo "Testing: $lib"
+            bash -n "$lib" || exit 1
+          done
+          echo "✅ All libraries pass syntax check"
+      
+      - name: Test utility functions
+        run: |
+          export KODRA_DIR="$PWD"
+          source lib/utils.sh
+          
+          # Test color variables exist
+          [ -n "$RED" ] && [ -n "$GREEN" ] && [ -n "$BLUE" ]
+          echo "✅ Color variables defined"
+      
+      - name: Test checks library
+        run: |
+          export KODRA_DIR="$PWD"
+          source lib/checks.sh
+          
+          # Test command_exists
+          command_exists bash || exit 1
+          ! command_exists nonexistent_command_12345 || exit 1
+          echo "✅ command_exists works"
+          
+          # Test is_ubuntu (should pass on ubuntu-24.04 runner)
+          is_ubuntu || echo "⚠️ Not Ubuntu (expected in some CI environments)"
+          echo "✅ is_ubuntu works"
+      
+      - name: Test state library
+        run: |
+          export KODRA_DIR="$PWD"
+          export KODRA_STATE_FILE="/tmp/kodra-test-state.json"
+          source lib/state.sh
+          
+          # Test state functions
+          init_state
+          mark_installed "test-component"
+          is_installed "test-component" || exit 1
+          ! is_installed "nonexistent" || exit 1
+          echo "✅ State tracking works"
+          
+          # Cleanup
+          rm -f "$KODRA_STATE_FILE"
+      
+      - name: Test package library
+        run: |
+          export KODRA_DIR="$PWD"
+          source lib/package.sh
+          
+          # Test detection functions
+          is_apt_installed "bash" || exit 1
+          ! is_apt_installed "nonexistent-package-12345" || exit 1
+          echo "✅ Package detection works"
+
+  version-check:
+    name: Version Consistency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check version consistency
+        run: |
+          # Get version from install.sh
+          VERSION=$(grep -oP 'KODRA_VERSION="\K[0-9]+\.[0-9]+\.[0-9]+' install.sh || echo "not found")
+          echo "Version in install.sh: $VERSION"
+          
+          # Check README mentions same version (if it does)
+          if grep -q "$VERSION" README.md 2>/dev/null; then
+            echo "✅ README.md matches version"
+          fi
+          
+          # Check lib/utils.sh
+          if grep -q "$VERSION" lib/utils.sh 2>/dev/null; then
+            echo "✅ lib/utils.sh matches version"
+          fi

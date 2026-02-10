@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 2160">
+  <defs>
+    <!-- Deep space gradient -->
+    <radialGradient id="spaceBg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" style="stop-color:#1a1b26"/>
+      <stop offset="100%" style="stop-color:#0a0b10"/>
+    </radialGradient>
+    
+    <!-- Multi-color glow -->
+    <filter id="multiGlow">
+      <feGaussianBlur stdDeviation="15" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Dot pattern -->
+    <pattern id="dots" patternUnits="userSpaceOnUse" width="60" height="60">
+      <circle cx="30" cy="30" r="1" fill="#ffffff08"/>
+    </pattern>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="url(#spaceBg)"/>
+  <rect width="100%" height="100%" fill="url(#dots)"/>
+  
+  <!-- Nebula effects -->
+  <ellipse cx="800" cy="600" rx="500" ry="300" fill="#7aa2f7" opacity="0.05" filter="url(#multiGlow)"/>
+  <ellipse cx="3000" cy="1600" rx="600" ry="350" fill="#bb9af7" opacity="0.04" filter="url(#multiGlow)"/>
+  <ellipse cx="1920" cy="1080" rx="800" ry="400" fill="#7dcfff" opacity="0.03" filter="url(#multiGlow)"/>
+  
+  <!-- Orbital rings -->
+  <g transform="translate(1920, 1080)">
+    <ellipse cx="0" cy="0" rx="600" ry="150" fill="none" stroke="#7aa2f7" stroke-width="1" opacity="0.2" transform="rotate(-20)"/>
+    <ellipse cx="0" cy="0" rx="700" ry="175" fill="none" stroke="#bb9af7" stroke-width="1" opacity="0.15" transform="rotate(-20)"/>
+    <ellipse cx="0" cy="0" rx="800" ry="200" fill="none" stroke="#7dcfff" stroke-width="1" opacity="0.1" transform="rotate(-20)"/>
+  </g>
+  
+  <!-- Code constellation patterns -->
+  <g stroke="#7aa2f7" stroke-width="1" fill="none" opacity="0.3">
+    <!-- Git branch pattern -->
+    <circle cx="400" cy="400" r="4" fill="#9ece6a"/>
+    <circle cx="500" cy="350" r="4" fill="#9ece6a"/>
+    <circle cx="600" cy="400" r="4" fill="#9ece6a"/>
+    <circle cx="550" cy="500" r="4" fill="#f7768e"/>
+    <line x1="400" y1="400" x2="500" y2="350"/>
+    <line x1="500" y1="350" x2="600" y2="400"/>
+    <line x1="500" y1="350" x2="550" y2="500"/>
+  </g>
+  
+  <g stroke="#bb9af7" stroke-width="1" fill="none" opacity="0.3">
+    <!-- Cloud pattern -->
+    <circle cx="3300" cy="500" r="4" fill="#7dcfff"/>
+    <circle cx="3400" cy="450" r="4" fill="#7dcfff"/>
+    <circle cx="3500" cy="500" r="4" fill="#7dcfff"/>
+    <circle cx="3400" cy="550" r="4" fill="#7dcfff"/>
+    <line x1="3300" y1="500" x2="3400" y2="450"/>
+    <line x1="3400" y1="450" x2="3500" y2="500"/>
+    <line x1="3500" y1="500" x2="3400" y2="550"/>
+    <line x1="3400" y1="550" x2="3300" y2="500"/>
+  </g>
+  
+  <!-- Central composition -->
+  <g transform="translate(1920, 1080)">
+    <!-- Main logo brackets -->
+    <g filter="url(#multiGlow)">
+      <text x="-180" y="40" fill="#7aa2f7" font-family="monospace" font-size="200" font-weight="bold">&lt;</text>
+      <text x="80" y="40" fill="#bb9af7" font-family="monospace" font-size="200" font-weight="bold">/&gt;</text>
+    </g>
+    
+    <!-- Inner code symbol -->
+    <text x="0" y="20" fill="#9ece6a" font-family="monospace" font-size="60" text-anchor="middle" opacity="0.8">λ</text>
+  </g>
+  
+  <!-- Kodra branding -->
+  <text x="1920" y="1350" fill="#c0caf5" font-family="system-ui, sans-serif" font-size="64" font-weight="200" text-anchor="middle" letter-spacing="30">KODRA</text>
+  <text x="1920" y="1410" fill="#565f89" font-family="monospace" font-size="18" text-anchor="middle" letter-spacing="5">FROM CODE TO CLOUD</text>
+  
+  <!-- Floating tech elements -->
+  <g fill="#7aa2f7" opacity="0.4" font-family="monospace" font-size="12">
+    <text x="200" y="800">docker</text>
+    <text x="3500" y="900">terraform</text>
+    <text x="300" y="1500">kubectl</text>
+    <text x="3400" y="1400">azure</text>
+    <text x="600" y="1800">git</text>
+    <text x="3100" y="300">npm</text>
+  </g>
+  
+  <!-- Stars field -->
+  <g fill="#ffffff">
+    <circle cx="150" cy="100" r="1.5" opacity="0.8"/>
+    <circle cx="450" cy="200" r="1" opacity="0.5"/>
+    <circle cx="750" cy="80" r="2" opacity="0.9"/>
+    <circle cx="1050" cy="150" r="1" opacity="0.4"/>
+    <circle cx="1350" cy="50" r="1.5" opacity="0.6"/>
+    <circle cx="1650" cy="180" r="1" opacity="0.5"/>
+    <circle cx="2150" cy="90" r="2" opacity="0.7"/>
+    <circle cx="2450" cy="140" r="1" opacity="0.4"/>
+    <circle cx="2750" cy="60" r="1.5" opacity="0.6"/>
+    <circle cx="3050" cy="200" r="1" opacity="0.5"/>
+    <circle cx="3350" cy="100" r="2" opacity="0.8"/>
+    <circle cx="3650" cy="160" r="1" opacity="0.4"/>
+    <circle cx="200" cy="1000" r="1" opacity="0.5"/>
+    <circle cx="3700" cy="1200" r="1.5" opacity="0.6"/>
+    <circle cx="100" cy="1800" r="2" opacity="0.7"/>
+    <circle cx="3750" cy="1900" r="1" opacity="0.4"/>
+  </g>
+  
+  <!-- Corner tech brackets -->
+  <path d="M 80 80 L 80 180 M 80 80 L 180 80" stroke="#7aa2f7" stroke-width="2" fill="none" opacity="0.6"/>
+  <path d="M 3760 80 L 3760 180 M 3760 80 L 3660 80" stroke="#7aa2f7" stroke-width="2" fill="none" opacity="0.6"/>
+  <path d="M 80 2080 L 80 1980 M 80 2080 L 180 2080" stroke="#bb9af7" stroke-width="2" fill="none" opacity="0.6"/>
+  <path d="M 3760 2080 L 3760 1980 M 3760 2080 L 3660 2080" stroke="#bb9af7" stroke-width="2" fill="none" opacity="0.6"/>
+  
+  <!-- Version badge -->
+  <rect x="1820" y="1450" width="200" height="30" rx="15" fill="#1a1b26" stroke="#7aa2f7" stroke-width="1" opacity="0.8"/>
+  <text x="1920" y="1472" fill="#7aa2f7" font-family="monospace" font-size="14" text-anchor="middle">v1.0.0</text>
+</svg>

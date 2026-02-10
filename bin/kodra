@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+#
+# Kodra CLI
+# A Code To Cloud Project ☁️
+# https://kodra.codetocloud.io
+# Developed by Code To Cloud
+#
+
+set -e
+
+KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
+
+# Read version from VERSION file
+if [ -f "$KODRA_DIR/VERSION" ]; then
+    VERSION=$(cat "$KODRA_DIR/VERSION" | tr -d '\n')
+else
+    VERSION="0.0.1"
+fi
+
+# Colors
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+NC='\033[0m'
+
+show_help() {
+    echo -e "\033[38;5;196m    ██╗  ██╗\033[38;5;208m ██████╗ \033[38;5;226m██████╗ \033[38;5;46m██████╗ \033[38;5;51m █████╗ \033[0m"
+    echo -e "\033[38;5;196m    ██║ ██╔╝\033[38;5;208m██╔═══██╗\033[38;5;226m██╔══██╗\033[38;5;46m██╔══██╗\033[38;5;51m██╔══██╗\033[0m"
+    echo -e "\033[38;5;196m    █████╔╝ \033[38;5;208m██║   ██║\033[38;5;226m██║  ██║\033[38;5;46m██████╔╝\033[38;5;51m███████║\033[0m"
+    echo -e "\033[38;5;196m    ██╔═██╗ \033[38;5;208m██║   ██║\033[38;5;226m██║  ██║\033[38;5;46m██╔══██╗\033[38;5;51m██╔══██║\033[0m"
+    echo -e "\033[38;5;196m    ██║  ██╗\033[38;5;208m╚██████╔╝\033[38;5;226m██████╔╝\033[38;5;46m██║  ██║\033[38;5;51m██║  ██║\033[0m"
+    echo -e "\033[38;5;196m    ╚═╝  ╚═╝\033[38;5;208m ╚═════╝ \033[38;5;226m╚═════╝ \033[38;5;46m╚═╝  ╚═╝\033[38;5;51m╚═╝  ╚═╝\033[0m"
+    echo -e "                                                     v$VERSION"
+    echo ""
+    echo -e "    \033[38;5;147m☁️  A  C O D E  T O  C L O U D  P R O J E C T  ☁️\033[0m"
+    echo -e "    \033[38;5;245mkodra.codetocloud.io\033[0m"
+    echo -e "    \033[38;5;240mDeveloped by Code To Cloud\033[0m"
+    echo ""
+    echo "Usage: kodra <command> [options]"
+    echo ""
+    echo "Commands:"
+    echo "  theme [name]      Switch themes (interactive if no name given)"
+    echo "  wallpaper [name]  Change wallpaper (interactive if no name given)"
+    echo "  desktop [cmd]     Configure desktop (dock, extensions)"
+    echo "  setup             Run first-time setup (GitHub, Azure, Git)"
+    echo "  fetch             Show beautiful system info"
+    echo "  update            Update Kodra and installed packages"
+    echo "  install <app>     Install an additional application"
+    echo "  uninstall <app>   Remove an application"
+    echo "  restore [cmd]     Restore backed up dotfiles"
+    echo "  resume [cmd]      Resume incomplete installation"
+    echo "  doctor            Check system health"
+    echo "  welcome           Show first-run welcome screen"
+    echo "  version           Show version information"
+    echo "  help              Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  kodra theme              # Interactive theme picker"
+    echo "  kodra theme tokyo-night  # Switch to tokyo-night theme"
+    echo "  kodra install discord    # Install Discord"
+    echo "  kodra update             # Update everything"
+    echo ""
+}
+
+show_version() {
+    echo "Kodra v$VERSION"
+    echo "A Code To Cloud project"
+    echo "https://kodra.codetocloud.io"
+    echo ""
+    echo "Installation: $KODRA_DIR"
+    if [ -f "$HOME/.config/kodra/theme" ]; then
+        echo "Theme: $(cat "$HOME/.config/kodra/theme")"
+    fi
+}
+
+# Dispatch to subcommand
+case "${1:-help}" in
+    theme)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/theme.sh" "$@"
+        ;;
+    update)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/update.sh" "$@"
+        ;;
+    install)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/install.sh" "$@"
+        ;;
+    uninstall)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/uninstall.sh" "$@"
+        ;;
+    restore|backup)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/restore.sh" "$@"
+        ;;
+    resume)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/resume.sh" "$@"
+        ;;
+    doctor)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/doctor.sh" "$@"
+        ;;
+    migrate)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/migrate.sh" "$@"
+        ;;
+    wallpaper|wp)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/wallpaper.sh" "$@"
+        ;;
+    desktop)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/desktop.sh" "$@"
+        ;;
+    setup|first-run)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/first-run.sh" --force "$@"
+        ;;
+    fetch|info|neofetch)
+        bash "$KODRA_DIR/bin/kodra-sub/fetch.sh"
+        ;;
+    welcome)
+        bash "$KODRA_DIR/bin/kodra-sub/welcome.sh"
+        ;;
+    version|-v|--version)
+        show_version
+        ;;
+    help|-h|--help)
+        show_help
+        ;;
+    *)
+        echo "Unknown command: $1"
+        echo ""
+        show_help
+        exit 1
+        ;;
+esac

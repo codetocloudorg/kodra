@@ -1,0 +1,24 @@
+{
+    "workbench.colorTheme": "Tokyo Night",
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.productIconTheme": "material-product-icons",
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'Fira Code', Consolas, monospace",
+    "editor.fontSize": 14,
+    "editor.fontLigatures": true,
+    "editor.cursorBlinking": "smooth",
+    "editor.cursorSmoothCaretAnimation": "on",
+    "editor.smoothScrolling": true,
+    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font', monospace",
+    "terminal.integrated.fontSize": 13,
+    "workbench.colorCustomizations": {
+        "editorCursor.foreground": "#c0caf5",
+        "terminalCursor.foreground": "#c0caf5",
+        "editor.selectionBackground": "#33467c",
+        "editor.selectionHighlightBackground": "#33467c44",
+        "activityBar.background": "#1a1b26",
+        "sideBar.background": "#16161e",
+        "editor.background": "#1a1b26",
+        "statusBar.background": "#7aa2f7",
+        "statusBar.foreground": "#1a1b26"
+    }
+}
