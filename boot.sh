@@ -141,10 +141,10 @@ echo "" >&2  # Force flush
 
 # Action menu
 cd "$KODRA_DIR"
-echo -e "    ${C_GRAY}Preparing menu...${C_RESET}" >&2
 
 # If action was specified via command line, skip menu (no TTY needed)
 if [ -n "$KODRA_ACTION" ]; then
+    echo -e "    ${C_GRAY}Preparing installation...${C_RESET}" >&2
     case "$KODRA_ACTION" in
         install)
             echo -e "    ${C_PURPLE}Starting installation...${C_RESET}"
@@ -166,10 +166,13 @@ if [ -n "$KODRA_ACTION" ]; then
 fi
 
 # Reconnect stdin to terminal for interactive menu (curl/wget pipe consumes stdin)
+echo -e "    ${C_GRAY}Preparing interactive menu...${C_RESET}" >&2
 if [ ! -t 0 ]; then
+    echo -e "    ${C_GRAY}Reconnecting to terminal...${C_RESET}" >&2
     # Test if /dev/tty is available - use simple check, avoid blocking
     if [ -c /dev/tty ] && [ -r /dev/tty ]; then
         exec < /dev/tty
+        echo -e "    ${C_GRAY}Terminal connected${C_RESET}" >&2
     else
         echo -e "    ${C_RED}Error: Cannot connect to terminal for interactive input${C_RESET}" >&2
         echo -e "    ${C_GRAY}Try running: bash ~/.kodra/boot.sh${C_RESET}" >&2
