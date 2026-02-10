@@ -104,7 +104,7 @@ install_deb_url() {
     local tmp_deb="/tmp/kodra-install-$$.deb"
     
     log_info "Downloading: $url"
-    curl -fsSL -o "$tmp_deb" "$url" || wget -q -O "$tmp_deb" "$url"
+    wget -q -O "$tmp_deb" "$url" || curl -fsSL -o "$tmp_deb" "$url"
     
     log_info "Installing .deb package..."
     sudo dpkg -i "$tmp_deb" || sudo apt-get install -f -y

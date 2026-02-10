@@ -43,7 +43,7 @@ We chose Ubuntu as our foundation for good reasons:
 ## Quick Start
 
 ```bash
-curl -fsSL https://kodra.codetocloud.io/boot.sh | bash
+wget -qO- https://kodra.codetocloud.io/boot.sh | bash
 ```
 
 That's it. The installer will:

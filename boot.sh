@@ -5,8 +5,8 @@
 # https://kodra.codetocloud.io
 #
 # Usage: 
-#   curl -fsSL https://kodra.codetocloud.io/boot.sh | bash
 #   wget -qO- https://kodra.codetocloud.io/boot.sh | bash
+#   curl -fsSL https://kodra.codetocloud.io/boot.sh | bash
 #
 # Options:
 #   --install    Skip menu, go straight to install
