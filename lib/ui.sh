@@ -209,8 +209,9 @@ confirm_installation() {
     echo -e "    ${C_GRAY}  • Beautiful GNOME desktop configuration${C_RESET}"
     echo ""
     
-    # Auto-confirm if running non-interactively (KODRA_AUTOCONFIRM=1 or no TTY available)
-    if [ "${KODRA_AUTOCONFIRM:-0}" = "1" ] || [ ! -e /dev/tty ]; then
+    # Auto-confirm if running non-interactively (KODRA_AUTOCONFIRM=1 or TTY unavailable)
+    # Check if we can actually read from /dev/tty, not just if it exists
+    if [ "${KODRA_AUTOCONFIRM:-0}" = "1" ] || ! ( exec 0</dev/tty ) 2>/dev/null; then
         echo -e "    ${C_GREEN}✓ Auto-confirmed (non-interactive mode)${C_RESET}"
         return 0
     fi
