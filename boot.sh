@@ -169,8 +169,8 @@ fi
 echo -e "    ${C_GRAY}Preparing interactive menu...${C_RESET}" >&2
 if [ ! -t 0 ]; then
     echo -e "    ${C_GRAY}Reconnecting to terminal...${C_RESET}" >&2
-    # Test if /dev/tty is available - use simple check, avoid blocking
-    if [ -c /dev/tty ] && [ -r /dev/tty ]; then
+    # Test if /dev/tty is actually usable - timeout prevents hanging on disconnected TTY
+    if timeout 1 sh -c 'exec 0</dev/tty' 2>/dev/null; then
         exec < /dev/tty
         echo -e "    ${C_GRAY}Terminal connected${C_RESET}" >&2
     else
