@@ -51,12 +51,19 @@ That's it. The installer will:
 2. Let you pick a theme and optional apps
 3. Configure your desktop with window tiling, keyboard shortcuts, and a macOS-style dock
 
+---
+
 <div align="center">
 
-![Kodra Screenshot](assets/kodra_screenshot.png)
-*Ghostty terminal with `kodra fetch` showing system info*
+### See it in action
+
+<img src="assets/kodra_screenshot.png" alt="Kodra Screenshot" width="800">
+
+<sub>Ghostty terminal with <code>kodra fetch</code> • Tokyo Night theme • Starship prompt</sub>
 
 </div>
+
+---
 
 ## What You Get
 
