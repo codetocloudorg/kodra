@@ -181,6 +181,7 @@ if [ ! -t 0 ]; then
         echo "[DEBUG] timeout test passed, connecting..." >&2
         exec < /dev/tty
         echo -e "    ${C_GRAY}Terminal connected${C_RESET}" >&2
+        echo "[DEBUG] After exec, continuing..." >&2
     else
         echo "[DEBUG] timeout test FAILED" >&2
         echo -e "    ${C_RED}Error: Cannot connect to terminal for interactive input${C_RESET}" >&2
@@ -190,12 +191,15 @@ if [ ! -t 0 ]; then
     fi
 fi
 
-echo ""
-echo -e "    ${C_WHITE}What would you like to do?${C_RESET}"
-echo ""
+echo "[DEBUG] Past TTY block" >&2
+echo "" >&2
+echo -e "    ${C_WHITE}What would you like to do?${C_RESET}" >&2
+echo "" >&2
+echo "[DEBUG] About to check for gum..." >&2
 
 # Install gum for beautiful menus if not already installed
 if ! command -v gum &> /dev/null; then
+    echo "[DEBUG] gum not found, installing..." >&2
     show_step "Installing gum for beautiful menus..."
     echo -e "    ${C_GRAY}Setting up Charm repository...${C_RESET}"
     sudo mkdir -p /etc/apt/keyrings
