@@ -141,6 +141,8 @@ echo "" >&2  # Force flush
 
 # Action menu
 cd "$KODRA_DIR"
+echo "[DEBUG] Changed to $KODRA_DIR" >&2
+echo "[DEBUG] KODRA_ACTION='$KODRA_ACTION'" >&2
 
 # If action was specified via command line, skip menu (no TTY needed)
 if [ -n "$KODRA_ACTION" ]; then
@@ -167,13 +169,20 @@ fi
 
 # Reconnect stdin to terminal for interactive menu (curl/wget pipe consumes stdin)
 echo -e "    ${C_GRAY}Preparing interactive menu...${C_RESET}" >&2
+echo "[DEBUG] Checking if stdin is TTY: $([ -t 0 ] && echo 'yes' || echo 'no')" >&2
 if [ ! -t 0 ]; then
-    echo -e "    ${C_GRAY}Reconnecting to terminal...${C_RESET}" >&2
+    echo "[DEBUG] stdin is NOT a TTY, attempting reconnect..." >&2
+    echo "[DEBUG] /dev/tty exists: $([ -e /dev/tty ] && echo 'yes' || echo 'no')" >&2
+    echo "[DEBUG] /dev/tty is char device: $([ -c /dev/tty ] && echo 'yes' || echo 'no')" >&2
+    echo "[DEBUG] /dev/tty is readable: $([ -r /dev/tty ] && echo 'yes' || echo 'no')" >&2
+    echo "[DEBUG] Running timeout test..." >&2
     # Test if /dev/tty is actually usable - timeout prevents hanging on disconnected TTY
     if timeout 1 sh -c 'exec 0</dev/tty' 2>/dev/null; then
+        echo "[DEBUG] timeout test passed, connecting..." >&2
         exec < /dev/tty
         echo -e "    ${C_GRAY}Terminal connected${C_RESET}" >&2
     else
+        echo "[DEBUG] timeout test FAILED" >&2
         echo -e "    ${C_RED}Error: Cannot connect to terminal for interactive input${C_RESET}" >&2
         echo -e "    ${C_GRAY}Try running: bash ~/.kodra/boot.sh${C_RESET}" >&2
         echo -e "    ${C_GRAY}Or use: curl -fsSL ... | bash -s -- --install${C_RESET}" >&2
