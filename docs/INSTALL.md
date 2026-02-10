@@ -7,12 +7,12 @@ Complete guide to installing Kodra on Ubuntu 24.04+.
 The fastest way to install Kodra:
 
 ```bash
-wget -qO- https://kodra.codetocloud.io/boot.sh | bash
+curl -fsSL https://kodra.codetocloud.io/boot.sh | bash
 ```
 
-> **💡 Tip:** If the command appears to hang, your network may have IPv6 connectivity issues. Use curl instead:
+> **Alternative:** If curl isn't available, use wget:
 > ```bash
-> curl -fsSL https://kodra.codetocloud.io/boot.sh | bash
+> wget -qO- https://kodra.codetocloud.io/boot.sh | bash
 > ```
 
 This launches an interactive installer that guides you through the setup.
@@ -32,13 +32,13 @@ This launches an interactive installer that guides you through the setup.
 ### Method 1: Interactive Install (Recommended)
 
 ```bash
-wget -qO- https://kodra.codetocloud.io/boot.sh | bash
+curl -fsSL https://kodra.codetocloud.io/boot.sh | bash
 ```
 
-Or using curl:
+Or using wget:
 
 ```bash
-curl -fsSL https://kodra.codetocloud.io/boot.sh | bash
+wget -qO- https://kodra.codetocloud.io/boot.sh | bash
 ```
 
 The boot menu gives you options to:

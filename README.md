@@ -11,7 +11,7 @@
 
 **Agentic Azure engineering using cloud-native tools—one command to ship.**
 
-[![Version](https://img.shields.io/badge/version-0.2.2-blue?style=flat-square)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.2.3-blue?style=flat-square)](VERSION)
 [![CI](https://img.shields.io/github/actions/workflow/status/codetocloudorg/kodra/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/codetocloudorg/kodra/actions)
 [![Ubuntu 24.04+](https://img.shields.io/badge/Ubuntu-24.04+-E95420?style=flat-square&logo=ubuntu&logoColor=white)](https://releases.ubuntu.com/noble/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
@@ -43,12 +43,12 @@ We chose Ubuntu as our foundation for good reasons:
 ## Quick Start
 
 ```bash
-wget -qO- https://kodra.codetocloud.io/boot.sh | bash
+curl -fsSL https://kodra.codetocloud.io/boot.sh | bash
 ```
 
-> **💡 Tip:** If the command appears to hang, your network may have IPv6 issues. Use curl instead:
+> **Alternative:** If curl isn't available, use wget:
 > ```bash
-> curl -fsSL https://kodra.codetocloud.io/boot.sh | bash
+> wget -qO- https://kodra.codetocloud.io/boot.sh | bash
 > ```
 
 That's it. The installer will:
