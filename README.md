@@ -11,7 +11,7 @@
 
 **Agentic Azure engineering using cloud-native tools—one command to ship.**
 
-[![Version](https://img.shields.io/badge/version-0.2.8-blue?style=flat-square)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.2.9-blue?style=flat-square)](VERSION)
 [![CI](https://img.shields.io/github/actions/workflow/status/codetocloudorg/kodra/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/codetocloudorg/kodra/actions)
 [![Ubuntu 24.04+](https://img.shields.io/badge/Ubuntu-24.04+-E95420?style=flat-square&logo=ubuntu&logoColor=white)](https://releases.ubuntu.com/noble/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
@@ -50,6 +50,13 @@ That's it. The installer will:
 1. Install everything you need for Azure and cloud-native development
 2. Let you pick a theme and optional apps
 3. Configure your desktop with window tiling, keyboard shortcuts, and a macOS-style dock
+
+<div align="center">
+
+![Kodra Screenshot](assets/kodra_screenshot.png)
+*Ghostty terminal with `kodra fetch` showing system info*
+
+</div>
 
 ## What You Get
 

@@ -127,7 +127,8 @@ show_tools_group() {
 
 # Theme selection
 select_theme() {
-    if ! command -v gum &> /dev/null; then
+    # Non-interactive mode or no TTY - use default
+    if [ "${NONINTERACTIVE:-0}" = "1" ] || ! command -v gum &> /dev/null || ! ( exec 0</dev/tty ) 2>/dev/null; then
         echo "tokyo-night"
         return
     fi
@@ -143,7 +144,8 @@ select_theme() {
 
 # Optional applications selection
 select_optional_apps() {
-    if ! command -v gum &> /dev/null; then
+    # Non-interactive mode or no TTY - use popular defaults
+    if [ "${NONINTERACTIVE:-0}" = "1" ] || ! command -v gum &> /dev/null || ! ( exec 0</dev/tty ) 2>/dev/null; then
         echo "spotify,bitwarden"
         return
     fi
@@ -170,8 +172,9 @@ select_optional_apps() {
 
 # Container runtime selection
 select_container_runtime() {
-    if ! command -v gum &> /dev/null; then
-        echo "docker"  # Default recommendation for Azure
+    # Non-interactive mode or no TTY - use Docker (recommended for Azure/Dev Containers)
+    if [ "${NONINTERACTIVE:-0}" = "1" ] || ! command -v gum &> /dev/null || ! ( exec 0</dev/tty ) 2>/dev/null; then
+        echo "docker"
         return
     fi
     
@@ -209,9 +212,9 @@ confirm_installation() {
     echo -e "    ${C_GRAY}  • Beautiful GNOME desktop configuration${C_RESET}"
     echo ""
     
-    # Auto-confirm if running non-interactively (KODRA_AUTOCONFIRM=1 or TTY unavailable)
+    # Auto-confirm if running non-interactively (NONINTERACTIVE=1, KODRA_AUTOCONFIRM=1, or no TTY)
     # Check if we can actually read from /dev/tty, not just if it exists
-    if [ "${KODRA_AUTOCONFIRM:-0}" = "1" ] || ! ( exec 0</dev/tty ) 2>/dev/null; then
+    if [ "${NONINTERACTIVE:-0}" = "1" ] || [ "${KODRA_AUTOCONFIRM:-0}" = "1" ] || ! ( exec 0</dev/tty ) 2>/dev/null; then
         echo -e "    ${C_GREEN}✓ Auto-confirmed (non-interactive mode)${C_RESET}"
         return 0
     fi
