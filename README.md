@@ -57,9 +57,12 @@ That's it. The installer will:
 
 ### See it in action
 
-<img src="assets/kodra_screenshot.png" alt="Kodra Screenshot" width="800">
+| Terminal | Desktop | CLI Tools |
+|:--------:|:-------:|:---------:|
+| <img src="assets/kodra-terminal.png" alt="Terminal" width="280"> | <img src="assets/kodra-desktop.png" alt="Desktop" width="280"> | <img src="assets/kodra-tools.png" alt="Tools" width="280"> |
+| Ghostty • fastfetch • Starship | GNOME • Blur • Dash to Dock | bat • eza • btop • lazygit |
 
-<sub>Ghostty terminal with <code>kodra fetch</code> • Tokyo Night theme • Starship prompt</sub>
+<sub>Tokyo Night theme • Nerd Fonts • 40+ cloud-native tools pre-configured</sub>
 
 </div>
 
