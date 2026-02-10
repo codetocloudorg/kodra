@@ -12,7 +12,8 @@ log_info "Updating Kodra..."
 
 # Update Kodra repository
 cd "$KODRA_DIR"
-git pull --quiet
+git fetch origin --quiet
+git reset --hard origin/main --quiet 2>/dev/null || git reset --hard origin/main
 log_success "Kodra repository updated"
 
 # Run migrations

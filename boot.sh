@@ -125,7 +125,9 @@ if [ -d "$KODRA_DIR" ]; then
     show_step "Updating existing Kodra installation..."
     cd "$KODRA_DIR"
     echo -e "    ${C_GRAY}Fetching latest changes from GitHub...${C_RESET}"
-    git pull --progress < /dev/null
+    git fetch origin --progress < /dev/null 2>&1
+    # Reset to origin/main to handle divergent branches (e.g., after history purge)
+    git reset --hard origin/main < /dev/null 2>&1
     show_done "Repository updated"
     KODRA_EXISTS=true
 else
