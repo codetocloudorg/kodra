@@ -141,9 +141,15 @@ fi
 # Action menu
 cd "$KODRA_DIR"
 
-# Reconnect stdin to terminal for interactive prompts (wget pipe consumes stdin)
-if [ ! -t 0 ] && ( exec < /dev/tty ) 2>/dev/null; then
-    exec < /dev/tty
+# Reconnect stdin to terminal for interactive prompts (curl/wget pipe consumes stdin)
+if [ ! -t 0 ]; then
+    if ( exec < /dev/tty ) 2>/dev/null; then
+        exec < /dev/tty
+    else
+        echo -e "    ${C_RED}Error: Cannot connect to terminal for interactive input${C_RESET}"
+        echo -e "    ${C_GRAY}Try running: bash ~/.kodra/boot.sh${C_RESET}"
+        exit 1
+    fi
 fi
 
 # If action was specified via command line, skip menu
@@ -177,12 +183,12 @@ if ! command -v gum &> /dev/null; then
     show_step "Installing gum for beautiful menus..."
     echo -e "    ${C_GRAY}Setting up Charm repository...${C_RESET}"
     sudo mkdir -p /etc/apt/keyrings
-    curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg 2>/dev/null
+    curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/charm.gpg 2>/dev/null
     echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list > /dev/null
-    echo -e "    ${C_GRAY}Updating package lists...${C_RESET}"
-    sudo apt-get update
+    echo -e "    ${C_GRAY}Updating package lists (this may take a minute)...${C_RESET}"
+    sudo apt-get update -qq
     echo -e "    ${C_GRAY}Installing gum...${C_RESET}"
-    sudo apt-get install -y gum
+    sudo apt-get install -y -qq gum
     show_done "gum installed"
 fi
 
