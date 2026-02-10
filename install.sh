@@ -87,10 +87,11 @@ source "$KODRA_DIR/lib/utils.sh"
 source "$KODRA_DIR/lib/ui.sh"
 
 # Reconnect stdin to terminal for interactive prompts (needed when run via curl | bash)
-# Skip if env vars are pre-set (non-interactive mode) or if /dev/tty doesn't exist
+# Skip if env vars are pre-set (non-interactive mode) or if /dev/tty can't be opened
 if [ ! -t 0 ] && [ -z "$KODRA_THEME" ]; then
-    if [ -e /dev/tty ] && [ -r /dev/tty ]; then
-        exec < /dev/tty 2>/dev/null || true
+    # Test if /dev/tty can actually be opened (not just exists)
+    if ( exec 0</dev/tty ) 2>/dev/null; then
+        exec < /dev/tty
     fi
 fi
 

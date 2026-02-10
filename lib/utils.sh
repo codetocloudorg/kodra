@@ -72,22 +72,51 @@ check_internet_connection() {
 
 # Check sudo access
 check_sudo_access() {
-    if sudo -v &> /dev/null; then
-        log_success "sudo access confirmed"
-    else
-        log_error "sudo access required"
-        return 1
+    # Try non-interactive first (works for passwordless sudo like Azure VMs)
+    if sudo -n true 2>/dev/null; then
+        log_success "sudo access confirmed (passwordless)"
+        return 0
     fi
+    
+    # If we have a TTY, try interactive sudo
+    if [ -t 0 ] || [ -e /dev/tty ]; then
+        if sudo -v &> /dev/null; then
+            log_success "sudo access confirmed"
+            return 0
+        fi
+    fi
+    
+    log_error "sudo access required"
+    return 1
 }
 
 # Start a background process to keep sudo credentials alive
 # This prevents multiple password prompts during long installations
 # The PID is stored in KODRA_SUDO_KEEPALIVE_PID for cleanup
 start_sudo_keepalive() {
-    # Initial sudo prompt (this is the only time user enters password)
-    echo -e "${CYAN}[INFO]${NC} Requesting sudo access (you'll only need to enter your password once)..."
-    if ! sudo -v; then
-        log_error "Failed to obtain sudo access"
+    # Try non-interactive first (works for passwordless sudo like Azure VMs)
+    if sudo -n true 2>/dev/null; then
+        log_success "Sudo access available (passwordless)"
+        # Still start keepalive in case there are time-limited credentials
+        (
+            while true; do
+                sudo -n true 2>/dev/null
+                sleep 50
+            done
+        ) &
+        export KODRA_SUDO_KEEPALIVE_PID=$!
+        return 0
+    fi
+    
+    # If we have a TTY, prompt for password once
+    if [ -t 0 ] || [ -e /dev/tty ]; then
+        echo -e "${CYAN}[INFO]${NC} Requesting sudo access (you'll only need to enter your password once)..."
+        if ! sudo -v; then
+            log_error "Failed to obtain sudo access"
+            return 1
+        fi
+    else
+        log_error "No TTY available and passwordless sudo not configured"
         return 1
     fi
     
