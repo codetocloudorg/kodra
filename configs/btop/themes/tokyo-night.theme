@@ -1,0 +1,73 @@
+# Tokyo Night theme for btop
+# Kodra - A Code To Cloud Project
+
+# Main background (transparent for terminal bg)
+theme[main_bg]="#1a1b26"
+
+# Main text color
+theme[main_fg]="#c0caf5"
+
+# Title color
+theme[title]="#7aa2f7"
+
+# Higlight color
+theme[hi_fg]="#bb9af7"
+
+# Inactive text color
+theme[inactive_fg]="#565f89"
+
+# Available memory meters
+theme[free_end]="#9ece6a"
+theme[free_mid]="#9ece6a"
+theme[free_start]="#73daca"
+
+# Used memory meters
+theme[used_end]="#f7768e"
+theme[used_mid]="#ff9e64"
+theme[used_start]="#e0af68"
+
+# Cached memory meters
+theme[cached_start]="#73daca"
+theme[cached_mid]="#7dcfff"
+theme[cached_end]="#7aa2f7"
+
+# Available/free swap meters
+theme[available_end]="#9ece6a"
+theme[available_mid]="#73daca"
+theme[available_start]="#7dcfff"
+
+# CPU process color
+theme[process_start]="#7aa2f7"
+theme[process_mid]="#9ece6a"
+theme[process_end]="#f7768e"
+
+# Temperature gradient
+theme[temp_start]="#9ece6a"
+theme[temp_mid]="#e0af68"
+theme[temp_end]="#f7768e"
+
+# Divider lines
+theme[div_line]="#3b4261"
+
+# Download speed meters
+theme[download_start]="#7dcfff"
+theme[download_mid]="#7aa2f7"
+theme[download_end]="#bb9af7"
+
+# Upload speed meters
+theme[upload_start]="#9ece6a"
+theme[upload_mid]="#73daca"
+theme[upload_end]="#7dcfff"
+
+# Selected item color
+theme[selected_bg]="#33467c"
+theme[selected_fg]="#c0caf5"
+
+# Graph text
+theme[graph_text]="#c0caf5"
+
+# Meter text
+theme[meter_bg]="#3b4261"
+
+# Proc misc colors
+theme[proc_misc]="#7dcfff"

@@ -298,6 +298,117 @@ dps() {
 }
 
 # ─────────────────────────────────────────────────────────────
+# Zoxide - Smart directory jumping
+# ─────────────────────────────────────────────────────────────
+
+if command -v zoxide &>/dev/null; then
+    if [ -n "$ZSH_VERSION" ]; then
+        eval "$(zoxide init zsh)"
+    elif [ -n "$BASH_VERSION" ]; then
+        eval "$(zoxide init bash)"
+    fi
+fi
+
+# ─────────────────────────────────────────────────────────────
+# FZF - Fuzzy finder enhancements
+# ─────────────────────────────────────────────────────────────
+
+if command -v fzf &>/dev/null; then
+    # Tokyo Night colors for fzf
+    export FZF_DEFAULT_OPTS="
+        --color=fg:#c0caf5,bg:#1a1b26,hl:#ff9e64
+        --color=fg+:#c0caf5,bg+:#292e42,hl+:#ff9e64
+        --color=info:#7aa2f7,prompt:#7dcfff,pointer:#7aa2f7
+        --color=marker:#9ece6a,spinner:#9ece6a,header:#9ece6a
+        --height=60%
+        --layout=reverse
+        --border=rounded
+        --prompt='❯ '
+        --pointer='▶'
+        --marker='✓'
+        --info=inline
+    "
+
+    # Use fd for faster file finding (if available)
+    if command -v fd &>/dev/null; then
+        export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+        export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+    fi
+
+    # Preview with bat (if available)
+    if command -v bat &>/dev/null; then
+        export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-range :300 {}'"
+    fi
+
+    # Zsh keybindings
+    if [ -n "$ZSH_VERSION" ]; then
+        [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ] && source /usr/share/doc/fzf/examples/key-bindings.zsh
+        [ -f /usr/share/doc/fzf/examples/completion.zsh ] && source /usr/share/doc/fzf/examples/completion.zsh
+        [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+    fi
+
+    # Bash keybindings
+    if [ -n "$BASH_VERSION" ]; then
+        [ -f /usr/share/doc/fzf/examples/key-bindings.bash ] && source /usr/share/doc/fzf/examples/key-bindings.bash
+        [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+    fi
+fi
+
+# ─────────────────────────────────────────────────────────────
+# Handy fzf functions
+# ─────────────────────────────────────────────────────────────
+
+# Fuzzy cd with zoxide
+zz() {
+    local result
+    result=$(zoxide query -l | fzf --no-sort --tac) && cd "$result"
+}
+
+# Fuzzy git branch checkout
+fco() {
+    local branches branch
+    branches=$(git branch --all | grep -v HEAD) &&
+    branch=$(echo "$branches" | fzf -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+    git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+}
+
+# Fuzzy process kill
+fkill() {
+    local pid
+    pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
+    if [ "x$pid" != "x" ]; then
+        echo "$pid" | xargs kill -${1:-9}
+    fi
+}
+
+# Fuzzy docker container shell
+dsh() {
+    local cid
+    cid=$(docker ps | sed 1d | fzf -1 -q "$1" | awk '{print $1}')
+    [ -n "$cid" ] && docker exec -it "$cid" ${2:-bash}
+}
+
+# Fuzzy edit file in current directory
+fe() {
+    local file
+    file=$(fzf --preview 'bat --style=numbers --color=always --line-range :300 {}')
+    [ -n "$file" ] && ${EDITOR:-nvim} "$file"
+}
+
+# Fuzzy git log browser
+fgl() {
+    git log --graph --color=always \
+        --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
+    fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
+        --bind "ctrl-m:execute:
+                (grep -o '[a-f0-9]\{7\}' | head -1 |
+                xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
+                {}
+FZF-EOF"
+}
+
+# ─────────────────────────────────────────────────────────────
 # Completions (auto-loaded)
 # ─────────────────────────────────────────────────────────────
 

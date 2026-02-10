@@ -19,7 +19,7 @@ APT_TOOLS=(
     "tree"         # Directory tree
     "tldr"         # Simplified man pages
     "httpie"       # curl alternative
-    "neofetch"     # System info
+    "fastfetch"    # Beautiful system info (replaces neofetch)
 )
 
 # Note: apt-get update already run by main install.sh
@@ -108,7 +108,36 @@ else
     fi
 fi
 
+# ─────────────────────────────────────────────────────────────
+# Configure fastfetch
+# ─────────────────────────────────────────────────────────────
+if command -v fastfetch &> /dev/null; then
+    echo "Configuring fastfetch..."
+    mkdir -p "$HOME/.config/fastfetch"
+    KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
+    if [ -f "$KODRA_DIR/configs/fastfetch/config.jsonc" ]; then
+        cp "$KODRA_DIR/configs/fastfetch/config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
+    fi
+fi
+
+# ─────────────────────────────────────────────────────────────
+# Configure btop with tokyo-night theme
+# ─────────────────────────────────────────────────────────────
+if command -v btop &> /dev/null; then
+    echo "Configuring btop..."
+    mkdir -p "$HOME/.config/btop/themes"
+    KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
+    if [ -f "$KODRA_DIR/configs/btop/btop.conf" ]; then
+        cp "$KODRA_DIR/configs/btop/btop.conf" "$HOME/.config/btop/btop.conf"
+    fi
+    if [ -f "$KODRA_DIR/configs/btop/themes/tokyo-night.theme" ]; then
+        cp "$KODRA_DIR/configs/btop/themes/tokyo-night.theme" "$HOME/.config/btop/themes/"
+    fi
+fi
+
+# ─────────────────────────────────────────────────────────────
 # Configure zoxide
+# ─────────────────────────────────────────────────────────────
 if command -v zoxide &> /dev/null; then
     # Add to bashrc
     if [ -f "$HOME/.bashrc" ] && ! grep -q "zoxide init" "$HOME/.bashrc"; then

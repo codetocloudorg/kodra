@@ -1,0 +1,123 @@
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "type": "none"
+    },
+    "display": {
+        "separator": " │ "
+    },
+    "modules": [
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m╭──────────────────────────────────────────────────────────────╮\u001b[0m"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m│\u001b[0m  \u001b[1;31m██╗  ██╗\u001b[1;33m ██████╗ \u001b[1;32m██████╗ \u001b[1;36m██████╗ \u001b[1;35m █████╗ \u001b[0m              \u001b[1;36m│\u001b[0m"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m│\u001b[0m  \u001b[1;31m██║ ██╔╝\u001b[1;33m██╔═══██╗\u001b[1;32m██╔══██╗\u001b[1;36m██╔══██╗\u001b[1;35m██╔══██╗\u001b[0m              \u001b[1;36m│\u001b[0m"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m│\u001b[0m  \u001b[1;31m█████╔╝ \u001b[1;33m██║   ██║\u001b[1;32m██║  ██║\u001b[1;36m██████╔╝\u001b[1;35m███████║\u001b[0m              \u001b[1;36m│\u001b[0m"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m│\u001b[0m  \u001b[1;31m██╔═██╗ \u001b[1;33m██║   ██║\u001b[1;32m██║  ██║\u001b[1;36m██╔══██╗\u001b[1;35m██╔══██║\u001b[0m              \u001b[1;36m│\u001b[0m"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m│\u001b[0m  \u001b[1;31m██║  ██╗\u001b[1;33m╚██████╔╝\u001b[1;32m██████╔╝\u001b[1;36m██║  ██║\u001b[1;35m██║  ██║\u001b[0m              \u001b[1;36m│\u001b[0m"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m│\u001b[0m  \u001b[1;31m╚═╝  ╚═╝\u001b[1;33m ╚═════╝ \u001b[1;32m╚═════╝ \u001b[1;36m╚═╝  ╚═╝\u001b[1;35m╚═╝  ╚═╝\u001b[0m              \u001b[1;36m│\u001b[0m"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m│\u001b[0m      \u001b[36m━━━ F R O M   C O D E   T O   C L O U D ━━━\u001b[0m          \u001b[1;36m│\u001b[0m"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m├──────────────────────────────────────────────────────────────┤\u001b[0m"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m│\u001b[0m  \u001b[1;33m󰒋  HARDWARE\u001b[0m                                                \u001b[1;36m│\u001b[0m"
+        },
+        {
+            "key": "│    Host",
+            "type": "host",
+            "format": "{?2}{2}{?}{?5} ({5}){?}"
+        },
+        {
+            "key": "│    CPU",
+            "type": "cpu",
+            "format": "{1} ({3})"
+        },
+        {
+            "key": "│    Memory",
+            "type": "memory"
+        },
+        {
+            "key": "│    Disk",
+            "type": "disk",
+            "format": "{1} / {2} ({3})"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m├──────────────────────────────────────────────────────────────┤\u001b[0m"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m│\u001b[0m  \u001b[1;32m  SOFTWARE\u001b[0m                                                \u001b[1;36m│\u001b[0m"
+        },
+        {
+            "key": "│    OS",
+            "type": "os",
+            "format": "{3} {12}"
+        },
+        {
+            "key": "│    Kernel",
+            "type": "kernel"
+        },
+        {
+            "key": "│    Shell",
+            "type": "shell"
+        },
+        {
+            "key": "│    Terminal",
+            "type": "terminal"
+        },
+        {
+            "key": "│    Editor",
+            "type": "editor"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m├──────────────────────────────────────────────────────────────┤\u001b[0m"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m│\u001b[0m  \u001b[1;35m󰅐  UPTIME\u001b[0m                                                  \u001b[1;36m│\u001b[0m"
+        },
+        {
+            "key": "│   ",
+            "type": "uptime"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m├──────────────────────────────────────────────────────────────┤\u001b[0m"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m│\u001b[0m  \u001b[1;31m●\u001b[1;33m●\u001b[1;32m●\u001b[1;36m●\u001b[1;35m●\u001b[1;34m●\u001b[0m  \u001b[31m●\u001b[33m●\u001b[32m●\u001b[36m●\u001b[35m●\u001b[34m●\u001b[0m                                            \u001b[1;36m│\u001b[0m"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m╰──────────────────────────────────────────────────────────────╯\u001b[0m"
+        }
+    ]
+}

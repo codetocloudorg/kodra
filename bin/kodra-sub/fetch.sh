@@ -1,8 +1,25 @@
 #!/usr/bin/env bash
 #
 # Kodra Fetch - Beautiful system info for developers
-# Like neofetch, but for cloud-native devs
+# Uses fastfetch with custom config, or falls back to built-in display
 #
+
+# ─────────────────────────────────────────────────────────────
+# Use fastfetch if available with kodra config
+# ─────────────────────────────────────────────────────────────
+
+if command -v fastfetch &>/dev/null; then
+    # Check if we have our custom config
+    if [ -f "$HOME/.config/fastfetch/config.jsonc" ]; then
+        exec fastfetch --config "$HOME/.config/fastfetch/config.jsonc"
+    else
+        exec fastfetch
+    fi
+fi
+
+# ─────────────────────────────────────────────────────────────
+# Fallback: Built-in display (when fastfetch not installed)
+# ─────────────────────────────────────────────────────────────
 
 # Colors
 R='\033[0;31m'
