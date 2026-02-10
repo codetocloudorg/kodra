@@ -10,7 +10,11 @@ The fastest way to install Kodra:
 curl -fsSL https://kodra.codetocloud.io/boot.sh | bash
 ```
 
-This runs the full installation automatically.
+This runs the interactive installer with a premium command-line experience:
+- Pre-flight checks showing system compatibility
+- Progress tracking with ETA estimates  
+- Live installation status with tool checkmarks
+- Completion summary with stats and ready-to-use tools
 
 ## Requirements
 
