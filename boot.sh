@@ -137,16 +137,13 @@ else
     show_done "Repository cloned to $KODRA_DIR"
     KODRA_EXISTS=false
 fi
-echo "" >&2  # Force flush
+echo ""
 
 # Action menu
 cd "$KODRA_DIR"
-echo "[DEBUG] Changed to $KODRA_DIR" >&2
-echo "[DEBUG] KODRA_ACTION='$KODRA_ACTION'" >&2
 
 # If action was specified via command line, skip menu (no TTY needed)
 if [ -n "$KODRA_ACTION" ]; then
-    echo -e "    ${C_GRAY}Preparing installation...${C_RESET}" >&2
     case "$KODRA_ACTION" in
         install)
             echo -e "    ${C_PURPLE}Starting installation...${C_RESET}"
@@ -167,39 +164,28 @@ if [ -n "$KODRA_ACTION" ]; then
     exit 0
 fi
 
-# Reconnect stdin to terminal for interactive menu (curl/wget pipe consumes stdin)
-echo -e "    ${C_GRAY}Preparing interactive menu...${C_RESET}" >&2
-echo "[DEBUG] Checking if stdin is TTY: $([ -t 0 ] && echo 'yes' || echo 'no')" >&2
-if [ ! -t 0 ]; then
-    echo "[DEBUG] stdin is NOT a TTY, attempting reconnect..." >&2
-    echo "[DEBUG] /dev/tty exists: $([ -e /dev/tty ] && echo 'yes' || echo 'no')" >&2
-    echo "[DEBUG] /dev/tty is char device: $([ -c /dev/tty ] && echo 'yes' || echo 'no')" >&2
-    echo "[DEBUG] /dev/tty is readable: $([ -r /dev/tty ] && echo 'yes' || echo 'no')" >&2
-    echo "[DEBUG] Running timeout test..." >&2
-    # Test if /dev/tty is actually usable - timeout prevents hanging on disconnected TTY
+# Check if TTY is available for interactive menu
+# Note: We can't use 'exec < /dev/tty' when piped because bash reads script from stdin
+USE_TTY=""
+if [ -c /dev/tty ] && [ -r /dev/tty ]; then
     if timeout 1 sh -c 'exec 0</dev/tty' 2>/dev/null; then
-        echo "[DEBUG] timeout test passed, connecting..." >&2
-        exec < /dev/tty
-        echo -e "    ${C_GRAY}Terminal connected${C_RESET}" >&2
-        echo "[DEBUG] After exec, continuing..." >&2
-    else
-        echo "[DEBUG] timeout test FAILED" >&2
-        echo -e "    ${C_RED}Error: Cannot connect to terminal for interactive input${C_RESET}" >&2
-        echo -e "    ${C_GRAY}Try running: bash ~/.kodra/boot.sh${C_RESET}" >&2
-        echo -e "    ${C_GRAY}Or use: curl -fsSL ... | bash -s -- --install${C_RESET}" >&2
-        exit 1
+        USE_TTY="</dev/tty"
     fi
 fi
 
-echo "[DEBUG] Past TTY block" >&2
-echo "" >&2
-echo -e "    ${C_WHITE}What would you like to do?${C_RESET}" >&2
-echo "" >&2
-echo "[DEBUG] About to check for gum..." >&2
+if [ -z "$USE_TTY" ]; then
+    echo -e "    ${C_RED}Error: Cannot connect to terminal for interactive input${C_RESET}" >&2
+    echo -e "    ${C_GRAY}Try running: bash ~/.kodra/boot.sh${C_RESET}" >&2
+    echo -e "    ${C_GRAY}Or use: curl -fsSL ... | bash -s -- --install${C_RESET}" >&2
+    exit 1
+fi
+
+echo ""
+echo -e "    ${C_WHITE}What would you like to do?${C_RESET}"
+echo ""
 
 # Install gum for beautiful menus if not already installed
 if ! command -v gum &> /dev/null; then
-    echo "[DEBUG] gum not found, installing..." >&2
     show_step "Installing gum for beautiful menus..."
     echo -e "    ${C_GRAY}Setting up Charm repository...${C_RESET}"
     sudo mkdir -p /etc/apt/keyrings
@@ -212,7 +198,7 @@ if ! command -v gum &> /dev/null; then
     show_done "gum installed"
 fi
 
-# Show menu based on installation status
+# Show menu based on installation status - use /dev/tty for input
 if [ "$KODRA_EXISTS" = true ]; then
     # Kodra already installed - show full menu
     CHOICE=$(gum choose --height=8 --cursor.foreground="51" \
@@ -220,12 +206,12 @@ if [ "$KODRA_EXISTS" = true ]; then
         "🔄 Update           (update Kodra & tools)" \
         "🎨 Change Theme     (switch themes)" \
         "🗑️  Uninstall        (remove Kodra)" \
-        "❌ Exit")
+        "❌ Exit" </dev/tty)
 else
     # Fresh install
     CHOICE=$(gum choose --height=5 --cursor.foreground="51" \
         "🚀 Install Kodra    (full installation)" \
-        "❌ Exit")
+        "❌ Exit" </dev/tty)
 fi
 
 echo ""
