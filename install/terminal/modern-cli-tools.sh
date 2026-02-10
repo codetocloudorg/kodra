@@ -19,11 +19,38 @@ APT_TOOLS=(
     "tree"         # Directory tree
     "tldr"         # Simplified man pages
     "httpie"       # curl alternative
-    "fastfetch"    # Beautiful system info (replaces neofetch)
 )
 
 # Note: apt-get update already run by main install.sh
 sudo apt-get install -y "${APT_TOOLS[@]}"
+
+# ─────────────────────────────────────────────────────────────────
+# Install fastfetch (not in default Ubuntu repos)
+# ─────────────────────────────────────────────────────────────────
+if ! command -v fastfetch &> /dev/null; then
+    echo "Installing fastfetch..."
+    # Add fastfetch PPA
+    if ! grep -q "fastfetch" /etc/apt/sources.list.d/*.list 2>/dev/null; then
+        sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch 2>/dev/null || true
+        sudo apt-get update
+    fi
+    sudo apt-get install -y fastfetch 2>/dev/null || {
+        # Fallback: download from GitHub releases
+        echo "  Installing fastfetch from GitHub..."
+        ARCH=$(uname -m)
+        case $ARCH in
+            x86_64) FF_ARCH="amd64" ;;
+            aarch64|arm64) FF_ARCH="aarch64" ;;
+            *) FF_ARCH="" ;;
+        esac
+        if [ -n "$FF_ARCH" ]; then
+            FF_VERSION=$(curl -s https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | grep -Po '"tag_name": "\K[^"]*' || echo "2.8.10")
+            curl -sL "https://github.com/fastfetch-cli/fastfetch/releases/download/${FF_VERSION}/fastfetch-linux-${FF_ARCH}.deb" -o /tmp/fastfetch.deb
+            sudo dpkg -i /tmp/fastfetch.deb 2>/dev/null || sudo apt-get install -f -y
+            rm -f /tmp/fastfetch.deb
+        fi
+    }
+fi
 
 # Create symlinks for tools with different names
 # bat is 'batcat' on Ubuntu
