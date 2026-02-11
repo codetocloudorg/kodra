@@ -44,7 +44,7 @@ retry_failed() {
     
     local confirm=""
     if command -v gum &> /dev/null; then
-        if gum confirm "Retry these components?"; then
+        if gum confirm "Retry these components? (y/N)"; then
             confirm="y"
         fi
     else

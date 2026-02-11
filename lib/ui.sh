@@ -344,7 +344,7 @@ confirm_installation() {
     fi
     
     if command -v gum &> /dev/null; then
-        if ! gum confirm --prompt.foreground="212" "Ready to ship to Azure?"; then
+        if ! gum confirm --prompt.foreground="212" "Ready to ship to Azure? (Y/n)"; then
             echo ""
             echo -e "    ${C_YELLOW}Installation cancelled.${C_RESET}"
             echo ""

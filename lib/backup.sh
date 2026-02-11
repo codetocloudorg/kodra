@@ -248,7 +248,7 @@ restore_interactive() {
     if [ -n "$selected" ]; then
         echo ""
         if command -v gum &> /dev/null; then
-            if gum confirm "Restore from $selected?"; then
+            if gum confirm "Restore from $selected? (y/N)"; then
                 restore_backup "$selected"
             else
                 echo "Restore cancelled."
@@ -301,7 +301,7 @@ cleanup_old_backups() {
     
     local confirm=""
     if command -v gum &> /dev/null; then
-        if gum confirm "Delete these old backups?"; then
+        if gum confirm "Delete these old backups? (y/N)"; then
             confirm="y"
         fi
     else

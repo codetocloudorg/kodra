@@ -420,7 +420,7 @@ fi
 # First-run setup (GitHub login, Azure login, etc.)
 echo ""
 if command -v gum &> /dev/null; then
-    if gum confirm "Run first-time setup? (GitHub login, Azure auth, Git config)"; then
+    if gum confirm "Run first-time setup? (GitHub login, Azure auth, Git config) (Y/n)"; then
         "$KODRA_DIR/bin/kodra-sub/first-run.sh"
     else
         echo ""

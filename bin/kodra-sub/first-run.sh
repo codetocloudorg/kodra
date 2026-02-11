@@ -57,7 +57,7 @@ setup_github() {
     echo ""
     
     if command -v gum &> /dev/null; then
-        if gum confirm "Login to GitHub now?"; then
+        if gum confirm "Login to GitHub now? (y/N)"; then
             echo ""
             gh auth login
         else
@@ -100,7 +100,7 @@ setup_azure() {
     echo ""
     
     if command -v gum &> /dev/null; then
-        if gum confirm "Login to Azure now?"; then
+        if gum confirm "Login to Azure now? (y/N)"; then
             echo ""
             az login
         else
@@ -132,7 +132,7 @@ setup_git_identity() {
         echo -e "${C_GREEN}✓${C_RESET} Git identity: ${C_WHITE}$current_name${C_RESET} <${C_CYAN}$current_email${C_RESET}>"
         
         if command -v gum &> /dev/null; then
-            if ! gum confirm "Keep current settings?"; then
+            if ! gum confirm "Keep current settings? (Y/n)"; then
                 current_name=""
                 current_email=""
             fi
