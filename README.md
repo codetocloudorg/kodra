@@ -11,7 +11,7 @@
 
 **Agentic Azure engineering using cloud-native tools—one command to ship.**
 
-[![Version](https://img.shields.io/badge/version-0.2.16-blue?style=flat-square)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.2.17-blue?style=flat-square)](VERSION)
 [![CI](https://img.shields.io/github/actions/workflow/status/codetocloudorg/kodra/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/codetocloudorg/kodra/actions)
 [![Ubuntu 24.04+](https://img.shields.io/badge/Ubuntu-24.04+-E95420?style=flat-square&logo=ubuntu&logoColor=white)](https://releases.ubuntu.com/noble/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
@@ -38,7 +38,7 @@ We chose Ubuntu as our foundation for good reasons:
 | ☁️ **Azure Native Support** | First-class support in Azure VMs, WSL, and all major cloud tools |
 | 🔒 **LTS Stability** | 5 years of security updates—no surprise breakages mid-project |
 
-> **🚀 Coming Soon:** WSL edition for Windows developers! All CLI tools, Azure integrations, and GitHub Copilot—right in Windows Terminal. [Join our Discord](https://discord.gg/vwfwq2EpXJ) to get notified!
+> **🎉 NEW:** WSL edition is now available for Windows developers! All CLI tools, Azure integrations, and GitHub Copilot—right in Windows Terminal. [Get started →](https://kodra.wsl.codetocloud.io)
 
 ## Quick Start
 
@@ -82,6 +82,8 @@ That's it. The installer will:
 | **CLI** | bat, eza, fzf, ripgrep, zoxide, btop, fastfetch, jq, yq |
 | **Desktop** | ULauncher, window tiling, system monitor, blur effects |
 
+> 📋 **[Full Cheat Sheet](docs/CHEATSHEET.md)** — All aliases, keyboard shortcuts, and keybindings
+
 ## Commands
 
 ```bash
@@ -105,16 +107,32 @@ Two beautiful themes that sync across terminal, editor, and desktop:
 | 🌃 **Tokyo Night** | Purple-blue Tokyo city lights |
 | 💙 **Ghostty Blue** | Deep navy with electric cyan |
 
-## Window Tiling
+## Keyboard Shortcuts & Aliases
 
-Rectangle/Magnet-style tiling via Tactile extension:
+Kodra includes 50+ shell aliases and keyboard shortcuts for productivity. Here are some highlights:
+
+### Desktop Shortcuts
 
 | Shortcut | Action |
 |----------|--------|
-| `Super + T` | Show tiling grid |
+| `Super + Space` | App launcher (Ulauncher) |
+| `Super + Return` | Open terminal |
+| `Super + T` | Window tiling grid |
 | `Super + ←/→` | Tile left/right half |
-| `Ctrl + Super + ←/→/↑/↓` | Tile to edges |
-| `Ctrl + Alt + U/I/J/K` | Tile to corners |
+| `Shift + Super + 3/4/5` | Screenshots (macOS-style) |
+
+### Shell Aliases
+
+| Alias | What it does |
+|-------|--------------|
+| `??` | Ask GitHub Copilot for shell commands |
+| `lg` | Launch lazygit TUI |
+| `lzd` | Launch lazydocker TUI |
+| `gs`, `ga`, `gc`, `gp` | Git shortcuts |
+| `azd-up` | Deploy to Azure |
+| `tf`, `tfi`, `tfp`, `tfa` | Terraform shortcuts |
+
+> 📋 **[Full Cheat Sheet](docs/CHEATSHEET.md)** — Complete reference for all aliases, keybindings, and shortcuts
 
 ## Customization
 

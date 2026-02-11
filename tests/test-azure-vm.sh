@@ -111,9 +111,12 @@ for i in {1..30}; do
 done
 success "SSH connected"
 
+# SSH options for reliability
+SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 -o ServerAliveInterval=30"
+
 # Install desktop environment (needed for GNOME tests)
 log "Installing Ubuntu Desktop (this takes ~5 minutes)..."
-ssh "$ADMIN_USER@$VM_IP" << 'INSTALL_DESKTOP'
+ssh $SSH_OPTS "$ADMIN_USER@$VM_IP" << 'INSTALL_DESKTOP'
     set -e
     export DEBIAN_FRONTEND=noninteractive
     sudo apt-get update -qq
@@ -124,7 +127,7 @@ success "Ubuntu Desktop installed"
 
 # Run Kodra installation
 log "Installing Kodra..."
-INSTALL_LOG=$(ssh "$ADMIN_USER@$VM_IP" << 'RUN_KODRA'
+INSTALL_LOG=$(ssh $SSH_OPTS "$ADMIN_USER@$VM_IP" << 'RUN_KODRA'
     set -e
     export KODRA_THEME="tokyo-night"
     export KODRA_MINIMAL=1
@@ -161,8 +164,8 @@ echo "$INSTALL_LOG" > "$RESULTS_DIR/install.log"
 
 # Copy logs from VM
 log "Collecting logs..."
-scp "$ADMIN_USER@$VM_IP:~/.config/kodra/install.log" "$RESULTS_DIR/" 2>/dev/null || true
-scp "$ADMIN_USER@$VM_IP:~/.config/kodra/state.json" "$RESULTS_DIR/" 2>/dev/null || true
+scp $SSH_OPTS "$ADMIN_USER@$VM_IP:~/.config/kodra/install.log" "$RESULTS_DIR/" 2>/dev/null || true
+scp $SSH_OPTS "$ADMIN_USER@$VM_IP:~/.config/kodra/state.json" "$RESULTS_DIR/" 2>/dev/null || true
 success "Logs saved to $RESULTS_DIR/"
 
 # Parse results

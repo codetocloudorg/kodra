@@ -43,6 +43,9 @@ BOX_CROSS='✗'
 BOX_ARROW='→'
 BOX_DOT='·'
 
+# Box width for consistent alignment (safe for 80-col terminals)
+BOX_WIDTH=60
+
 # Display the Kodra banner with typing effect
 show_banner() {
     # Get version from VERSION file
@@ -72,9 +75,9 @@ show_banner() {
     echo -e "                                                    ${C_GRAY}v${version}${C_RESET}"
     echo ""
     sleep 0.1
-    echo -e "    ${C_DIM}${BOX_TL}$(printf '%0.s─' {1..63})${BOX_TR}${C_RESET}"
-    echo -e "    ${C_DIM}${BOX_V}${C_RESET}       ${C_PURPLE}${C_BOLD}A  C O D E  T O  C L O U D  P R O J E C T${C_RESET}           ${C_DIM}${BOX_V}${C_RESET}"
-    echo -e "    ${C_DIM}${BOX_BL}$(printf '%0.s─' {1..63})${BOX_BR}${C_RESET}"
+    echo -e "    ${C_DIM}${BOX_TL}$(printf '%0.s─' $(seq 1 $BOX_WIDTH))${BOX_TR}${C_RESET}"
+    printf "    ${C_DIM}${BOX_V}${C_RESET} %*s${C_PURPLE}${C_BOLD}A  C O D E  T O  C L O U D  P R O J E C T${C_RESET}%*s ${C_DIM}${BOX_V}${C_RESET}\n" $(((BOX_WIDTH-42)/2)) "" $(((BOX_WIDTH-42)/2)) ""
+    echo -e "    ${C_DIM}${BOX_BL}$(printf '%0.s─' $(seq 1 $BOX_WIDTH))${BOX_BR}${C_RESET}"
     echo ""
     sleep 0.1
     echo -e "    ${C_CYAN}${BOX_BULLET}${C_RESET} ${C_WHITE}Agentic Azure engineering${C_RESET}"
@@ -156,15 +159,21 @@ section() {
     
     # Top border with gradient
     printf "    ${C_PINK}${BOX_TL}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${BOX_TR}${C_RESET}\n"
     
-    # Title row
-    printf "    ${C_PINK}${BOX_V}${C_RESET}  ${emoji}  ${C_WHITE}${C_BOLD}%-52s${C_RESET}  ${C_DIM}%d/%d${C_RESET}  ${C_PINK}${BOX_V}${C_RESET}\n" "$title" "$KODRA_CURRENT_STEP" "$KODRA_TOTAL_STEPS"
+    # Title row - calculate padding dynamically
+    local title_len=${#title}
+    local step_text="$KODRA_CURRENT_STEP/$KODRA_TOTAL_STEPS"
+    local step_len=${#step_text}
+    local content_len=$((4 + title_len + 2 + step_len))  # emoji+spaces + title + spaces + step
+    local padding=$((BOX_WIDTH - content_len - 2))  # -2 for border spacing
+    [ $padding -lt 0 ] && padding=0
+    printf "    ${C_PINK}${BOX_V}${C_RESET}  ${emoji}  ${C_WHITE}${C_BOLD}%s${C_RESET}%*s${C_DIM}%s${C_RESET}  ${C_PINK}${BOX_V}${C_RESET}\n" "$title" "$padding" "" "$step_text"
     
     # Bottom border
     printf "    ${C_PINK}${BOX_BL}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${BOX_BR}${C_RESET}\n"
     
     echo ""
@@ -211,7 +220,7 @@ show_tools_group() {
     local tools="$1"
     echo ""
     echo -e "    ${C_BLUE}${BOX_ARROW}${C_RESET} ${C_WHITE}${tools}${C_RESET}"
-    echo -e "    ${C_DIM}$(printf '%0.s─' {1..55})${C_RESET}"
+    echo -e "    ${C_DIM}$(printf '%0.s─' $(seq 1 $((BOX_WIDTH - 4))))${C_RESET}"
 }
 
 # Theme selection
@@ -283,38 +292,48 @@ select_container_runtime() {
 confirm_installation() {
     echo ""
     
+    # Helper to print a boxed line with auto-padding
+    print_box_line() {
+        local color="$1"
+        local content="$2"
+        local content_len=${#content}
+        local padding=$((BOX_WIDTH - content_len - 2))  # -2 for left/right spacing
+        [ $padding -lt 0 ] && padding=0
+        printf "    ${color}${BOX_V}${C_RESET} %s%*s ${color}${BOX_V}${C_RESET}\n" "$content" "$padding" ""
+    }
+    
     # Modern card header
     printf "    ${C_PURPLE}${BOX_TL}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${BOX_TR}${C_RESET}\n"
-    printf "    ${C_PURPLE}${BOX_V}${C_RESET}  ${C_WHITE}${C_BOLD}📋  Installation Plan${C_RESET}%45s${C_PURPLE}${BOX_V}${C_RESET}\n" ""
+    print_box_line "$C_PURPLE" "${C_WHITE}${C_BOLD}📋  Installation Plan${C_RESET}"
     printf "    ${C_PURPLE}${BOX_V}${C_DIM}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${C_RESET}${C_PURPLE}${BOX_V}${C_RESET}\n"
     
     # Configuration
-    printf "    ${C_PURPLE}${BOX_V}${C_RESET}  ${C_CYAN}Theme${C_RESET}           ${C_WHITE}%-46s${C_RESET}${C_PURPLE}${BOX_V}${C_RESET}\n" "$KODRA_THEME"
-    printf "    ${C_PURPLE}${BOX_V}${C_RESET}  ${C_CYAN}Containers${C_RESET}      ${C_WHITE}%-46s${C_RESET}${C_PURPLE}${BOX_V}${C_RESET}\n" "$KODRA_CONTAINER_RUNTIME"
+    print_box_line "$C_PURPLE" "${C_CYAN}Theme${C_RESET}           ${C_WHITE}$KODRA_THEME${C_RESET}"
+    print_box_line "$C_PURPLE" "${C_CYAN}Containers${C_RESET}      ${C_WHITE}$KODRA_CONTAINER_RUNTIME${C_RESET}"
     if [ -n "$OPTIONAL_APPS" ]; then
-        printf "    ${C_PURPLE}${BOX_V}${C_RESET}  ${C_CYAN}Optional${C_RESET}        ${C_WHITE}%-46s${C_RESET}${C_PURPLE}${BOX_V}${C_RESET}\n" "$OPTIONAL_APPS"
+        print_box_line "$C_PURPLE" "${C_CYAN}Optional${C_RESET}        ${C_WHITE}$OPTIONAL_APPS${C_RESET}"
     fi
     
     # Divider
     printf "    ${C_PURPLE}${BOX_V}${C_DIM}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${C_RESET}${C_PURPLE}${BOX_V}${C_RESET}\n"
     
     # What's included
-    printf "    ${C_PURPLE}${BOX_V}${C_RESET}  ${C_DIM}${BOX_BULLET}${C_RESET} ${C_GRAY}Package managers (Homebrew, Flatpak, mise)${C_RESET}%16s${C_PURPLE}${BOX_V}${C_RESET}\n" ""
-    printf "    ${C_PURPLE}${BOX_V}${C_RESET}  ${C_DIM}${BOX_BULLET}${C_RESET} ${C_GRAY}Modern terminal (Ghostty, Neovim, Starship)${C_RESET}%14s${C_PURPLE}${BOX_V}${C_RESET}\n" ""
-    printf "    ${C_PURPLE}${BOX_V}${C_RESET}  ${C_DIM}${BOX_BULLET}${C_RESET} ${C_GRAY}CLI tools (bat, eza, fzf, ripgrep, lazygit)${C_RESET}%14s${C_PURPLE}${BOX_V}${C_RESET}\n" ""
-    printf "    ${C_PURPLE}${BOX_V}${C_RESET}  ${C_DIM}${BOX_BULLET}${C_RESET} ${C_GRAY}Cloud tools (Azure CLI, azd, kubectl, Helm)${C_RESET}%15s${C_PURPLE}${BOX_V}${C_RESET}\n" ""
-    printf "    ${C_PURPLE}${BOX_V}${C_RESET}  ${C_DIM}${BOX_BULLET}${C_RESET} ${C_GRAY}IaC tools (Terraform, OpenTofu, Bicep)${C_RESET}%19s${C_PURPLE}${BOX_V}${C_RESET}\n" ""
-    printf "    ${C_PURPLE}${BOX_V}${C_RESET}  ${C_DIM}${BOX_BULLET}${C_RESET} ${C_GRAY}Beautiful GNOME desktop configuration${C_RESET}%21s${C_PURPLE}${BOX_V}${C_RESET}\n" ""
+    print_box_line "$C_PURPLE" "${C_DIM}${BOX_BULLET}${C_RESET} ${C_GRAY}Package managers (Homebrew, Flatpak, mise)${C_RESET}"
+    print_box_line "$C_PURPLE" "${C_DIM}${BOX_BULLET}${C_RESET} ${C_GRAY}Modern terminal (Ghostty, Neovim, Starship)${C_RESET}"
+    print_box_line "$C_PURPLE" "${C_DIM}${BOX_BULLET}${C_RESET} ${C_GRAY}CLI tools (bat, eza, fzf, ripgrep, lazygit)${C_RESET}"
+    print_box_line "$C_PURPLE" "${C_DIM}${BOX_BULLET}${C_RESET} ${C_GRAY}Cloud tools (Azure CLI, azd, kubectl, Helm)${C_RESET}"
+    print_box_line "$C_PURPLE" "${C_DIM}${BOX_BULLET}${C_RESET} ${C_GRAY}IaC tools (Terraform, OpenTofu, Bicep)${C_RESET}"
+    print_box_line "$C_PURPLE" "${C_DIM}${BOX_BULLET}${C_RESET} ${C_GRAY}Beautiful GNOME desktop configuration${C_RESET}"
     
     # Card footer
     printf "    ${C_PURPLE}${BOX_BL}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${BOX_BR}${C_RESET}\n"
     echo ""
     
@@ -401,86 +420,107 @@ show_completion() {
     
     # Success banner with gradient border
     printf "    ${border_color}${BOX_TL}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${BOX_TR}${C_RESET}\n"
-    printf "    ${border_color}${BOX_V}${C_RESET}%67s${border_color}${BOX_V}${C_RESET}\n" ""
-    printf "    ${border_color}${BOX_V}${C_RESET}   ${status_icon}  ${C_WHITE}${C_BOLD}%-57s${C_RESET}   ${border_color}${BOX_V}${C_RESET}\n" "$status_text"
-    printf "    ${border_color}${BOX_V}${C_RESET}%67s${border_color}${BOX_V}${C_RESET}\n" ""
+    printf "    ${border_color}${BOX_V}${C_RESET}%*s${border_color}${BOX_V}${C_RESET}\n" "$BOX_WIDTH" ""
+    local status_len=${#status_text}
+    local status_pad=$(((BOX_WIDTH - status_len - 5) / 2))  # -5 for icon and spaces
+    printf "    ${border_color}${BOX_V}${C_RESET}%*s${status_icon}  ${C_WHITE}${C_BOLD}%s${C_RESET}%*s${border_color}${BOX_V}${C_RESET}\n" "$status_pad" "" "$status_text" "$status_pad" ""
+    printf "    ${border_color}${BOX_V}${C_RESET}%*s${border_color}${BOX_V}${C_RESET}\n" "$BOX_WIDTH" ""
     printf "    ${border_color}${BOX_BL}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${BOX_BR}${C_RESET}\n"
     
     echo ""
     
     # Stats card
     printf "    ${C_DIM}${BOX_TL}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${BOX_TR}${C_RESET}\n"
-    printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_BLUE}STATS${C_RESET}%58s${C_DIM}${BOX_V}${C_RESET}\n" ""
+    printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_BLUE}STATS${C_RESET}%*s${C_DIM}${BOX_V}${C_RESET}\n" "$((BOX_WIDTH - 7))" ""
     printf "    ${C_DIM}${BOX_V}  "
-    printf '%0.s─' {1..63}
+    printf '%0.s─' $(seq 1 $((BOX_WIDTH - 2)))
     printf "${BOX_V}${C_RESET}\n"
     
     # Time
+    local time_str
     if [ $minutes -gt 0 ]; then
-        printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_CYAN}⏱${C_RESET}  Duration          ${C_WHITE}%dm %ds${C_RESET}%35s${C_DIM}${BOX_V}${C_RESET}\n" "$minutes" "$seconds" ""
+        time_str="${minutes}m ${seconds}s"
     else
-        printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_CYAN}⏱${C_RESET}  Duration          ${C_WHITE}%ds${C_RESET}%39s${C_DIM}${BOX_V}${C_RESET}\n" "$seconds" ""
+        time_str="${seconds}s"
     fi
+    printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_CYAN}⏱${C_RESET}  Duration          ${C_WHITE}%s${C_RESET}%*s${C_DIM}${BOX_V}${C_RESET}\n" "$time_str" "$((BOX_WIDTH - 24 - ${#time_str}))" ""
     
     # Component count
     local success_count=$((${KODRA_INSTALL_COUNT:-0} - ${KODRA_FAIL_COUNT:-0}))
-    printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_GREEN}${BOX_CHECK}${C_RESET}  Installed          ${C_WHITE}%d${C_RESET} components%24s${C_DIM}${BOX_V}${C_RESET}\n" "$success_count" ""
+    local comp_str="${success_count} components"
+    printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_GREEN}${BOX_CHECK}${C_RESET}  Installed          ${C_WHITE}%s${C_RESET}%*s${C_DIM}${BOX_V}${C_RESET}\n" "$comp_str" "$((BOX_WIDTH - 24 - ${#comp_str}))" ""
     
     if [ "${KODRA_FAIL_COUNT:-0}" -gt 0 ]; then
-        printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_RED}${BOX_CROSS}${C_RESET}  Failed             ${C_WHITE}%d${C_RESET} components%24s${C_DIM}${BOX_V}${C_RESET}\n" "$KODRA_FAIL_COUNT" ""
+        local fail_str="${KODRA_FAIL_COUNT} components"
+        printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_RED}${BOX_CROSS}${C_RESET}  Failed             ${C_WHITE}%s${C_RESET}%*s${C_DIM}${BOX_V}${C_RESET}\n" "$fail_str" "$((BOX_WIDTH - 24 - ${#fail_str}))" ""
     fi
     
     printf "    ${C_DIM}${BOX_BL}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${BOX_BR}${C_RESET}\n"
     
     echo ""
     
     # Tools available card
     printf "    ${C_DIM}${BOX_TL}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${BOX_TR}${C_RESET}\n"
-    printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_BLUE}READY TO USE${C_RESET}%51s${C_DIM}${BOX_V}${C_RESET}\n" ""
+    printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_BLUE}READY TO USE${C_RESET}%*s${C_DIM}${BOX_V}${C_RESET}\n" "$((BOX_WIDTH - 14))" ""
     printf "    ${C_DIM}${BOX_V}  "
-    printf '%0.s─' {1..63}
+    printf '%0.s─' $(seq 1 $((BOX_WIDTH - 2)))
     printf "${BOX_V}${C_RESET}\n"
     
+    # Helper for tool lines
+    print_tool_line() {
+        local text="$1"
+        local text_len=${#text}
+        local pad=$((BOX_WIDTH - 6 - text_len))  # 6 = "  ✓  " length
+        [ $pad -lt 0 ] && pad=0
+        printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_GREEN}${BOX_CHECK}${C_RESET}  %s%*s${C_DIM}${BOX_V}${C_RESET}\n" "$text" "$pad" ""
+    }
+    
     # Check which tools are available
-    command -v ghostty &>/dev/null && printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_GREEN}${BOX_CHECK}${C_RESET}  Ghostty terminal with Starship prompt%20s${C_DIM}${BOX_V}${C_RESET}\n" ""
-    command -v code &>/dev/null && printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_GREEN}${BOX_CHECK}${C_RESET}  VS Code with cloud-native extensions%22s${C_DIM}${BOX_V}${C_RESET}\n" ""
-    command -v az &>/dev/null && printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_GREEN}${BOX_CHECK}${C_RESET}  Azure CLI, azd, Terraform, Bicep%25s${C_DIM}${BOX_V}${C_RESET}\n" ""
-    command -v docker &>/dev/null && printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_GREEN}${BOX_CHECK}${C_RESET}  Docker, kubectl, Helm, k9s%32s${C_DIM}${BOX_V}${C_RESET}\n" ""
-    command -v bat &>/dev/null && printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_GREEN}${BOX_CHECK}${C_RESET}  Modern CLI (bat, eza, fzf, lazygit)%22s${C_DIM}${BOX_V}${C_RESET}\n" ""
+    command -v ghostty &>/dev/null && print_tool_line "Ghostty terminal with Starship prompt"
+    command -v code &>/dev/null && print_tool_line "VS Code with cloud-native extensions"
+    command -v az &>/dev/null && print_tool_line "Azure CLI, azd, Terraform, Bicep"
+    command -v docker &>/dev/null && print_tool_line "Docker, kubectl, Helm, k9s"
+    command -v bat &>/dev/null && print_tool_line "Modern CLI (bat, eza, fzf, lazygit)"
     
     printf "    ${C_DIM}${BOX_BL}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${BOX_BR}${C_RESET}\n"
     
     # Show failures if any
     if [ "${KODRA_FAIL_COUNT:-0}" -gt 0 ] && [ -n "$KODRA_FAILED_INSTALLS" ]; then
         echo ""
         printf "    ${C_YELLOW}${BOX_TL}"
-        printf '%0.s─' {1..65}
+        printf '%0.s─' $(seq 1 $BOX_WIDTH)
         printf "${BOX_TR}${C_RESET}\n"
-        printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_YELLOW}FAILED COMPONENTS${C_RESET}%46s${C_YELLOW}${BOX_V}${C_RESET}\n" ""
+        printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_YELLOW}FAILED COMPONENTS${C_RESET}%*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$((BOX_WIDTH - 19))" ""
         printf "    ${C_YELLOW}${BOX_V}  "
-        printf '%0.s─' {1..63}
+        printf '%0.s─' $(seq 1 $((BOX_WIDTH - 2)))
         printf "${BOX_V}${C_RESET}\n"
         
         echo -e "$KODRA_FAILED_INSTALLS" | while read -r line; do
-            [ -n "$line" ] && printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_RED}${BOX_CROSS}${C_RESET}  %-59s${C_YELLOW}${BOX_V}${C_RESET}\n" "$line"
+            if [ -n "$line" ]; then
+                local line_len=${#line}
+                local pad=$((BOX_WIDTH - 6 - line_len))
+                [ $pad -lt 0 ] && pad=0
+                printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_RED}${BOX_CROSS}${C_RESET}  %s%*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$line" "$pad" ""
+            fi
         done
         
-        printf "    ${C_YELLOW}${BOX_V}${C_RESET}%67s${C_YELLOW}${BOX_V}${C_RESET}\n" ""
-        printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_DIM}Run 'kodra resume' to retry failed components${C_RESET}%14s${C_YELLOW}${BOX_V}${C_RESET}\n" ""
+        printf "    ${C_YELLOW}${BOX_V}${C_RESET}%*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$BOX_WIDTH" ""
+        local resume_text="Run 'kodra resume' to retry failed components"
+        printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_DIM}%s${C_RESET}%*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$resume_text" "$((BOX_WIDTH - 4 - ${#resume_text}))" ""
         printf "    ${C_YELLOW}${BOX_BL}"
-        printf '%0.s─' {1..65}
+        printf '%0.s─' $(seq 1 $BOX_WIDTH)
         printf "${BOX_BR}${C_RESET}\n"
     fi
     
@@ -515,11 +555,11 @@ show_info() {
 show_preflight() {
     echo ""
     printf "    ${C_DIM}${BOX_TL}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${BOX_TR}${C_RESET}\n"
-    printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_CYAN}PRE-FLIGHT CHECKS${C_RESET}%45s${C_DIM}${BOX_V}${C_RESET}\n" ""
+    printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_CYAN}PRE-FLIGHT CHECKS${C_RESET}%*s${C_DIM}${BOX_V}${C_RESET}\n" "$((BOX_WIDTH - 19))" ""
     printf "    ${C_DIM}${BOX_V}  "
-    printf '%0.s─' {1..63}
+    printf '%0.s─' $(seq 1 $((BOX_WIDTH - 2)))
     printf "${BOX_V}${C_RESET}\n"
 }
 
@@ -534,16 +574,22 @@ show_check() {
     [ "$status" = "fail" ] && icon="${C_RED}${BOX_CROSS}${C_RESET}"
     
     if [ -n "$detail" ]; then
-        printf "    ${C_DIM}${BOX_V}${C_RESET}  ${icon}  %-25s ${C_DIM}%s${C_RESET}%*s${C_DIM}${BOX_V}${C_RESET}\n" "$name" "$detail" $((32 - ${#detail})) ""
+        local content="${name} ${detail}"
+        local content_len=$((${#name} + 1 + ${#detail}))
+        local pad=$((BOX_WIDTH - 6 - content_len))  # 6 = "  ✓  " length
+        [ $pad -lt 0 ] && pad=0
+        printf "    ${C_DIM}${BOX_V}${C_RESET}  ${icon}  %s ${C_DIM}%s${C_RESET}%*s${C_DIM}${BOX_V}${C_RESET}\n" "$name" "$detail" "$pad" ""
     else
-        printf "    ${C_DIM}${BOX_V}${C_RESET}  ${icon}  %-55s${C_DIM}${BOX_V}${C_RESET}\n" "$name"
+        local pad=$((BOX_WIDTH - 6 - ${#name}))
+        [ $pad -lt 0 ] && pad=0
+        printf "    ${C_DIM}${BOX_V}${C_RESET}  ${icon}  %s%*s${C_DIM}${BOX_V}${C_RESET}\n" "$name" "$pad" ""
     fi
 }
 
 # End preflight section
 end_preflight() {
     printf "    ${C_DIM}${BOX_BL}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${BOX_BR}${C_RESET}\n"
     echo ""
 }

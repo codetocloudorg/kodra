@@ -14,6 +14,12 @@ if ! command -v gdm3 &> /dev/null && ! [ -d /etc/gdm3 ]; then
     exit 0
 fi
 
+# Ensure glib-compile-resources is available (needed for GDM theme compilation)
+if ! command -v glib-compile-resources &> /dev/null; then
+    echo "Installing glib-compile-resources..."
+    sudo apt-get install -y -qq libglib2.0-dev-bin 2>/dev/null || true
+fi
+
 KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
 
 # Get current theme

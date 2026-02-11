@@ -1023,7 +1023,7 @@
     <section class="hero">
         <div class="hero-badge">
             <span class="hero-badge-dot"></span>
-            v0.2.16 — Premium installation UI with progress tracking
+            v0.2.17 — WSL edition + 50+ shell aliases & shortcuts
         </div>
         
         <pre class="ascii-art">
@@ -1218,16 +1218,15 @@
                         <div style="color: var(--text-secondary); font-size: 0.9rem;">Noble Numbat LTS</div>
                     </div>
                     
-                    <div class="coming-soon-badge">
+                    <a href="https://kodra.wsl.codetocloud.io" class="coming-soon-badge" style="text-decoration: none; background: linear-gradient(135deg, rgba(63, 185, 80, 0.2), rgba(88, 166, 255, 0.2)); border-color: var(--accent-green);">
                         <svg viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
                         </svg>
-                        <span><strong>WSL Edition</strong> coming soon!</span>
-                    </div>
+                        <span><strong>WSL Edition</strong> now available!</span>
+                    </a>
                     
                     <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem;">
-                        All CLI tools, Azure integrations, and GitHub Copilot—running in Windows Terminal. Perfect for Windows developers.
+                        All CLI tools, Azure integrations, and GitHub Copilot—running in Windows Terminal. <a href="https://kodra.wsl.codetocloud.io" style="color: var(--accent-blue);">Get started →</a>
                     </p>
                 </div>
             </div>
@@ -1269,6 +1268,11 @@
                 <div class="feature-icon">⚡</div>
                 <h3 class="feature-title">Modern Terminal</h3>
                 <p class="feature-description">Ghostty terminal with Starship prompt and Nerd Fonts. Fast and beautiful.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⌨️</div>
+                <h3 class="feature-title">50+ Shortcuts</h3>
+                <p class="feature-description">Shell aliases for Git, Docker, Azure, Terraform. Type <code>??</code> to ask Copilot anything.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🎨</div>
@@ -1411,6 +1415,61 @@
                 <code class="command-code">kodra fetch</code>
                 <span class="command-desc">Show system info</span>
             </div>
+        </div>
+    </section>
+
+    <!-- Shortcuts Section -->
+    <section>
+        <div class="section-header">
+            <span class="section-label">Productivity</span>
+            <h2 class="section-title">50+ built-in shortcuts</h2>
+            <p class="section-subtitle">
+                Shell aliases and keybindings to supercharge your workflow.
+            </p>
+        </div>
+        
+        <div class="commands-list">
+            <div class="command-item">
+                <code class="command-code">??</code>
+                <span class="command-desc">Ask GitHub Copilot for shell commands</span>
+            </div>
+            <div class="command-item">
+                <code class="command-code">lg</code>
+                <span class="command-desc">Launch lazygit TUI</span>
+            </div>
+            <div class="command-item">
+                <code class="command-code">lzd</code>
+                <span class="command-desc">Launch lazydocker TUI</span>
+            </div>
+            <div class="command-item">
+                <code class="command-code">gs, ga, gc, gp</code>
+                <span class="command-desc">Git status, add, commit, push</span>
+            </div>
+            <div class="command-item">
+                <code class="command-code">azd-up</code>
+                <span class="command-desc">Deploy to Azure with azd</span>
+            </div>
+            <div class="command-item">
+                <code class="command-code">tf, tfi, tfp, tfa</code>
+                <span class="command-desc">Terraform shortcuts</span>
+            </div>
+            <div class="command-item">
+                <code class="command-code">Super + Space</code>
+                <span class="command-desc">App launcher (Ulauncher)</span>
+            </div>
+            <div class="command-item">
+                <code class="command-code">Super + T</code>
+                <span class="command-desc">Window tiling grid</span>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="https://github.com/codetocloudorg/kodra/blob/main/docs/CHEATSHEET.md" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M0 1.75A.75.75 0 01.75 1h4.253c1.227 0 2.317.59 3 1.501A3.744 3.744 0 0111.006 1h4.245a.75.75 0 01.75.75v10.5a.75.75 0 01-.75.75h-4.507a2.25 2.25 0 00-1.591.659l-.622.621a.75.75 0 01-1.06 0l-.622-.621A2.25 2.25 0 005.258 13H.75a.75.75 0 01-.75-.75V1.75zm8.755 3a2.25 2.25 0 012.25-2.25H14.5v9h-3.757c-.71 0-1.4.201-1.992.572l.004-7.322zm-1.504 7.324l.004-5.073-.002-2.253A2.25 2.25 0 005.003 2.5H1.5v9h3.757a3.75 3.75 0 011.994.574z"/>
+                </svg>
+                View Full Cheat Sheet
+            </a>
         </div>
     </section>
 

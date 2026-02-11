@@ -64,12 +64,16 @@ apply_theme() {
     # VS Code (if settings exist)
     if [ -f "$theme_dir/vscode-settings.json" ]; then
         VSCODE_DIR="$HOME/.config/Code/User"
-        if [ -d "$VSCODE_DIR" ]; then
-            # Merge theme settings
-            if command -v jq &> /dev/null; then
-                jq -s '.[0] * .[1]' "$VSCODE_DIR/settings.json" "$theme_dir/vscode-settings.json" > "$VSCODE_DIR/settings.json.tmp"
-                mv "$VSCODE_DIR/settings.json.tmp" "$VSCODE_DIR/settings.json"
-            fi
+        # Create VS Code settings directory if it doesn't exist
+        mkdir -p "$VSCODE_DIR"
+        # Create empty settings.json if it doesn't exist
+        if [ ! -f "$VSCODE_DIR/settings.json" ]; then
+            echo '{}' > "$VSCODE_DIR/settings.json"
+        fi
+        # Merge theme settings
+        if command -v jq &> /dev/null; then
+            jq -s '.[0] * .[1]' "$VSCODE_DIR/settings.json" "$theme_dir/vscode-settings.json" > "$VSCODE_DIR/settings.json.tmp"
+            mv "$VSCODE_DIR/settings.json.tmp" "$VSCODE_DIR/settings.json"
             log_success "VS Code theme applied"
         fi
     fi

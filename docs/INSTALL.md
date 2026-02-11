@@ -127,6 +127,20 @@ You can re-run this setup anytime:
 kodra setup
 ```
 
+## Learning the Shortcuts
+
+Kodra includes 50+ shell aliases and keyboard shortcuts to boost your productivity:
+
+```bash
+# Quick examples
+??           # Ask GitHub Copilot for shell commands
+lg           # Launch lazygit
+azd-up       # Deploy to Azure
+gs           # git status
+```
+
+See the **[Full Cheat Sheet](CHEATSHEET.md)** for all aliases, keyboard shortcuts, and keybindings.
+
 ## Verifying Installation
 
 Check that everything is working:
