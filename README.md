@@ -9,7 +9,7 @@
     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
 ```
 
-**Agentic Azure engineering using cloud-native tools—one command to ship.**
+**Agentic Azure engineering powered by GitHub CLI—one command to ship.**
 
 [![Version](https://img.shields.io/badge/version-0.2.18-blue?style=flat-square)](VERSION)
 [![CI](https://img.shields.io/github/actions/workflow/status/codetocloudorg/kodra/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/codetocloudorg/kodra/actions)
@@ -23,9 +23,9 @@
 
 ---
 
-**That's the pitch.** No more hunting for tools, configuring extensions, or figuring out which CLI utilities matter. Kodra is an opinionated Ubuntu setup for engineers who build and deploy on **Azure**—with AI assistance baked in.
+**That's the pitch.** No more hunting for tools, configuring extensions, or figuring out which CLI utilities matter. Kodra is an opinionated Ubuntu setup for engineers who build and deploy on **Azure**—with **GitHub CLI** and **AI agentic workflows** baked in.
 
-Whether you're deploying to AKS, authoring Bicep templates, or shipping containers with GitHub Copilot suggesting your next command—Kodra gets you from fresh install to `azd up` in minutes.
+GitHub CLI (`gh`) is the backbone of Kodra's agentic development experience. Combined with Copilot CLI, you can ask questions, generate code, create PRs, and manage repos—all from your terminal. Whether you're deploying to AKS, authoring Bicep templates, or letting AI suggest your next command—Kodra gets you from fresh install to `azd up` in minutes.
 
 ## Why Ubuntu?
 
@@ -77,8 +77,8 @@ That's it. The installer will:
 | **Cloud** | Azure CLI, azd, Bicep, Terraform, OpenTofu, PowerShell 7 |
 | **Kubernetes** | kubectl, Helm, k9s |
 | **Containers** | Docker CE, lazydocker, Dev Containers support |
-| **Git** | GitHub CLI, GitHub Desktop, lazygit, GitLens |
-| **AI** | GitHub Copilot + Copilot CLI (`gh copilot suggest`) |
+| **Git & GitHub** | **GitHub CLI** (`gh`), GitHub Desktop, lazygit, GitLens |
+| **AI Agentic** | GitHub Copilot + Copilot CLI—ask `??` or `gh copilot suggest` |
 | **CLI** | bat, eza, fzf, ripgrep, zoxide, btop, fastfetch, jq, yq |
 | **Desktop** | ULauncher, window tiling, system monitor, blur effects |
 
@@ -125,7 +125,8 @@ Kodra includes 50+ shell aliases and keyboard shortcuts for productivity. Here a
 
 | Alias | What it does |
 |-------|--------------|
-| `??` | Ask GitHub Copilot for shell commands |
+| `??` | Ask GitHub Copilot for shell commands (agentic AI) |
+| `ghpr` | Create a PR via GitHub CLI |
 | `lg` | Launch lazygit TUI |
 | `lzd` | Launch lazydocker TUI |
 | `gs`, `ga`, `gc`, `gp` | Git shortcuts |

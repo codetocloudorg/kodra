@@ -65,8 +65,8 @@ echo -e "\033[38;5;51m    ━━━━━━━━━━━━━━━━━━
 echo -e "\033[38;5;147m        ☁️  F R O M   C O D E   T O   C L O U D  ☁️\033[0m"
 echo -e "\033[38;5;51m    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 echo ""
-echo -e "    ${C_GRAY}Agentic cloud-native engineering for Azure${C_RESET}"
-echo -e "    ${C_GRAY}Azure • Kubernetes • Containers • IaC${C_RESET}"
+echo -e "    ${C_GRAY}Agentic cloud-native engineering powered by GitHub CLI${C_RESET}"
+echo -e "    ${C_GRAY}Azure • GitHub CLI • Kubernetes • Containers • IaC${C_RESET}"
 echo ""
 
 # Helper functions
