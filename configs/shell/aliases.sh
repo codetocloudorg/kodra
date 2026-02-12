@@ -83,11 +83,11 @@ alias azd-deploy='azd deploy'
 # GitHub Copilot CLI shortcuts
 # ---------------------------------------------------------
 
-if command -v gh &> /dev/null && gh extension list 2>/dev/null | grep -q copilot; then
-    alias '??'='gh copilot suggest -t shell'
-    alias 'git?'='gh copilot suggest -t git'
-    alias 'gh?'='gh copilot suggest -t gh'
-    alias 'explain'='gh copilot explain'
+# New standalone Copilot CLI (copilot-cli via Homebrew)
+if command -v copilot &> /dev/null; then
+    alias '??'='copilot -p'
+    alias 'explain'='copilot -p "Explain this command:"'
+    alias 'copilot-login'='copilot'  # Run /login inside interactive session
 fi
 
 # ---------------------------------------------------------

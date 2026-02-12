@@ -78,7 +78,7 @@ That's it. The installer will:
 | **Kubernetes** | kubectl, Helm, k9s |
 | **Containers** | Docker CE, lazydocker, Dev Containers support |
 | **Git & GitHub** | **GitHub CLI** (`gh`), GitHub Desktop, lazygit, GitLens |
-| **AI Agentic** | GitHub Copilot + Copilot CLI—ask `??` or `gh copilot suggest` |
+| **AI Agentic** | GitHub Copilot CLI—ask `??` or run `copilot` for interactive AI |
 | **CLI** | bat, eza, fzf, ripgrep, zoxide, btop, fastfetch, jq, yq |
 | **Desktop** | ULauncher, window tiling, system monitor, blur effects |
 
