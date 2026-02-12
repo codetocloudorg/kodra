@@ -100,6 +100,21 @@ apply_theme() {
         fi
     fi
     
+    # GNOME accent color (Ubuntu 22.04+)
+    # Available: blue, teal, green, yellow, orange, red, pink, purple, slate
+    if command -v gsettings &> /dev/null && [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+        local accent_color=""
+        case "$theme" in
+            tokyo-night)  accent_color="purple" ;;
+            ghostty-blue) accent_color="blue" ;;
+            *)            accent_color="blue" ;;
+        esac
+        
+        if gsettings set org.gnome.desktop.interface accent-color "$accent_color" 2>/dev/null; then
+            log_success "Accent color set to $accent_color"
+        fi
+    fi
+    
     # Save current theme
     mkdir -p "$KODRA_CONFIG_DIR"
     echo "$theme" > "$KODRA_CONFIG_DIR/theme"

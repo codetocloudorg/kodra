@@ -152,6 +152,10 @@ echo "⚙️  Applying desktop settings..."
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
 
+# Accent color (purple for Tokyo Night default theme)
+# Available: blue, teal, green, yellow, orange, red, pink, purple, slate
+gsettings set org.gnome.desktop.interface accent-color 'purple' 2>/dev/null || true
+
 # Window controls on LEFT (macOS style) - close, minimize, maximize
 gsettings set org.gnome.desktop.wm.preferences button-layout 'close,minimize,maximize:'
 
