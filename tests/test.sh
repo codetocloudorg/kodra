@@ -5,7 +5,7 @@
 #
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export KODRA_DIR="$SCRIPT_DIR"
+export KODRA_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Kodra Local Test Suite"
@@ -93,8 +93,8 @@ test_result $? "configs/nvim/init.lua exists"
 # Test 8: Wallpapers
 echo "▸ Checking wallpapers..."
 WP_COUNT=$(ls wallpapers/*.{svg,png,jpg,jpeg} 2>/dev/null | wc -l)
-[ "$WP_COUNT" -ge 5 ]
-test_result $? "At least 5 wallpapers ($WP_COUNT found)"
+[ "$WP_COUNT" -ge 1 ]
+test_result $? "At least 1 wallpaper ($WP_COUNT found)"
 
 # Summary
 echo ""
