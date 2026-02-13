@@ -145,7 +145,7 @@ export KODRA_FAILED_INSTALLS=""
 export KODRA_INSTALL_COUNT=0
 export KODRA_FAIL_COUNT=0
 
-# Run an installer script (non-fatal in debug mode)
+# Run an installer script (always continues on failure, tracks failures for summary)
 run_installer() {
     local script="$1"
     shift
@@ -183,15 +183,14 @@ run_installer() {
         cat "$output_file" >> "$KODRA_LOG_FILE" 2>/dev/null || true
         echo "=== END $name ===" >> "$KODRA_LOG_FILE"
         
+        log_error "Failed to install $name"
         if [ "${KODRA_DEBUG:-false}" = "true" ]; then
-            log_warning "Failed: $name - continuing (debug mode)"
             log_warning "  Details saved to: $output_file"
-            return 0  # Don't fail in debug mode
-        else
-            log_error "Failed to install $name"
-            return 1
         fi
     fi
+    
+    # Always continue — failures are tracked in KODRA_FAIL_COUNT
+    return 0
 }
 
 # Add directory to PATH in shell configs

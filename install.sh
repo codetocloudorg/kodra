@@ -253,15 +253,15 @@ if [ -f /etc/apt/sources.list.d/ghostty.list ]; then
 fi
 
 show_installing "Updating package lists"
-sudo apt-get update -qq
+sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq
 show_installed "Package lists updated"
 
 show_installing "Upgrading system packages"
-sudo apt-get upgrade -y -qq
+sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y -qq
 show_installed "System packages upgraded"
 
 show_installing "Installing build essentials"
-sudo apt-get install -y -qq \
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
     build-essential \
     curl \
     wget \
@@ -342,7 +342,7 @@ if [ -n "$OPTIONAL_APPS" ]; then
     for app in "${APPS[@]}"; do
         app=$(echo "$app" | xargs) # trim whitespace
         if [ -f "$KODRA_DIR/applications/${app}.sh" ]; then
-            run_installer "$KODRA_DIR/applications/${app}.sh" || true
+            run_installer "$KODRA_DIR/applications/${app}.sh"
         fi
     done
 fi
@@ -354,11 +354,11 @@ section "Desktop Environment" "🎨"
 
 show_tools_group "Beautiful GNOME desktop with Tokyo Night theme"
 for script in "$KODRA_DIR/install/desktop/"*.sh; do
-    run_installer "$script" || true
+    run_installer "$script"
 done
 
 show_installing "Applying $KODRA_THEME theme"
-run_installer "$KODRA_DIR/bin/kodra-sub/theme.sh" "$KODRA_THEME" || true
+run_installer "$KODRA_DIR/bin/kodra-sub/theme.sh" "$KODRA_THEME"
 show_success "$KODRA_THEME theme applied"
 
 # -----------------------------------------------------------------------------

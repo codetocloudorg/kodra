@@ -194,8 +194,8 @@ install_gum() {
     sudo mkdir -p /etc/apt/keyrings
     curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg 2>/dev/null
     echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list > /dev/null
-    sudo apt-get update -qq
-    sudo apt-get install -y gum > /dev/null 2>&1
+    sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gum > /dev/null 2>&1
     echo -e "    ${C_GREEN}${BOX_CHECK}${C_RESET} ${C_DIM}Interactive CLI ready${C_RESET}"
 }
 
