@@ -32,17 +32,21 @@ export KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
 export KODRA_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/kodra"
 export KODRA_LOG_FILE="/tmp/kodra-install-$(date +%Y%m%d-%H%M%S).log"
 
+# Suppress apt noise (needrestart, dpkg prompts)
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+
 # Start logging everything to file
 exec > >(tee -a "$KODRA_LOG_FILE") 2>&1
 
-echo "═══════════════════════════════════════════════════════════════════"
+echo "$(printf '%0.s═' $(seq 1 60))"
 echo "Kodra Installation Log"
 echo "Started: $(date)"
 echo "System: $(uname -a)"
 echo "User: $USER"
 echo "Log file: $KODRA_LOG_FILE"
 [ "$KODRA_DEBUG" = "true" ] && echo "Mode: DEBUG (resilient - will continue on errors)"
-echo "═══════════════════════════════════════════════════════════════════"
+echo "$(printf '%0.s═' $(seq 1 60))"
 echo ""
 
 # Error handler with verbose logging
@@ -50,9 +54,9 @@ kodra_error_handler() {
     local exit_code=$?
     local line_no=$1
     echo ""
-    echo "╔════════════════════════════════════════════════════════════╗"
-    echo "║               INSTALLATION ERROR                           ║"
-    echo "╚════════════════════════════════════════════════════════════╝"
+    echo "╭$(printf '%0.s─' $(seq 1 60))╮"
+    printf "│  %-58s│\n" "INSTALLATION ERROR"
+    echo "╰$(printf '%0.s─' $(seq 1 60))╯"
     echo ""
     echo "❌ Error occurred at line $line_no (exit code: $exit_code)"
     echo ""
@@ -419,7 +423,11 @@ fi
 
 # First-run setup (GitHub login, Azure login, etc.)
 echo ""
-if command -v gum &> /dev/null; then
+if ! ( exec 0</dev/tty ) 2>/dev/null; then
+    # No TTY available (piped install via wget|bash or nohup)
+    show_info "Skipped first-run (no TTY). Run 'kodra setup' anytime to configure."
+    "$KODRA_DIR/bin/kodra-sub/first-run.sh" --skip
+elif command -v gum &> /dev/null; then
     if gum confirm "Run first-time setup? (GitHub login, Azure auth, Git config) (Y/n)"; then
         "$KODRA_DIR/bin/kodra-sub/first-run.sh"
     else

@@ -169,7 +169,7 @@ run_installer() {
         export PATH
     fi
     
-    if bash "$script" "$@" 2>&1 | tee -a "$output_file"; then
+    if bash "$script" "$@" >> "$output_file" 2>&1; then
         log_success "$name installed"
         rm -f "$output_file"  # Clean up on success
     else

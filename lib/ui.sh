@@ -76,7 +76,9 @@ show_banner() {
     echo ""
     sleep 0.1
     echo -e "    ${C_DIM}${BOX_TL}$(printf '%0.s─' $(seq 1 $BOX_WIDTH))${BOX_TR}${C_RESET}"
-    printf "    ${C_DIM}${BOX_V}${C_RESET} %*s${C_PURPLE}${C_BOLD}A  C O D E  T O  C L O U D  P R O J E C T${C_RESET}%*s ${C_DIM}${BOX_V}${C_RESET}\n" $(((BOX_WIDTH-42)/2)) "" $(((BOX_WIDTH-42)/2)) ""
+    local sub_pad=$(( (BOX_WIDTH - 43) / 2 ))  # 43 = 41 (text) + 2 (bookend spaces)
+    local sub_pad_r=$(( BOX_WIDTH - 43 - sub_pad ))
+    printf "    ${C_DIM}${BOX_V}${C_RESET} %*s${C_PURPLE}${C_BOLD}A  C O D E  T O  C L O U D  P R O J E C T${C_RESET}%*s ${C_DIM}${BOX_V}${C_RESET}\n" "$sub_pad" "" "$sub_pad_r" ""
     echo -e "    ${C_DIM}${BOX_BL}$(printf '%0.s─' $(seq 1 $BOX_WIDTH))${BOX_BR}${C_RESET}"
     echo ""
     sleep 0.1
@@ -124,7 +126,7 @@ show_progress() {
         fi
     done
     printf "${C_DIM}"
-    printf '%*s' "$empty" | tr ' ' '░'
+    printf '%*s' "$empty" | tr ' ' '·'
     printf "${C_RESET}${C_DIM}]${C_RESET} ${C_WHITE}%3d%%${C_RESET}${eta_text}\n" "$percent"
 }
 
@@ -296,10 +298,13 @@ confirm_installation() {
     print_box_line() {
         local color="$1"
         local content="$2"
-        local content_len=${#content}
+        # Strip ANSI escape codes for length calculation
+        local stripped
+        stripped=$(printf '%b' "$content" | sed 's/\x1b\[[0-9;]*m//g')
+        local content_len=${#stripped}
         local padding=$((BOX_WIDTH - content_len - 2))  # -2 for left/right spacing
         [ $padding -lt 0 ] && padding=0
-        printf "    ${color}${BOX_V}${C_RESET} %s%*s ${color}${BOX_V}${C_RESET}\n" "$content" "$padding" ""
+        printf "    ${color}${BOX_V}${C_RESET} %b%*s ${color}${BOX_V}${C_RESET}\n" "$content" "$padding" ""
     }
     
     # Modern card header
@@ -424,8 +429,9 @@ show_completion() {
     printf "${BOX_TR}${C_RESET}\n"
     printf "    ${border_color}${BOX_V}${C_RESET}%*s${border_color}${BOX_V}${C_RESET}\n" "$BOX_WIDTH" ""
     local status_len=${#status_text}
-    local status_pad=$(((BOX_WIDTH - status_len - 5) / 2))  # -5 for icon and spaces
-    printf "    ${border_color}${BOX_V}${C_RESET}%*s${status_icon}  ${C_WHITE}${C_BOLD}%s${C_RESET}%*s${border_color}${BOX_V}${C_RESET}\n" "$status_pad" "" "$status_text" "$status_pad" ""
+    local status_pad=$(((BOX_WIDTH - status_len - 4) / 2))  # -4 for emoji(2) + spaces(2)
+    local status_pad_r=$((BOX_WIDTH - status_len - 4 - status_pad))
+    printf "    ${border_color}${BOX_V}${C_RESET}%*s${status_icon}  ${C_WHITE}${C_BOLD}%s${C_RESET}%*s${border_color}${BOX_V}${C_RESET}\n" "$status_pad" "" "$status_text" "$status_pad_r" ""
     printf "    ${border_color}${BOX_V}${C_RESET}%*s${border_color}${BOX_V}${C_RESET}\n" "$BOX_WIDTH" ""
     printf "    ${border_color}${BOX_BL}"
     printf '%0.s─' $(seq 1 $BOX_WIDTH)
@@ -480,7 +486,7 @@ show_completion() {
     print_tool_line() {
         local text="$1"
         local text_len=${#text}
-        local pad=$((BOX_WIDTH - 6 - text_len))  # 6 = "  ✓  " length
+        local pad=$((BOX_WIDTH - 5 - text_len))  # 5 = "  ✓  " (2+1+2)
         [ $pad -lt 0 ] && pad=0
         printf "    ${C_DIM}${BOX_V}${C_RESET}  ${C_GREEN}${BOX_CHECK}${C_RESET}  %s%*s${C_DIM}${BOX_V}${C_RESET}\n" "$text" "$pad" ""
     }
@@ -510,7 +516,7 @@ show_completion() {
         echo -e "$KODRA_FAILED_INSTALLS" | while read -r line; do
             if [ -n "$line" ]; then
                 local line_len=${#line}
-                local pad=$((BOX_WIDTH - 6 - line_len))
+                local pad=$((BOX_WIDTH - 5 - line_len))  # 5 = "  ✗  " (2+1+2)
                 [ $pad -lt 0 ] && pad=0
                 printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_RED}${BOX_CROSS}${C_RESET}  %s%*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$line" "$pad" ""
             fi
@@ -518,7 +524,7 @@ show_completion() {
         
         printf "    ${C_YELLOW}${BOX_V}${C_RESET}%*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$BOX_WIDTH" ""
         local resume_text="Run 'kodra resume' to retry failed components"
-        printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_DIM}%s${C_RESET}%*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$resume_text" "$((BOX_WIDTH - 4 - ${#resume_text}))" ""
+        printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_DIM}%s${C_RESET}%*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$resume_text" "$((BOX_WIDTH - 2 - ${#resume_text}))" ""
         printf "    ${C_YELLOW}${BOX_BL}"
         printf '%0.s─' $(seq 1 $BOX_WIDTH)
         printf "${BOX_BR}${C_RESET}\n"
@@ -576,11 +582,11 @@ show_check() {
     if [ -n "$detail" ]; then
         local content="${name} ${detail}"
         local content_len=$((${#name} + 1 + ${#detail}))
-        local pad=$((BOX_WIDTH - 6 - content_len))  # 6 = "  ✓  " length
+        local pad=$((BOX_WIDTH - 5 - content_len))  # 5 = "  ✓  " (2+1+2)
         [ $pad -lt 0 ] && pad=0
         printf "    ${C_DIM}${BOX_V}${C_RESET}  ${icon}  %s ${C_DIM}%s${C_RESET}%*s${C_DIM}${BOX_V}${C_RESET}\n" "$name" "$detail" "$pad" ""
     else
-        local pad=$((BOX_WIDTH - 6 - ${#name}))
+        local pad=$((BOX_WIDTH - 5 - ${#name}))  # 5 = "  ✓  " (2+1+2)
         [ $pad -lt 0 ] && pad=0
         printf "    ${C_DIM}${BOX_V}${C_RESET}  ${icon}  %s%*s${C_DIM}${BOX_V}${C_RESET}\n" "$name" "$pad" ""
     fi
