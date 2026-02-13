@@ -3,7 +3,7 @@
 # Visual Studio Code Installer
 # https://code.visualstudio.com/
 #
-# Installs VS Code with 13 essential extensions for cloud-native development
+# Installs VS Code with essential extensions for cloud-native development
 #
 
 # Don't use set -e globally - we handle errors gracefully for extensions
@@ -26,8 +26,7 @@ echo "Installing essential extensions..."
 
 EXTENSIONS=(
     # AI - Your coding copilot
-    "github.copilot"                       # AI code completion & chat
-    "github.copilot-chat"                  # Copilot Chat
+    "github.copilot-chat"                  # GitHub Copilot (unified AI assistant)
     
     # Infrastructure as Code
     "ms-azuretools.vscode-bicep"           # Bicep for Azure IaC
@@ -109,7 +108,7 @@ fi
 
 echo ""
 echo "Essential tools ready:"
-echo "  • AI assistance (Copilot + Copilot Chat)"
+echo "  • AI assistance (GitHub Copilot)"
 echo "  • Infrastructure as Code (Bicep, Terraform)"
 echo "  • Containers (Docker, Kubernetes, Dev Containers)"
 echo "  • Azure (azd integration)"
