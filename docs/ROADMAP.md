@@ -295,6 +295,13 @@
 - #25 Troubleshooting guide
 - #29 Code quality
 
+### v0.3.1 (Stability)
+- GNOME 46 compatibility (screenshot shortcuts schema fallback)
+- Unified Copilot extension (`github.copilot-chat` replaces deprecated `github.copilot`)
+- Resilient installer (component failures tracked, never kill install)
+- Fixed needrestart non-interactive configuration
+- Fixed progress bar rendering (ASCII-compatible)
+
 ### v0.4.0 (Features)
 - #8 ARM support
 - #18 Configuration profiles
