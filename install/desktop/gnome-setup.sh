@@ -26,6 +26,7 @@ sudo apt-get install -y \
     gnome-shell-extension-prefs \
     gnome-shell-extensions \
     chrome-gnome-shell \
+    dconf-cli \
     dconf-editor \
     papirus-icon-theme \
     libfuse2 2>/dev/null || true
