@@ -323,9 +323,50 @@ echo "✅ Dock configured! You may need to log out and back in."
 DOCKSCRIPT
 chmod +x "$KODRA_DATA_DIR/configure-dock.sh"
 
-# Try to configure dock now (will work if extension schema exists)
-if gsettings list-schemas 2>/dev/null | grep -q "org.gnome.shell.extensions.dash-to-dock"; then
-    "$KODRA_DATA_DIR/configure-dock.sh" 2>/dev/null || true
+# Enable Dash to Dock extension (replaces Ubuntu Dock)
+gnome-extensions enable dash-to-dock@micxgx.gmail.com 2>/dev/null || true
+
+# Configure dock using dconf (works even if schemas aren't loaded yet)
+# This writes directly to the dconf database, bypassing schema validation
+DCONF_DOCK_PATH="/org/gnome/shell/extensions/dash-to-dock/"
+if command -v dconf &> /dev/null; then
+    echo "   Writing dock configuration via dconf..."
+    dconf write "${DCONF_DOCK_PATH}dock-position" "'BOTTOM'" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}multi-monitor" "false" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}extend-height" "false" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}dash-max-icon-size" "48" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}dock-fixed" "false" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}autohide" "true" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}intellihide" "true" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}autohide-in-fullscreen" "true" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}animation-time" "0.2" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}hide-delay" "0.2" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}show-delay" "0.25" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}pressure-threshold" "100" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}running-indicator-style" "'DOTS'" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}running-indicator-dominant-color" "true" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}click-action" "'focus-or-previews'" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}scroll-action" "'cycle-windows'" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}middle-click-action" "'launch'" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}transparency-mode" "'DYNAMIC'" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}background-opacity" "0.6" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}custom-background-color" "true" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}background-color" "'rgb(30,30,30)'" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}show-favorites" "true" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}show-running" "true" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}show-trash" "false" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}show-mounts" "false" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}show-apps-at-top" "false" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}show-show-apps-button" "true" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}custom-theme-shrink" "true" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}unity-backlit-items" "false" 2>/dev/null || true
+    dconf write "${DCONF_DOCK_PATH}apply-custom-theme" "false" 2>/dev/null || true
+    echo "   ✓ Dock settings written"
+else
+    # Fallback: try gsettings if dconf not available
+    if gsettings list-schemas 2>/dev/null | grep -q "org.gnome.shell.extensions.dash-to-dock"; then
+        "$KODRA_DATA_DIR/configure-dock.sh" 2>/dev/null || true
+    fi
 fi
 
 # -----------------------------------------------------------------------------
