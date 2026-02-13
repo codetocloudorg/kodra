@@ -3,8 +3,8 @@
 # Kodra Desktop Setup
 # Beautiful GNOME desktop for developers
 #
-
-set -e
+# Note: We don't use set -e because gsettings failures are cosmetic
+# (keys may not exist in all GNOME versions) and shouldn't kill the script
 
 echo "✨ Setting up your developer desktop..."
 
@@ -460,16 +460,21 @@ echo "⌨️  Setting up keyboard shortcuts..."
 gsettings set org.gnome.desktop.input-sources xkb-options "['caps:escape']"
 
 # Open terminal with Super+Return (in addition to Ctrl+Alt+T)
-gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "['<Super>Return', '<Control><Alt>t']"
+gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "['<Super>Return', '<Control><Alt>t']" 2>/dev/null || true
 
 # Screenshot shortcuts (macOS-like: Cmd+Shift+3/4/5)
-gsettings set org.gnome.settings-daemon.plugins.media-keys screenshot "['<Shift><Super>3', 'Print']"
-gsettings set org.gnome.settings-daemon.plugins.media-keys area-screenshot "['<Shift><Super>4', '<Shift>Print']"
-gsettings set org.gnome.settings-daemon.plugins.media-keys window-screenshot "['<Shift><Super>5', '<Alt>Print']"
+# Note: GNOME 46+ moved screenshots to org.gnome.shell.keybindings
+# Try both schemas for compatibility
+gsettings set org.gnome.shell.keybindings screenshot "['<Shift><Super>3', 'Print']" 2>/dev/null || \
+    gsettings set org.gnome.settings-daemon.plugins.media-keys screenshot "['<Shift><Super>3', 'Print']" 2>/dev/null || true
+gsettings set org.gnome.shell.keybindings screenshot-window "['<Shift><Super>5', '<Alt>Print']" 2>/dev/null || \
+    gsettings set org.gnome.settings-daemon.plugins.media-keys window-screenshot "['<Shift><Super>5', '<Alt>Print']" 2>/dev/null || true
+gsettings set org.gnome.shell.keybindings show-screenshot-ui "['<Shift><Super>4', '<Shift>Print']" 2>/dev/null || \
+    gsettings set org.gnome.settings-daemon.plugins.media-keys area-screenshot "['<Shift><Super>4', '<Shift>Print']" 2>/dev/null || true
 
-# Screenshot save location
+# Screenshot save location (only if gnome-screenshot schema exists)
 mkdir -p "$HOME/Pictures/Screenshots"
-gsettings set org.gnome.gnome-screenshot auto-save-directory "$HOME/Pictures/Screenshots"
+gsettings set org.gnome.gnome-screenshot auto-save-directory "$HOME/Pictures/Screenshots" 2>/dev/null || true
 
 # Window management shortcuts
 gsettings set org.gnome.desktop.wm.keybindings close "['<Super>q', '<Alt>F4']"
