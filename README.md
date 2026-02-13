@@ -11,7 +11,7 @@
 
 **Agentic Azure engineering powered by GitHub CLI—one command to ship.**
 
-[![Version](https://img.shields.io/badge/version-0.2.18-blue?style=flat-square)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.2.21-blue?style=flat-square)](VERSION)
 [![CI](https://img.shields.io/github/actions/workflow/status/codetocloudorg/kodra/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/codetocloudorg/kodra/actions)
 [![Ubuntu 24.04+](https://img.shields.io/badge/Ubuntu-24.04+-E95420?style=flat-square&logo=ubuntu&logoColor=white)](https://releases.ubuntu.com/noble/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
@@ -73,7 +73,7 @@ That's it. The installer will:
 | Category | Tools |
 |----------|-------|
 | **Terminal** | [Ghostty](https://ghostty.org) + [Starship](https://starship.rs) prompt + Nerd Fonts |
-| **Editor** | VS Code with 13 essential extensions + Neovim |
+| **Editor** | VS Code with [Tokyo Night](https://github.com/tokyo-night/tokyo-night-vscode-theme) theme + 15 essential extensions + Neovim |
 | **Cloud** | Azure CLI, azd, Bicep, Terraform, OpenTofu, PowerShell 7 |
 | **Kubernetes** | kubectl, Helm, k9s |
 | **Containers** | Docker CE, lazydocker, Dev Containers support |

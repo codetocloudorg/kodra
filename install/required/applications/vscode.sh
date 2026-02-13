@@ -27,6 +27,7 @@ echo "Installing essential extensions..."
 EXTENSIONS=(
     # AI - Your coding copilot
     "github.copilot"                       # AI code completion & chat
+    "github.copilot-chat"                  # Copilot Chat
     
     # Infrastructure as Code
     "ms-azuretools.vscode-bicep"           # Bicep for Azure IaC
@@ -49,8 +50,9 @@ EXTENSIONS=(
     "esbenp.prettier-vscode"               # Code formatter
     
     # Look & Feel
-    "github.github-vscode-theme"           # GitHub Dark theme
+    "enkia.tokyo-night"                    # Tokyo Night theme (default)
     "PKief.material-icon-theme"            # File icons
+    "PKief.material-product-icons"         # Product icons
 )
 
 echo "  Installing ${#EXTENSIONS[@]} essential extensions..."
@@ -73,12 +75,45 @@ done
 
 echo ""
 echo "✅ VS Code installed with $installed extensions ($skipped skipped)"
+
+# Apply Tokyo Night theme settings
+echo ""
+echo "🎨 Applying Tokyo Night theme settings..."
+
+KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
+VSCODE_SETTINGS_DIR="$HOME/.config/Code/User"
+VSCODE_SETTINGS_FILE="$VSCODE_SETTINGS_DIR/settings.json"
+KODRA_THEME_SETTINGS="$KODRA_DIR/themes/tokyo-night/vscode-settings.json"
+
+mkdir -p "$VSCODE_SETTINGS_DIR"
+
+if [ -f "$KODRA_THEME_SETTINGS" ]; then
+    if [ -f "$VSCODE_SETTINGS_FILE" ]; then
+        # Merge with existing settings (theme settings take precedence)
+        if command -v jq &> /dev/null; then
+            jq -s '.[0] * .[1]' "$VSCODE_SETTINGS_FILE" "$KODRA_THEME_SETTINGS" > "${VSCODE_SETTINGS_FILE}.tmp" 2>/dev/null && \
+                mv "${VSCODE_SETTINGS_FILE}.tmp" "$VSCODE_SETTINGS_FILE" && \
+                echo "  ✓ Tokyo Night theme applied (merged with existing settings)"
+        else
+            # No jq, just copy the theme settings
+            cp "$KODRA_THEME_SETTINGS" "$VSCODE_SETTINGS_FILE"
+            echo "  ✓ Tokyo Night theme applied"
+        fi
+    else
+        cp "$KODRA_THEME_SETTINGS" "$VSCODE_SETTINGS_FILE"
+        echo "  ✓ Tokyo Night theme applied"
+    fi
+else
+    echo "  ⚠ Theme settings not found, using extension defaults"
+fi
+
 echo ""
 echo "Essential tools ready:"
-echo "  • AI assistance (Copilot)"
+echo "  • AI assistance (Copilot + Copilot Chat)"
 echo "  • Infrastructure as Code (Bicep, Terraform)"
 echo "  • Containers (Docker, Kubernetes, Dev Containers)"
 echo "  • Azure (azd integration)"
+echo "  • Tokyo Night theme configured"
 echo ""
 echo "Add more extensions as needed: code --install-extension <id>"
 
