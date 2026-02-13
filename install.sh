@@ -50,9 +50,9 @@ kodra_error_handler() {
     local exit_code=$?
     local line_no=$1
     echo ""
-    echo "╔══════════════════════════════════════════════════════════════════╗"
-    echo "║                    INSTALLATION ERROR                            ║"
-    echo "╚══════════════════════════════════════════════════════════════════╝"
+    echo "╔════════════════════════════════════════════════════════════╗"
+    echo "║               INSTALLATION ERROR                           ║"
+    echo "╚════════════════════════════════════════════════════════════╝"
     echo ""
     echo "❌ Error occurred at line $line_no (exit code: $exit_code)"
     echo ""
@@ -398,22 +398,22 @@ show_info "Log saved: ~/.config/kodra/install.log"
 if [ "$KODRA_DEBUG" = "true" ] && [ -n "$KODRA_FAILED_INSTALLS" ]; then
     echo ""
     printf "    ${C_YELLOW}${BOX_TL}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${BOX_TR}${C_RESET}\n"
-    printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_YELLOW}DEBUG: INSTALLATION SUMMARY${C_RESET}%36s${C_YELLOW}${BOX_V}${C_RESET}\n" ""
+    printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_YELLOW}DEBUG: INSTALLATION SUMMARY${C_RESET}%*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$((BOX_WIDTH - 28))" ""
     printf "    ${C_YELLOW}${BOX_V}  "
-    printf '%0.s─' {1..63}
+    printf '%0.s─' $(seq 1 $((BOX_WIDTH - 2)))
     printf "${BOX_V}${C_RESET}\n"
-    printf "    ${C_YELLOW}${BOX_V}${C_RESET}  Attempted: %-52s${C_YELLOW}${BOX_V}${C_RESET}\n" "$KODRA_INSTALL_COUNT installers"
-    printf "    ${C_YELLOW}${BOX_V}${C_RESET}  Failed:    %-52s${C_YELLOW}${BOX_V}${C_RESET}\n" "$KODRA_FAIL_COUNT installers"
-    printf "    ${C_YELLOW}${BOX_V}${C_RESET}%67s${C_YELLOW}${BOX_V}${C_RESET}\n" ""
+    printf "    ${C_YELLOW}${BOX_V}${C_RESET}  Attempted: %-*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$((BOX_WIDTH - 14))" "$KODRA_INSTALL_COUNT installers"
+    printf "    ${C_YELLOW}${BOX_V}${C_RESET}  Failed:    %-*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$((BOX_WIDTH - 14))" "$KODRA_FAIL_COUNT installers"
+    printf "    ${C_YELLOW}${BOX_V}${C_RESET}%*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$BOX_WIDTH" ""
     echo -e "$KODRA_FAILED_INSTALLS" | while read -r line; do
-        [ -n "$line" ] && printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_RED}${BOX_CROSS}${C_RESET} %-60s${C_YELLOW}${BOX_V}${C_RESET}\n" "$line"
+        [ -n "$line" ] && printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_RED}${BOX_CROSS}${C_RESET} %-*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$((BOX_WIDTH - 6))" "$line"
     done
-    printf "    ${C_YELLOW}${BOX_V}${C_RESET}%67s${C_YELLOW}${BOX_V}${C_RESET}\n" ""
-    printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_DIM}Logs: /tmp/kodra-install-*.log${C_RESET}%30s${C_YELLOW}${BOX_V}${C_RESET}\n" ""
+    printf "    ${C_YELLOW}${BOX_V}${C_RESET}%*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$BOX_WIDTH" ""
+    printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_DIM}Logs: /tmp/kodra-install-*.log${C_RESET}%*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$((BOX_WIDTH - 31))" ""
     printf "    ${C_YELLOW}${BOX_BL}"
-    printf '%0.s─' {1..65}
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
     printf "${BOX_BR}${C_RESET}\n"
 fi
 

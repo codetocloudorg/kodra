@@ -63,7 +63,7 @@ items=(
     "👻 Ghostty terminal with Nerd Fonts"
     "⭐ Starship prompt - beautiful & fast"
     "📝 Neovim + VS Code with extensions"
-    "🎨 5 stunning developer themes"
+    "🎨 Tokyo Night & Ghostty Blue themes"
     "🖼️  Curated wallpapers"
     "🖥️  Beautiful dock & polished desktop"
 )
