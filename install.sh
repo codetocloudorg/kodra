@@ -342,7 +342,7 @@ if [ -n "$OPTIONAL_APPS" ]; then
     for app in "${APPS[@]}"; do
         app=$(echo "$app" | xargs) # trim whitespace
         if [ -f "$KODRA_DIR/applications/${app}.sh" ]; then
-            run_installer "$KODRA_DIR/applications/${app}.sh"
+            run_installer "$KODRA_DIR/applications/${app}.sh" || true
         fi
     done
 fi
@@ -354,11 +354,11 @@ section "Desktop Environment" "🎨"
 
 show_tools_group "Beautiful GNOME desktop with Tokyo Night theme"
 for script in "$KODRA_DIR/install/desktop/"*.sh; do
-    run_installer "$script"
+    run_installer "$script" || true
 done
 
 show_installing "Applying $KODRA_THEME theme"
-run_installer "$KODRA_DIR/bin/kodra-sub/theme.sh" "$KODRA_THEME"
+run_installer "$KODRA_DIR/bin/kodra-sub/theme.sh" "$KODRA_THEME" || true
 show_success "$KODRA_THEME theme applied"
 
 # -----------------------------------------------------------------------------
