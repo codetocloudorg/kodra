@@ -94,8 +94,8 @@ echo -e "${CYAN}Package Managers${NC}"
 check "apt" "command -v apt"
 check "Flatpak" \
     "command -v flatpak" \
-    "sudo apt install -y flatpak" \
-    "sudo apt install flatpak"
+    "sudo apt-get install -y flatpak" \
+    "sudo apt-get install flatpak"
 check "Homebrew" \
     "command -v brew" \
     "" \

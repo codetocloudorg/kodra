@@ -126,7 +126,7 @@ show_progress() {
         fi
     done
     printf "${C_DIM}"
-    printf '%*s' "$empty" | tr ' ' '·'
+    printf '%*s' "$empty" | tr ' ' '.'
     printf "${C_RESET}${C_DIM}]${C_RESET} ${C_WHITE}%3d%%${C_RESET}${eta_text}\n" "$percent"
 }
 

@@ -239,6 +239,12 @@ section "System Updates" "📦"
 
 show_tools_group "Preparing system environment"
 
+# Suppress needrestart prompts during installation
+# sudo strips env vars, so we configure needrestart directly
+if [ -d /etc/needrestart/conf.d ]; then
+    echo '$nrconf{restart} = "a";' | sudo tee /etc/needrestart/conf.d/kodra.conf >/dev/null
+fi
+
 # Cleanup any broken apt repos from previous failed installs
 if [ -f /etc/apt/sources.list.d/ghostty.list ]; then
     show_info "Cleaning up previous install artifacts"
