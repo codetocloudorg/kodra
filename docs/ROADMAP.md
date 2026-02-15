@@ -302,6 +302,14 @@
 - Fixed needrestart non-interactive configuration
 - Fixed progress bar rendering (ASCII-compatible)
 
+### v0.3.2 (Desktop Polish)
+- Auto-enable all installed GNOME extensions via gsettings
+- 6 extensions enabled by default: Dash to Dock, Blur my Shell, Tactile, TopHat, Alphabetical Grid, Space Bar
+- Disabled night light (user can re-enable)
+- Disabled extension version validation (no update prompts)
+- Improved dock favorites with dconf fallback
+- VS Code Tokyo Night theme auto-applied with extensions
+
 ### v0.4.0 (Features)
 - #8 ARM support
 - #18 Configuration profiles

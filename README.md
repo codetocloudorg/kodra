@@ -11,7 +11,7 @@
 
 **Agentic Azure engineering powered by GitHub CLI—one command to ship.**
 
-[![Version](https://img.shields.io/badge/version-0.3.1-blue?style=flat-square)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.3.2-blue?style=flat-square)](VERSION)
 [![CI](https://img.shields.io/github/actions/workflow/status/codetocloudorg/kodra/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/codetocloudorg/kodra/actions)
 [![Ubuntu 24.04+](https://img.shields.io/badge/Ubuntu-24.04+-E95420?style=flat-square&logo=ubuntu&logoColor=white)](https://releases.ubuntu.com/noble/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
