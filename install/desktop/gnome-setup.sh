@@ -434,9 +434,16 @@ if [ ${#INSTALLED_APPS[@]} -gt 0 ]; then
     FAVORITES_LIST=$(printf "'%s'," "${INSTALLED_APPS[@]}")
     FAVORITES_LIST="[${FAVORITES_LIST%,}]"
     gsettings set org.gnome.shell favorite-apps "$FAVORITES_LIST" 2>/dev/null || true
+    # Also write via dconf as fallback
+    dconf write /org/gnome/shell/favorite-apps "$FAVORITES_LIST" 2>/dev/null || true
     echo "   ✓ Dock favorites set (${#INSTALLED_APPS[@]} apps)"
 else
-    echo "   ℹ No dock apps found yet - run 'kodra desktop' after installing apps"
+    # Set sensible defaults even if apps not found yet
+    echo "   Setting default dock favorites..."
+    DEFAULT_FAVORITES="['org.gnome.Nautilus.desktop', 'brave-browser.desktop', 'ghostty.desktop', 'code.desktop', 'org.gnome.Settings.desktop']"
+    gsettings set org.gnome.shell favorite-apps "$DEFAULT_FAVORITES" 2>/dev/null || true
+    dconf write /org/gnome/shell/favorite-apps "$DEFAULT_FAVORITES" 2>/dev/null || true
+    echo "   ✓ Default dock favorites set (run 'kodra dock' to customize)"
 fi
 
 # -----------------------------------------------------------------------------
@@ -636,12 +643,14 @@ echo "🧩 Enabling GNOME extensions..."
 # Get current enabled extensions (if any)
 CURRENT_EXTENSIONS=$(gsettings get org.gnome.shell enabled-extensions 2>/dev/null || echo "@as []")
 
-# Our curated extensions to enable
+# Our curated extensions to enable (must match what we install above)
 KODRA_EXTENSIONS=(
     "dash-to-dock@micxgx.gmail.com"
     "blur-my-shell@aunetx"
     "tactile@lundal.io"
-    "user-theme@gnome-shell-extensions.gcampax.github.com"
+    "tophat@fflewddur.github.io"
+    "AlphabeticalAppGrid@stuarthayhurst"
+    "space-bar@luchrioh"
 )
 
 # Build new extensions array
@@ -668,7 +677,7 @@ NEW_EXTENSIONS="${NEW_EXTENSIONS%, }]"
 
 # Apply the extensions
 gsettings set org.gnome.shell enabled-extensions "$NEW_EXTENSIONS" 2>/dev/null || true
-echo "   ✓ Extensions enabled: dash-to-dock, blur-my-shell, tactile, user-themes"
+echo "   ✓ Extensions enabled: dash-to-dock, blur-my-shell, tactile, tophat, alpha-grid, space-bar"
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -680,8 +689,10 @@ echo "  ✓ Papirus icons installed"
 echo "  ✓ GNOME Tweaks installed"
 echo "  ✓ Dark mode enabled"
 echo "  ✓ Keyboard shortcuts configured"
-echo "  ✓ Extensions auto-enabled (Dash to Dock, Blur, Tactile)"
-echo "  ✓ Dock configured (bottom-center, auto-hide)"
+echo "  ✓ 6 extensions auto-enabled:"
+echo "      Dash to Dock • Blur my Shell • Tactile"
+echo "      TopHat • Alphabetical Grid • Space Bar"
+echo "  ✓ Dock favorites configured"
 echo ""
 echo "  → Log out and log back in to see your new desktop!"
 echo ""
