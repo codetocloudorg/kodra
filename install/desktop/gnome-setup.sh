@@ -192,9 +192,11 @@ gsettings set org.gnome.desktop.wm.preferences num-workspaces 6
 # Edge tiling (window snapping)
 gsettings set org.gnome.mutter edge-tiling true
 
-# Night Light (like macOS Night Shift)
-gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled true
-gsettings set org.gnome.settings-daemon.plugins.color night-light-schedule-automatic true
+# Disable Night Light (user can enable if desired)
+gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled false 2>/dev/null || true
+
+# Disable extension update notifications (we curate extensions)
+gsettings set org.gnome.shell disable-extension-version-validation true 2>/dev/null || true
 
 # -----------------------------------------------------------------------------
 # Disable Default Ubuntu Extensions (cleaner look)
@@ -626,6 +628,48 @@ chmod +x "$KODRA_DATA_DIR/setup-extensions.sh"
 # -----------------------------------------------------------------------------
 # Final touches
 # -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Enable Extensions via gsettings (works before logout)
+# -----------------------------------------------------------------------------
+echo "🧩 Enabling GNOME extensions..."
+
+# Get current enabled extensions (if any)
+CURRENT_EXTENSIONS=$(gsettings get org.gnome.shell enabled-extensions 2>/dev/null || echo "@as []")
+
+# Our curated extensions to enable
+KODRA_EXTENSIONS=(
+    "dash-to-dock@micxgx.gmail.com"
+    "blur-my-shell@aunetx"
+    "tactile@lundal.io"
+    "user-theme@gnome-shell-extensions.gcampax.github.com"
+)
+
+# Build new extensions array
+NEW_EXTENSIONS="["
+for ext in "${KODRA_EXTENSIONS[@]}"; do
+    NEW_EXTENSIONS+="'$ext', "
+done
+
+# Also preserve any existing extensions that aren't Ubuntu defaults
+if [[ "$CURRENT_EXTENSIONS" != "@as []" ]]; then
+    # Extract existing extensions, skip Ubuntu defaults
+    EXISTING=$(echo "$CURRENT_EXTENSIONS" | tr -d "[]' " | tr ',' '\n' | grep -v "ubuntu-dock\|ubuntu-appindicators\|ding@\|tiling-assistant" | tr '\n' ',' || true)
+    if [ -n "$EXISTING" ]; then
+        for ext in $(echo "$EXISTING" | tr ',' ' '); do
+            if [[ ! " ${KODRA_EXTENSIONS[*]} " =~ " $ext " ]] && [ -n "$ext" ]; then
+                NEW_EXTENSIONS+="'$ext', "
+            fi
+        done
+    fi
+fi
+
+# Remove trailing comma and close array
+NEW_EXTENSIONS="${NEW_EXTENSIONS%, }]"
+
+# Apply the extensions
+gsettings set org.gnome.shell enabled-extensions "$NEW_EXTENSIONS" 2>/dev/null || true
+echo "   ✓ Extensions enabled: dash-to-dock, blur-my-shell, tactile, user-themes"
+
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  🍎 macOS-Style Desktop Setup Complete!"
@@ -635,20 +679,11 @@ echo "  ✓ Window buttons moved to left (macOS style)"
 echo "  ✓ Papirus icons installed"
 echo "  ✓ GNOME Tweaks installed"
 echo "  ✓ Dark mode enabled"
-echo "  ✓ Night Light enabled"
 echo "  ✓ Keyboard shortcuts configured"
-echo "  ✓ Blur my Shell extension installed"
+echo "  ✓ Extensions auto-enabled (Dash to Dock, Blur, Tactile)"
+echo "  ✓ Dock configured (bottom-center, auto-hide)"
 echo ""
-echo "  Next steps for the FULL macOS experience:"
-echo ""
-echo "  1. Log out and log back in"
-echo ""
-echo "  2. Open Extension Manager and enable:"
-echo "     → Dash to Dock (for bottom-center dock)"
-echo "     → Blur my Shell (frosted glass blur effects)"
-echo ""
-echo "  3. After enabling Dash to Dock, run:"
-echo "     ~/.local/share/kodra/configure-dock.sh"
+echo "  → Log out and log back in to see your new desktop!"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
