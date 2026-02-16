@@ -5,6 +5,34 @@ All notable changes to Kodra will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-02-16
+
+### Added
+- **`kodra repair` command** - Re-apply all configurations without reinstalling apps
+  - Shell integration, desktop files, terminal configs, VS Code settings
+  - GNOME extensions, dock favorites, login screen
+  - Options: `--shell`, `--desktop`, `--login`, `--apps`, `--vscode`, `--terminal`
+- **Login screen customization** via `kodra repair --login`
+  - Syncs desktop wallpaper to login screen
+  - Multi-monitor safe (per-screen, not stretched)
+  - Dark theme with Papirus icons
+- Desktop files for CLI tools (appear in app launcher)
+  - Neovim, btop, lazygit, lazydocker, k9s
+
+### Fixed
+- Flatpak apps now appear in launcher (XDG_DATA_DIRS persisted in ~/.profile)
+- GNOME extensions activate after reboot
+- Configs apply even if tools already installed (ghostty, starship, neovim)
+- Dock favorites persist correctly
+- Removed Bitwarden from default dock (Brave was already there)
+
+### Changed
+- SEO improvements for kodra.codetocloud.io
+  - Updated meta description and hero tagline
+  - Enhanced Open Graph and Twitter cards
+  - JSON-LD structured data
+- Restructured install scripts for better idempotency
+
 ## [0.3.2] - 2026-02-16
 
 ### Fixed
