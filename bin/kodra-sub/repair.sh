@@ -379,38 +379,38 @@ repair_desktop() {
 repair_login_screen() {
     echo -e "${CYAN}━━━ Login Screen ━━━${NC}"
     
-    # Get current theme
-    local current_theme="tokyo-night"
-    [ -f "$KODRA_CONFIG/theme" ] && current_theme=$(cat "$KODRA_CONFIG/theme")
+    # Use Kodra's default wallpaper (wallpaper5.jpg)
+    # This ensures consistent branding and works on multi-monitor (zoom = per-screen, not stretched)
+    local wallpaper_file="wallpaper5.jpg"
+    local wallpaper_path="$KODRA_DIR/wallpapers/$wallpaper_file"
+    local wallpaper_dest="/usr/share/backgrounds/kodra-login.jpg"
     
-    # Get current desktop wallpaper
-    local desktop_wallpaper
-    desktop_wallpaper=$(gsettings get org.gnome.desktop.background picture-uri 2>/dev/null | tr -d "'")
-    
-    if [ -z "$desktop_wallpaper" ] || [ "$desktop_wallpaper" = "" ]; then
-        # Fall back to Kodra wallpaper
-        local wallpaper_file="wallpaper5.jpg"
-        desktop_wallpaper="file://$KODRA_DIR/wallpapers/$wallpaper_file"
+    if [ ! -f "$wallpaper_path" ]; then
+        echo "  ⚠ Wallpaper not found: $wallpaper_path"
+        echo ""
+        return
     fi
     
-    # Copy wallpaper to system location for GDM
-    local wallpaper_path="${desktop_wallpaper#file://}"
-    local wallpaper_ext="${wallpaper_path##*.}"
-    local wallpaper_dest="/usr/share/backgrounds/kodra-login.$wallpaper_ext"
+    # Copy wallpaper to system location for GDM (requires sudo)
+    if sudo cp "$wallpaper_path" "$wallpaper_dest" 2>/dev/null; then
+        echo "  ✓ Copied wallpaper to login screen"
+    else
+        echo "  ⚠ Could not copy wallpaper (need sudo password)"
+        echo ""
+        return
+    fi
     
-    if [ -f "$wallpaper_path" ]; then
-        sudo cp "$wallpaper_path" "$wallpaper_dest" 2>/dev/null && echo "  ✓ Copied wallpaper to login screen" || echo "  ⚠ Could not copy wallpaper (need sudo)"
-        
-        # Configure GDM via dconf
-        sudo mkdir -p /etc/dconf/profile
-        cat << 'DCONFPROFILE' | sudo tee /etc/dconf/profile/gdm > /dev/null
+    # Configure GDM via dconf (official API - safe, survives updates)
+    sudo mkdir -p /etc/dconf/profile
+    cat << 'DCONFPROFILE' | sudo tee /etc/dconf/profile/gdm > /dev/null
 user-db:user
 system-db:gdm
 file-db:/usr/share/gdm/greeter-dconf-defaults
 DCONFPROFILE
 
-        sudo mkdir -p /etc/dconf/db/gdm.d
-        cat << DCONFTHEME | sudo tee /etc/dconf/db/gdm.d/01-kodra-theme > /dev/null
+    sudo mkdir -p /etc/dconf/db/gdm.d
+    # Note: picture-options='zoom' ensures wallpaper is shown per-monitor (not stretched across screens)
+    cat << DCONFTHEME | sudo tee /etc/dconf/db/gdm.d/01-kodra-theme > /dev/null
 [org/gnome/desktop/interface]
 color-scheme='prefer-dark'
 gtk-theme='Yaru-dark'
@@ -433,9 +433,9 @@ logo=''
 banner-message-enable=false
 DCONFTHEME
 
-        sudo dconf update 2>/dev/null && echo "  ✓ Login screen configured" || true
-    else
-        echo "  ⚠ Wallpaper not found: $wallpaper_path"
+    if sudo dconf update 2>/dev/null; then
+        echo "  ✓ Login screen configured (dark theme, Kodra wallpaper)"
+        echo "  ℹ Multi-monitor safe: wallpaper shown per-screen, not stretched"
     fi
     
     echo ""
