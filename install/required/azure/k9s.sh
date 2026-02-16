@@ -43,6 +43,22 @@ k9s completion zsh > ~/.config/zsh/completions/_k9s 2>/dev/null || true
 # Verify installation
 k9s version --short 2>/dev/null || k9s version
 
+# Create desktop file for app launcher
+mkdir -p "$HOME/.local/share/applications"
+cat > "$HOME/.local/share/applications/k9s.desktop" << 'EOF'
+[Desktop Entry]
+Name=K9s
+GenericName=Kubernetes CLI
+Comment=Kubernetes cluster manager
+Exec=k9s
+Terminal=true
+Type=Application
+Keywords=kubernetes;k8s;cluster;
+Icon=utilities-terminal
+Categories=Development;
+EOF
+update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+
 echo "k9s installed successfully!"
 echo "  Completions configured for bash and zsh"
 echo "  Run 'k9s' to launch Kubernetes cluster UI"

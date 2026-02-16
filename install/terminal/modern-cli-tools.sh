@@ -181,6 +181,44 @@ if command -v zoxide &> /dev/null; then
     fi
 fi
 
+# ─────────────────────────────────────────────────────────────
+# Create desktop files for CLI tools (so they appear in launcher)
+# ─────────────────────────────────────────────────────────────
+mkdir -p "$HOME/.local/share/applications"
+
+if command -v btop &>/dev/null; then
+    cat > "$HOME/.local/share/applications/btop.desktop" << 'EOF'
+[Desktop Entry]
+Name=btop
+GenericName=System Monitor
+Comment=Resource monitor that shows usage and stats
+Exec=btop
+Terminal=true
+Type=Application
+Keywords=system;monitor;task;
+Icon=utilities-system-monitor
+Categories=System;Monitor;
+EOF
+fi
+
+if command -v lazygit &>/dev/null; then
+    cat > "$HOME/.local/share/applications/lazygit.desktop" << 'EOF'
+[Desktop Entry]
+Name=LazyGit
+GenericName=Git Client
+Comment=Simple terminal UI for git commands
+Exec=lazygit
+Terminal=true
+Type=Application
+Keywords=git;vcs;version;
+Icon=git
+Categories=Development;RevisionControl;
+EOF
+fi
+
+# Update desktop database
+update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+
 echo ""
 echo "Modern CLI tools installed!"
 echo ""
