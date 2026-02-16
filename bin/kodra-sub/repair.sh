@@ -25,13 +25,15 @@ show_help() {
     echo "Options:"
     echo "  --all         Repair everything (default)"
     echo "  --shell       Repair shell configs only"
-    echo "  --desktop     Repair desktop/GNOME only"
+    echo "  --desktop     Repair desktop/GNOME only (extensions, dock)"
+    echo "  --login       Repair login screen wallpaper"
     echo "  --apps        Repair app desktop files only"
     echo "  --vscode      Repair VS Code settings only"
     echo ""
     echo "Examples:"
     echo "  kodra repair           # Fix everything"
     echo "  kodra repair --shell   # Just fix shell configs"
+    echo "  kodra repair --login   # Sync login screen with desktop wallpaper"
 }
 
 repair_shell_integration() {
@@ -311,10 +313,132 @@ repair_terminal_configs() {
 repair_desktop() {
     echo -e "${CYAN}━━━ Desktop Environment ━━━${NC}"
     
-    # Run desktop refresh which handles extensions, dock, etc.
-    if [ -f "$KODRA_DIR/bin/kodra-sub/desktop.sh" ]; then
-        bash "$KODRA_DIR/bin/kodra-sub/desktop.sh" refresh
+    # 1. Enable extensions
+    echo "  Enabling GNOME extensions..."
+    EXTENSIONS=(
+        "dash-to-dock@micxgx.gmail.com"
+        "blur-my-shell@aunetx"
+        "tactile@lundal.io"
+        "tophat@fflewddur.github.io"
+        "AlphabeticalAppGrid@stuarthayhurst"
+        "space-bar@luchrioh"
+    )
+    
+    for ext in "${EXTENSIONS[@]}"; do
+        if [ -d "$HOME/.local/share/gnome-shell/extensions/$ext" ]; then
+            gnome-extensions enable "$ext" 2>/dev/null && echo "    ✓ $ext" || true
+        fi
+    done
+    
+    # Disable conflicting Ubuntu defaults
+    gnome-extensions disable ubuntu-dock@ubuntu.com 2>/dev/null || true
+    gnome-extensions disable ding@rastersoft.com 2>/dev/null || true
+    
+    # 2. Set dock favorites directly
+    echo "  Setting dock favorites..."
+    DESKTOP_DIRS=(
+        "/var/lib/flatpak/exports/share/applications"
+        "$HOME/.local/share/applications"
+        "/usr/share/applications"
+        "/usr/local/share/applications"
+    )
+    
+    find_app() {
+        local variants=("$@")
+        for variant in "${variants[@]}"; do
+            for dir in "${DESKTOP_DIRS[@]}"; do
+                if [ -f "$dir/$variant" ]; then
+                    echo "$variant"
+                    return 0
+                fi
+            done
+        done
+        return 1
+    }
+    
+    INSTALLED_APPS=()
+    app=$(find_app "org.gnome.Nautilus.desktop") && INSTALLED_APPS+=("$app")
+    app=$(find_app "com.brave.Browser.desktop" "brave-browser.desktop") && INSTALLED_APPS+=("$app")
+    app=$(find_app "com.mitchellh.ghostty.desktop" "ghostty.desktop") && INSTALLED_APPS+=("$app")
+    app=$(find_app "code.desktop") && INSTALLED_APPS+=("$app")
+    app=$(find_app "io.github.shiftey.Desktop.desktop" "github-desktop.desktop") && INSTALLED_APPS+=("$app")
+    app=$(find_app "com.spotify.Client.desktop" "spotify.desktop") && INSTALLED_APPS+=("$app")
+    app=$(find_app "com.discordapp.Discord.desktop" "discord.desktop") && INSTALLED_APPS+=("$app")
+    app=$(find_app "org.gnome.Settings.desktop" "gnome-control-center.desktop") && INSTALLED_APPS+=("$app")
+    
+    if [ ${#INSTALLED_APPS[@]} -gt 0 ]; then
+        FAVORITES_LIST=$(printf "'%s'," "${INSTALLED_APPS[@]}")
+        FAVORITES_LIST="[${FAVORITES_LIST%,}]"
+        gsettings set org.gnome.shell favorite-apps "$FAVORITES_LIST" 2>/dev/null || true
+        echo "    ✓ Set ${#INSTALLED_APPS[@]} dock favorites"
     fi
+    
+    echo ""
+}
+
+repair_login_screen() {
+    echo -e "${CYAN}━━━ Login Screen ━━━${NC}"
+    
+    # Get current theme
+    local current_theme="tokyo-night"
+    [ -f "$KODRA_CONFIG/theme" ] && current_theme=$(cat "$KODRA_CONFIG/theme")
+    
+    # Get current desktop wallpaper
+    local desktop_wallpaper
+    desktop_wallpaper=$(gsettings get org.gnome.desktop.background picture-uri 2>/dev/null | tr -d "'")
+    
+    if [ -z "$desktop_wallpaper" ] || [ "$desktop_wallpaper" = "" ]; then
+        # Fall back to Kodra wallpaper
+        local wallpaper_file="wallpaper5.jpg"
+        desktop_wallpaper="file://$KODRA_DIR/wallpapers/$wallpaper_file"
+    fi
+    
+    # Copy wallpaper to system location for GDM
+    local wallpaper_path="${desktop_wallpaper#file://}"
+    local wallpaper_ext="${wallpaper_path##*.}"
+    local wallpaper_dest="/usr/share/backgrounds/kodra-login.$wallpaper_ext"
+    
+    if [ -f "$wallpaper_path" ]; then
+        sudo cp "$wallpaper_path" "$wallpaper_dest" 2>/dev/null && echo "  ✓ Copied wallpaper to login screen" || echo "  ⚠ Could not copy wallpaper (need sudo)"
+        
+        # Configure GDM via dconf
+        sudo mkdir -p /etc/dconf/profile
+        cat << 'DCONFPROFILE' | sudo tee /etc/dconf/profile/gdm > /dev/null
+user-db:user
+system-db:gdm
+file-db:/usr/share/gdm/greeter-dconf-defaults
+DCONFPROFILE
+
+        sudo mkdir -p /etc/dconf/db/gdm.d
+        cat << DCONFTHEME | sudo tee /etc/dconf/db/gdm.d/01-kodra-theme > /dev/null
+[org/gnome/desktop/interface]
+color-scheme='prefer-dark'
+gtk-theme='Yaru-dark'
+icon-theme='Papirus-Dark'
+cursor-theme='Yaru'
+
+[org/gnome/desktop/background]
+picture-uri='file://$wallpaper_dest'
+picture-uri-dark='file://$wallpaper_dest'
+picture-options='zoom'
+primary-color='#0d1117'
+
+[org/gnome/desktop/screensaver]
+picture-uri='file://$wallpaper_dest'
+picture-options='zoom'
+primary-color='#0d1117'
+
+[org/gnome/login-screen]
+logo=''
+banner-message-enable=false
+DCONFTHEME
+
+        sudo dconf update 2>/dev/null && echo "  ✓ Login screen configured" || true
+    else
+        echo "  ⚠ Wallpaper not found: $wallpaper_path"
+    fi
+    
+    echo ""
 }
 
 repair_all() {
@@ -330,6 +454,7 @@ repair_all() {
     repair_terminal_configs
     repair_vscode_settings
     repair_desktop
+    repair_login_screen
     
     echo ""
     echo -e "\033[38;5;46m╔════════════════════════════════════════════════════════════╗\033[0m"
@@ -374,6 +499,11 @@ case "${1:-all}" in
         echo ""
         repair_terminal_configs
         echo -e "${GREEN}✓ Terminal configs repaired${NC}"
+        ;;
+    --login|login)
+        echo ""
+        repair_login_screen
+        echo -e "${GREEN}✓ Login screen repaired${NC}"
         ;;
     *)
         echo "Unknown option: $1"
