@@ -54,5 +54,12 @@ if command -v code &> /dev/null; then
     log_success "VS Code extensions updated"
 fi
 
+# Refresh desktop settings (extensions, dock, flatpak apps)
+if command -v gnome-shell &> /dev/null; then
+    log_info "Refreshing desktop settings..."
+    bash "$KODRA_DIR/bin/kodra-sub/desktop.sh" refresh
+fi
+
 echo ""
 log_success "Kodra update complete!"
+echo ""

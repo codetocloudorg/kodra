@@ -368,6 +368,16 @@ section "Finalizing" "🏁"
 
 show_tools_group "Wrapping up installation"
 
+# Refresh desktop database for Flatpak apps to appear in launcher
+show_installing "Refreshing desktop database"
+export XDG_DATA_DIRS="/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+if command -v update-desktop-database &>/dev/null; then
+    sudo update-desktop-database /var/lib/flatpak/exports/share/applications 2>/dev/null || true
+    update-desktop-database "$HOME/.local/share/flatpak/exports/share/applications" 2>/dev/null || true
+    update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+fi
+show_installed "Desktop database refreshed"
+
 # Create config directory
 show_installing "Setting up configuration"
 mkdir -p "$KODRA_CONFIG_DIR"

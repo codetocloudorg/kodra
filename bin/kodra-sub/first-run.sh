@@ -244,6 +244,9 @@ run_first_run() {
     echo -e "${C_GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${C_RESET}"
     echo ""
     echo -e "${C_WHITE}  Log out and back in${C_RESET} to activate all changes."
+    echo -e "${C_GRAY}  Extensions and dock will configure automatically.${C_RESET}"
+    echo -e "${C_GRAY}  You'll see a notification when it's complete.${C_RESET}"
+    echo ""
     echo -e "${C_GRAY}  Then launch ${C_CYAN}Ghostty${C_GRAY} for your new terminal.${C_RESET}"
     echo ""
 }

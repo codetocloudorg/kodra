@@ -531,6 +531,33 @@ show_completion() {
     fi
     
     echo ""
+    
+    # Next steps card
+    printf "    ${C_PURPLE}${BOX_TL}"
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
+    printf "${BOX_TR}${C_RESET}\n"
+    printf "    ${C_PURPLE}${BOX_V}${C_RESET}  ${C_PURPLE}NEXT STEPS${C_RESET}%*s${C_PURPLE}${BOX_V}${C_RESET}\n" "$((BOX_WIDTH - 12))" ""
+    printf "    ${C_PURPLE}${BOX_V}  "
+    printf '%0.s─' $(seq 1 $((BOX_WIDTH - 2)))
+    printf "${BOX_V}${C_RESET}\n"
+    
+    # Log out instruction
+    local logout_text="1. Log out and log back in"
+    printf "    ${C_PURPLE}${BOX_V}${C_RESET}  ${C_WHITE}%s${C_RESET}%*s${C_PURPLE}${BOX_V}${C_RESET}\n" "$logout_text" "$((BOX_WIDTH - 2 - ${#logout_text}))" ""
+    local logout_detail="   Extensions and dock will auto-configure"
+    printf "    ${C_PURPLE}${BOX_V}${C_RESET}  ${C_DIM}%s${C_RESET}%*s${C_PURPLE}${BOX_V}${C_RESET}\n" "$logout_detail" "$((BOX_WIDTH - 2 - ${#logout_detail}))" ""
+    printf "    ${C_PURPLE}${BOX_V}${C_RESET}%*s${C_PURPLE}${BOX_V}${C_RESET}\n" "$BOX_WIDTH" ""
+    
+    local kodra_text="2. Run 'kodra' to explore commands"
+    printf "    ${C_PURPLE}${BOX_V}${C_RESET}  ${C_WHITE}%s${C_RESET}%*s${C_PURPLE}${BOX_V}${C_RESET}\n" "$kodra_text" "$((BOX_WIDTH - 2 - ${#kodra_text}))" ""
+    local kodra_detail="   Theme, dock, wallpaper management"
+    printf "    ${C_PURPLE}${BOX_V}${C_RESET}  ${C_DIM}%s${C_RESET}%*s${C_PURPLE}${BOX_V}${C_RESET}\n" "$kodra_detail" "$((BOX_WIDTH - 2 - ${#kodra_detail}))" ""
+    
+    printf "    ${C_PURPLE}${BOX_BL}"
+    printf '%0.s─' $(seq 1 $BOX_WIDTH)
+    printf "${BOX_BR}${C_RESET}\n"
+    
+    echo ""
 }
 
 # Show error message

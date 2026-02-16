@@ -164,7 +164,24 @@ install_flatpak() {
     
     log_info "Installing flatpak: $app_id"
     flatpak install -y "$remote" "$app_id"
+    
+    # Refresh desktop database so app appears in launcher immediately
+    refresh_flatpak_desktop_database
+    
     log_success "Installed flatpak: $app_id"
+}
+
+# Refresh desktop database for Flatpak apps
+# Call this after installing Flatpak apps to ensure they appear in launcher
+refresh_flatpak_desktop_database() {
+    # Ensure XDG_DATA_DIRS includes Flatpak paths
+    export XDG_DATA_DIRS="/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+    
+    # Update desktop database
+    if command -v update-desktop-database &>/dev/null; then
+        sudo update-desktop-database /var/lib/flatpak/exports/share/applications 2>/dev/null || true
+        update-desktop-database "$HOME/.local/share/flatpak/exports/share/applications" 2>/dev/null || true
+    fi
 }
 
 # Remove apt package

@@ -573,18 +573,9 @@ gsettings set org.gnome.nautilus.preferences show-delete-permanently false
 gsettings set org.gnome.nautilus.list-view default-zoom-level 'small'
 
 # -----------------------------------------------------------------------------
-# Set Favorite Apps in Dock
+# Note: Dock favorites are already set above at line ~402-436
+# We don't set them again here to avoid overwriting the dynamic detection
 # -----------------------------------------------------------------------------
-echo "📌 Setting dock favorites..."
-
-gsettings set org.gnome.shell favorite-apps "[\
-'org.gnome.Nautilus.desktop', \
-'ghostty.desktop', \
-'code.desktop', \
-'firefox_firefox.desktop', \
-'google-chrome.desktop', \
-'org.gnome.Settings.desktop'\
-]"
 
 # -----------------------------------------------------------------------------
 # Apply Wallpaper
@@ -679,6 +670,185 @@ NEW_EXTENSIONS="${NEW_EXTENSIONS%, }]"
 gsettings set org.gnome.shell enabled-extensions "$NEW_EXTENSIONS" 2>/dev/null || true
 echo "   ✓ Extensions enabled: dash-to-dock, blur-my-shell, tactile, tophat, alpha-grid, space-bar"
 
+# -----------------------------------------------------------------------------
+# Create First-Login Autostart Script
+# -----------------------------------------------------------------------------
+# This script runs ONCE on the first login after installation to:
+# 1. Enable extensions (GNOME Shell now knows about them)
+# 2. Configure dock and favorites
+# 3. Refresh desktop database for Flatpak apps
+#
+# This is necessary because during install, GNOME Shell hasn't loaded the
+# extension schemas yet, and XDG_DATA_DIRS doesn't include Flatpak paths.
+# -----------------------------------------------------------------------------
+echo "🚀 Setting up first-login configuration..."
+
+AUTOSTART_DIR="$HOME/.config/autostart"
+mkdir -p "$AUTOSTART_DIR"
+
+# Create the one-time setup script
+cat > "$KODRA_DATA_DIR/first-login-setup.sh" << 'FIRSTLOGIN'
+#!/usr/bin/env bash
+#
+# Kodra First-Login Setup
+# Runs ONCE on first login after installation
+# Enables extensions, configures dock, refreshes app database
+#
+
+KODRA_DATA_DIR="$HOME/.local/share/kodra"
+MARKER_FILE="$HOME/.config/kodra/first_login_complete"
+
+# Exit if already run
+if [ -f "$MARKER_FILE" ]; then
+    exit 0
+fi
+
+# Wait for GNOME Shell to fully start
+sleep 5
+
+# Log to file
+LOG_FILE="/tmp/kodra-first-login.log"
+exec > "$LOG_FILE" 2>&1
+
+echo "=== Kodra First-Login Setup ===" 
+echo "Started: $(date)"
+
+# -----------------------------------------------------------------------------
+# 1. Enable GNOME Extensions
+# -----------------------------------------------------------------------------
+echo "Enabling extensions..."
+
+EXTENSIONS=(
+    "dash-to-dock@micxgx.gmail.com"
+    "blur-my-shell@aunetx"
+    "tactile@lundal.io"
+    "tophat@fflewddur.github.io"
+    "AlphabeticalAppGrid@stuarthayhurst"
+    "space-bar@luchrioh"
+)
+
+for ext in "${EXTENSIONS[@]}"; do
+    if [ -d "$HOME/.local/share/gnome-shell/extensions/$ext" ]; then
+        gnome-extensions enable "$ext" 2>/dev/null && echo "  Enabled: $ext" || true
+    fi
+done
+
+# Disable Ubuntu defaults that conflict with our extensions
+gnome-extensions disable ubuntu-dock@ubuntu.com 2>/dev/null || true
+gnome-extensions disable ding@rastersoft.com 2>/dev/null || true
+
+# -----------------------------------------------------------------------------
+# 2. Configure Dash to Dock
+# -----------------------------------------------------------------------------
+echo "Configuring dock..."
+
+if [ -f "$KODRA_DATA_DIR/configure-dock.sh" ]; then
+    bash "$KODRA_DATA_DIR/configure-dock.sh" 2>/dev/null || true
+fi
+
+# -----------------------------------------------------------------------------
+# 3. Refresh Desktop Database for Flatpak Apps
+# -----------------------------------------------------------------------------
+echo "Refreshing desktop database..."
+
+# Ensure XDG_DATA_DIRS includes Flatpak paths
+export XDG_DATA_DIRS="/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+
+# Update desktop database
+if command -v update-desktop-database &>/dev/null; then
+    sudo update-desktop-database /var/lib/flatpak/exports/share/applications 2>/dev/null || true
+    update-desktop-database "$HOME/.local/share/flatpak/exports/share/applications" 2>/dev/null || true
+    update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+fi
+
+# -----------------------------------------------------------------------------
+# 4. Set Dock Favorites (now that Flatpak apps are discoverable)
+# -----------------------------------------------------------------------------
+echo "Setting dock favorites..."
+
+# Desktop file locations
+DESKTOP_DIRS=(
+    "/var/lib/flatpak/exports/share/applications"
+    "$HOME/.local/share/applications"
+    "/usr/share/applications"
+    "/usr/local/share/applications"
+)
+
+# Helper: find first existing desktop file
+find_app() {
+    local variants=("$@")
+    for variant in "${variants[@]}"; do
+        for dir in "${DESKTOP_DIRS[@]}"; do
+            if [ -f "$dir/$variant" ]; then
+                echo "$variant"
+                return 0
+            fi
+        done
+    done
+    return 1
+}
+
+# Build favorites list
+INSTALLED_APPS=()
+
+# Core apps
+app=$(find_app "org.gnome.Nautilus.desktop") && INSTALLED_APPS+=("$app")
+app=$(find_app "com.brave.Browser.desktop" "brave-browser.desktop") && INSTALLED_APPS+=("$app")
+app=$(find_app "com.mitchellh.ghostty.desktop" "ghostty.desktop") && INSTALLED_APPS+=("$app")
+app=$(find_app "code.desktop") && INSTALLED_APPS+=("$app")
+
+# GitHub Desktop  
+app=$(find_app "io.github.shiftey.Desktop.desktop" "github-desktop.desktop") && INSTALLED_APPS+=("$app")
+
+# Optional apps (Flatpak)
+app=$(find_app "com.spotify.Client.desktop" "spotify.desktop") && INSTALLED_APPS+=("$app")
+app=$(find_app "com.discordapp.Discord.desktop" "discord.desktop") && INSTALLED_APPS+=("$app")
+app=$(find_app "com.bitwarden.desktop.desktop") && INSTALLED_APPS+=("$app")
+
+# Settings
+app=$(find_app "org.gnome.Settings.desktop" "gnome-control-center.desktop") && INSTALLED_APPS+=("$app")
+
+if [ ${#INSTALLED_APPS[@]} -gt 0 ]; then
+    FAVORITES_LIST=$(printf "'%s'," "${INSTALLED_APPS[@]}")
+    FAVORITES_LIST="[${FAVORITES_LIST%,}]"
+    gsettings set org.gnome.shell favorite-apps "$FAVORITES_LIST" 2>/dev/null || true
+    echo "Set ${#INSTALLED_APPS[@]} dock favorites"
+fi
+
+# -----------------------------------------------------------------------------
+# 5. Mark as complete and clean up
+# -----------------------------------------------------------------------------
+mkdir -p "$(dirname "$MARKER_FILE")"
+date +%s > "$MARKER_FILE"
+
+# Remove autostart entry (one-time only)
+rm -f "$HOME/.config/autostart/kodra-first-login.desktop"
+
+echo "First-login setup complete!"
+echo "Finished: $(date)"
+
+# Show notification
+if command -v notify-send &>/dev/null; then
+    notify-send "Kodra" "Desktop setup complete! Extensions and dock configured." --icon=preferences-desktop
+fi
+FIRSTLOGIN
+chmod +x "$KODRA_DATA_DIR/first-login-setup.sh"
+
+# Create autostart desktop entry
+cat > "$AUTOSTART_DIR/kodra-first-login.desktop" << AUTOSTART
+[Desktop Entry]
+Type=Application
+Name=Kodra First-Login Setup
+Comment=One-time desktop configuration after Kodra installation
+Exec=$KODRA_DATA_DIR/first-login-setup.sh
+Terminal=false
+Hidden=false
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=3
+AUTOSTART
+
+echo "   ✓ First-login setup configured (runs after you log back in)"
+
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  🍎 macOS-Style Desktop Setup Complete!"
@@ -689,12 +859,21 @@ echo "  ✓ Papirus icons installed"
 echo "  ✓ GNOME Tweaks installed"
 echo "  ✓ Dark mode enabled"
 echo "  ✓ Keyboard shortcuts configured"
-echo "  ✓ 6 extensions auto-enabled:"
+echo "  ✓ 6 extensions pending activation:"
 echo "      Dash to Dock • Blur my Shell • Tactile"
 echo "      TopHat • Alphabetical Grid • Space Bar"
-echo "  ✓ Dock favorites configured"
+echo "  ✓ Dock favorites pending configuration"
 echo ""
-echo "  → Log out and log back in to see your new desktop!"
+echo "  ┌─────────────────────────────────────────────────────────┐"
+echo "  │  📋 IMPORTANT: First-Login Setup                       │"
+echo "  ├─────────────────────────────────────────────────────────┤"
+echo "  │  When you log back in, Kodra will automatically:       │"
+echo "  │    • Enable GNOME extensions                           │"
+echo "  │    • Configure dock favorites with your apps           │"
+echo "  │    • Register Flatpak apps in launcher                 │"
+echo "  │                                                        │"
+echo "  │  You'll see a notification when it's complete!        │"
+echo "  └─────────────────────────────────────────────────────────┘"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
