@@ -9,13 +9,15 @@
     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
 ```
 
-**Agentic Azure engineering powered by GitHub CLI—one command to ship.**
+**One-command Ubuntu setup for Azure cloud-native developers. GitHub CLI, Docker, Kubernetes, AI-powered workflows. From fresh install to production in minutes.**
 
 [![Version](https://img.shields.io/badge/version-0.3.2-blue?style=flat-square)](VERSION)
 [![CI](https://img.shields.io/github/actions/workflow/status/codetocloudorg/kodra/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/codetocloudorg/kodra/actions)
 [![Ubuntu 24.04+](https://img.shields.io/badge/Ubuntu-24.04+-E95420?style=flat-square&logo=ubuntu&logoColor=white)](https://releases.ubuntu.com/noble/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/vwfwq2EpXJ)
+[![GitHub stars](https://img.shields.io/github/stars/codetocloudorg/kodra?style=flat-square&logo=github)](https://github.com/codetocloudorg/kodra/stargazers)
+[![GitHub last commit](https://img.shields.io/github/last-commit/codetocloudorg/kodra?style=flat-square)](https://github.com/codetocloudorg/kodra/commits/main)
 
 *Developed by [Code To Cloud](https://www.codetocloud.io)*
 

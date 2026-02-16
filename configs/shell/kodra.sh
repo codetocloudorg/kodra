@@ -4,6 +4,12 @@
 # Beautiful MOTD and shell enhancements
 #
 
+# Ensure XDG_DATA_DIRS includes Flatpak paths for app launcher discovery
+# This must be set on every shell start for GNOME to find Flatpak apps
+if [[ ! "$XDG_DATA_DIRS" =~ "flatpak" ]]; then
+    export XDG_DATA_DIRS="/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+fi
+
 # Only show once per session
 if [ -z "$KODRA_MOTD_SHOWN" ]; then
     export KODRA_MOTD_SHOWN=1

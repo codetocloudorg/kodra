@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discord Community
+    url: https://discord.gg/vwfwq2EpXJ
+    about: Get help from the community and discuss ideas
+  - name: Documentation
+    url: https://kodra.codetocloud.io
+    about: Check our documentation and guides
+  - name: FAQ
+    url: https://github.com/codetocloudorg/kodra/blob/main/docs/FAQ.md
+    about: Check frequently asked questions

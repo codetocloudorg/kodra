@@ -41,6 +41,27 @@ if ! grep -q "EDITOR=nvim" "$HOME/.zshrc" 2>/dev/null; then
     echo 'export EDITOR=nvim' >> "$HOME/.zshrc"
 fi
 
+# Create desktop file for app launcher
+mkdir -p "$HOME/.local/share/applications"
+NVIM_PATH=$(command -v nvim)
+cat > "$HOME/.local/share/applications/nvim.desktop" << EOF
+[Desktop Entry]
+Name=Neovim
+GenericName=Text Editor
+Comment=Edit text files
+Exec=$NVIM_PATH %F
+Terminal=true
+Type=Application
+Keywords=Text;editor;vim;nvim;
+Icon=nvim
+Categories=Utility;TextEditor;
+StartupNotify=false
+MimeType=text/plain;text/x-c;text/x-c++;text/x-java;text/x-python;text/x-shellscript;
+EOF
+
+# Update desktop database
+update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+
 # Verify installation
 nvim --version | head -1
 

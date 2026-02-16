@@ -222,6 +222,18 @@ add_shell_integration() {
     local kodra_dir="${KODRA_DIR:-$HOME/.kodra}"
     local source_line="[ -f \"$kodra_dir/configs/shell/kodra.sh\" ] && source \"$kodra_dir/configs/shell/kodra.sh\""
     
+    # Add XDG_DATA_DIRS to ~/.profile for GNOME session (so app launcher finds Flatpak apps)
+    # This must be in .profile because GNOME reads it at login before starting the shell
+    if [ -f "$HOME/.profile" ]; then
+        if ! grep -q "flatpak/exports/share" "$HOME/.profile"; then
+            echo "" >> "$HOME/.profile"
+            echo "# Kodra: Include Flatpak paths for GNOME app launcher" >> "$HOME/.profile"
+            echo 'if [[ ! "$XDG_DATA_DIRS" =~ "flatpak" ]]; then' >> "$HOME/.profile"
+            echo '    export XDG_DATA_DIRS="/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"' >> "$HOME/.profile"
+            echo 'fi' >> "$HOME/.profile"
+        fi
+    fi
+    
     # Add to .bashrc
     if [ -f "$HOME/.bashrc" ]; then
         if ! grep -q "kodra.sh" "$HOME/.bashrc"; then
