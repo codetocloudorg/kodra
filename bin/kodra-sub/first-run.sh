@@ -146,30 +146,61 @@ setup_git_identity() {
         fi
     fi
     
-    if [ -z "$current_name" ]; then
-        local default_name=$(getent passwd "$USER" | cut -d: -f5 | cut -d, -f1)
+    if [ -z "$current_name" ] || [ -z "$current_email" ]; then
+        # Try to get defaults from GitHub CLI if authenticated
+        local default_name=""
+        local default_email=""
+        if command -v gh &> /dev/null && gh auth status &>/dev/null; then
+            default_name=$(gh api user -q '.name // empty' 2>/dev/null || echo "")
+            default_email=$(gh api user -q '.email // empty' 2>/dev/null || echo "")
+        fi
         
+        # Fallback: system full name (macOS: id -F, Linux: getent)
+        if [ -z "$default_name" ]; then
+            if [[ "$(uname)" == "Darwin" ]]; then
+                default_name=$(id -F 2>/dev/null || echo "")
+            else
+                default_name=$(getent passwd "$USER" 2>/dev/null | cut -d: -f5 | cut -d, -f1)
+            fi
+        fi
+        
+        echo -e "${C_GRAY}Enter your full name and email for Git commits.${C_RESET}"
+        echo ""
+    fi
+    
+    if [ -z "$current_name" ]; then
         if command -v gum &> /dev/null; then
-            local new_name=$(gum input --placeholder "Your name" --value "$default_name" --header "Git user name:")
+            local new_name=$(gum input --placeholder "John Doe" --value "$default_name" --header "Git user name (your full name):")
             [ -n "$new_name" ] && git config --global user.name "$new_name"
         else
-            read -p "Git user name [$default_name]: " new_name
-            [ -z "$new_name" ] && new_name="$default_name"
+            if [ -n "$default_name" ]; then
+                read -p "Git user name (your full name) [$default_name]: " new_name
+                [ -z "$new_name" ] && new_name="$default_name"
+            else
+                read -p "Git user name (your full name): " new_name
+            fi
             [ -n "$new_name" ] && git config --global user.name "$new_name"
         fi
     fi
     
     if [ -z "$current_email" ]; then
         if command -v gum &> /dev/null; then
-            local new_email=$(gum input --placeholder "you@example.com" --header "Git email:")
+            local new_email=$(gum input --placeholder "you@example.com" --value "$default_email" --header "Git email:")
             [ -n "$new_email" ] && git config --global user.email "$new_email"
         else
-            read -p "Git email: " new_email
+            if [ -n "$default_email" ]; then
+                read -p "Git email [$default_email]: " new_email
+                [ -z "$new_email" ] && new_email="$default_email"
+            else
+                read -p "Git email: " new_email
+            fi
             [ -n "$new_email" ] && git config --global user.email "$new_email"
         fi
     fi
     
-    echo -e "${C_GREEN}✓${C_RESET} Git configured"
+    local final_name=$(git config --global user.name 2>/dev/null || echo "Not set")
+    local final_email=$(git config --global user.email 2>/dev/null || echo "Not set")
+    echo -e "${C_GREEN}✓${C_RESET} Git configured: ${C_WHITE}$final_name${C_RESET} <${C_CYAN}$final_email${C_RESET}>"
 }
 
 # Install GitHub Copilot CLI after auth
