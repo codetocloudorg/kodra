@@ -803,7 +803,6 @@ app=$(find_app "io.github.shiftey.Desktop.desktop" "github-desktop.desktop") && 
 # Optional apps (Flatpak)
 app=$(find_app "com.spotify.Client.desktop" "spotify.desktop") && INSTALLED_APPS+=("$app")
 app=$(find_app "com.discordapp.Discord.desktop" "discord.desktop") && INSTALLED_APPS+=("$app")
-app=$(find_app "com.bitwarden.desktop.desktop") && INSTALLED_APPS+=("$app")
 
 # Settings
 app=$(find_app "org.gnome.Settings.desktop" "gnome-control-center.desktop") && INSTALLED_APPS+=("$app")
