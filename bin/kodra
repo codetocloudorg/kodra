@@ -47,6 +47,7 @@ show_help() {
     echo "  update            Update Kodra and installed packages"
     echo "  install <app>     Install an additional application"
     echo "  uninstall <app>   Remove an application"
+    echo "  repair            Re-apply all configs without reinstalling"
     echo "  restore [cmd]     Restore backed up dotfiles"
     echo "  resume [cmd]      Resume incomplete installation"
     echo "  doctor            Check system health"
@@ -58,6 +59,7 @@ show_help() {
     echo "  kodra theme              # Interactive theme picker"
     echo "  kodra theme tokyo-night  # Switch to tokyo-night theme"
     echo "  kodra desktop refresh    # Re-apply desktop settings after update"
+    echo "  kodra repair             # Fix configs without reinstalling apps"
     echo "  kodra install discord    # Install Discord"
     echo "  kodra update             # Update everything"
     echo ""
@@ -103,6 +105,10 @@ case "${1:-help}" in
     doctor)
         shift
         bash "$KODRA_DIR/bin/kodra-sub/doctor.sh" "$@"
+        ;;
+    repair|fix)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/repair.sh" "$@"
         ;;
     migrate)
         shift
