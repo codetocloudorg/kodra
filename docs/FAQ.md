@@ -179,10 +179,15 @@ kodra desktop refresh
 
 Run:
 ```bash
-kodra desktop refresh
+kodra repair
 ```
 
-This updates the desktop database and registers Flatpak apps.
+This re-applies all configurations including:
+- XDG_DATA_DIRS for Flatpak desktop file discovery
+- Desktop database refresh
+- Shell integration
+
+Then **log out and back in** for changes to take effect.
 
 ### Docker permission denied error
 

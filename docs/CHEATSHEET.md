@@ -165,6 +165,7 @@ explain "tar -xzvf archive.tar.gz"
 |-------|---------|-------------|
 | `kodra-theme` | `kodra theme` | Change theme |
 | `kodra-update` | `kodra update` | Update Kodra |
+| `kodra-repair` | `kodra repair` | Re-apply all configs |
 | `kodra-doctor` | `kodra doctor` | Diagnose issues |
 
 ---
