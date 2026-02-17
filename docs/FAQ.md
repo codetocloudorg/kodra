@@ -141,6 +141,7 @@ This updates:
 - Kodra scripts
 - System packages (apt)
 - Homebrew packages
+- npm global packages
 - Flatpak apps
 - VS Code extensions
 - Desktop configuration

@@ -5,6 +5,13 @@ All notable changes to Kodra will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-02-17
+
+### Changed
+- **GitHub Copilot CLI installer** switched from Homebrew (`brew install copilot-cli`) to npm (`npm install -g @github/copilot`)
+  - Aligns with official install method at https://github.com/github/copilot-cli
+  - npm is more cross-platform and doesn't require Homebrew as a prerequisite
+
 ## [0.4.0] - 2026-02-16
 
 ### Added

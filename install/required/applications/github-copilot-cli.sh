@@ -14,10 +14,10 @@ if command -v copilot &> /dev/null; then
     exit 0
 fi
 
-# Install via Homebrew (macOS/Linux)
-if command -v brew &> /dev/null; then
-    echo "Installing GitHub Copilot CLI via Homebrew..."
-    if brew install copilot-cli; then
+# Install via npm (macOS/Linux/Windows)
+if command -v npm &> /dev/null; then
+    echo "Installing GitHub Copilot CLI via npm..."
+    if npm install -g @github/copilot; then
         echo ""
         echo "GitHub Copilot CLI installed successfully!"
         echo ""
@@ -33,14 +33,14 @@ if command -v brew &> /dev/null; then
     else
         echo ""
         echo "⚠️  Could not install GitHub Copilot CLI."
-        echo "   Try: brew install copilot-cli"
+        echo "   Try: npm install -g @github/copilot"
         echo ""
         exit 1
     fi
 else
     echo ""
-    echo "⚠️  Homebrew is required to install GitHub Copilot CLI."
-    echo "   Install Homebrew first, then run: brew install copilot-cli"
+    echo "⚠️  npm is required to install GitHub Copilot CLI."
+    echo "   Install Node.js/npm first, then run: npm install -g @github/copilot"
     echo ""
     exit 1
 fi

@@ -83,7 +83,7 @@ alias azd-deploy='azd deploy'
 # GitHub Copilot CLI shortcuts
 # ---------------------------------------------------------
 
-# New standalone Copilot CLI (copilot-cli via Homebrew)
+# New standalone Copilot CLI (@github/copilot via npm)
 if command -v copilot &> /dev/null; then
     alias '??'='copilot -p'
     alias 'explain'='copilot -p "Explain this command:"'
