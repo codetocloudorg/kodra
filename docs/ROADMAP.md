@@ -45,14 +45,14 @@
 - [x] Add `--continue-on-error` flag (via `--debug`/`--resilient`)
 - [x] Show installation summary on completion
 
-### #5 Uninstall Scripts per Component 🟡 P1
-- [ ] Create `uninstall/` mirroring `install/`
-- [ ] Each install has matching uninstall
-- [ ] Interactive uninstall menu
-- [ ] Options: uninstall all, by category, specific tool
+### #5 Uninstall Scripts per Component 🟡 P1 ✅
+- [x] Create `uninstall/` mirroring `install/`
+- [x] Each install has matching uninstall
+- [x] Interactive uninstall menu
+- [x] Options: uninstall all, by category, specific tool
 - [ ] Option to keep or remove configs
 - [ ] Restore backed up dotfiles
-- [ ] Add `--dry-run` flag
+- [x] Add `--dry-run` flag
 
 ### #7 Health Check & Doctor Command 🟡 P1 ✅
 - [x] `kodra doctor` exists
@@ -82,12 +82,12 @@
 - [ ] Test on Ubuntu 22.04 LTS
 - [ ] Add CI badge to README
 
-### #10 Interactive Boot Menu 🟡 P1
-- [ ] Implement gum-based interactive menu in boot.sh
-- [ ] Menu options: Install, Update, Change Theme, Uninstall, Exit
-- [ ] Handle TTY detection for piped vs direct execution
-- [ ] Support both `curl | bash` and direct `./boot.sh` execution
-- [ ] Graceful fallback when no TTY available
+### #10 Interactive Boot Menu 🟡 P1 ✅
+- [x] Implement gum-based interactive menu in boot.sh
+- [x] Menu options: Install, Update, Change Theme, Uninstall, Exit
+- [x] Handle TTY detection for piped vs direct execution
+- [x] Support both `curl | bash` and direct `./boot.sh` execution
+- [x] Graceful fallback when no TTY available
 
 ---
 
@@ -129,8 +129,8 @@
 ### #14 SEO & Discoverability 🟡 P1
 - [x] sitemap.xml exists
 - [x] robots.txt exists
-- [ ] Add meta tags (title, description, OG)
-- [ ] Add structured data (JSON-LD)
+- [x] Add meta tags (title, description, OG)
+- [x] Add structured data (JSON-LD)
 - [ ] Submit to Google Search Console
 - [ ] Add analytics (Plausible)
 
@@ -140,11 +140,11 @@
 - [ ] Discord member count
 - [ ] "As used by" section
 
-### #16 Landing Page Improvements 🟡 P1
-- [ ] Add hero section with video/screenshot
-- [ ] "How It Works" 3-step section
+### #16 Landing Page Improvements 🟡 P1 ✅
+- [x] Add hero section with video/screenshot
+- [x] "How It Works" 3-step section
 - [ ] "Why Kodra?" benefits section
-- [ ] FAQ section
+- [x] FAQ section
 - [ ] Improve mobile responsiveness
 
 ---
@@ -208,18 +208,18 @@
 
 ### #24 CONTRIBUTING.md Guide 🟡 P1
 - [x] Basic contributing guide exists
-- [ ] How to report bugs
-- [ ] How to add new tools
-- [ ] How to create themes
+- [x] How to report bugs
+- [x] How to add new tools
+- [x] How to create themes
 - [ ] Code style guide
 - [ ] Development setup
 
-### #25 Troubleshooting Guide 🟡 P1
-- [ ] Installation failures
-- [ ] Azure CLI login issues
-- [ ] Docker permission issues
-- [ ] Theme not applying
-- [ ] GNOME extension issues
+### #25 Troubleshooting Guide 🟡 P1 ✅
+- [x] Installation failures
+- [x] Azure CLI login issues
+- [x] Docker permission issues
+- [x] Theme not applying
+- [x] GNOME extension issues
 - [ ] Link from error messages
 
 ---
@@ -334,11 +334,11 @@ The following shell functions already exist in `configs/shell/kodra.sh`:
 - [x] FZF with Tokyo Night colors
 - [x] FZF keybindings for ctrl-r, ctrl-t, alt-c
 
-### #40 Ghostty Terminal Improvements 🔴 P0
-- [ ] Split pane resize keybinds (Super+Ctrl+Shift+Arrow)
-- [ ] Mouse scroll multiplier (0.95)
-- [ ] async-backend = epoll for performance
-- [ ] Unbind conflicting keybinds for tmux
+### #40 Ghostty Terminal Improvements 🔴 P0 ✅
+- [x] Split pane resize keybinds (Super+Ctrl+Shift+Arrow)
+- [x] Mouse scroll multiplier (0.95)
+- [x] async-backend = epoll for performance
+- [x] Unbind conflicting keybinds for tmux
 
 ---
 
@@ -422,12 +422,12 @@ Located in `themes/` directory:
 - [ ] Matte Black - Subtle blacks
 - [ ] Ethereal - Dreamy pastels
 
-### #48 Theme Hot-Swap 🟡 P1
-- [ ] Refresh components without logout
-- [ ] `kodra-refresh-terminal` post theme switch
-- [ ] `kodra-refresh-starship` post theme switch
-- [ ] Script to reload VS Code theme
-- [ ] Reload btop with new theme
+### #48 Theme Hot-Swap 🟡 P1 ✅
+- [x] Refresh components without logout
+- [x] `kodra-refresh-terminal` post theme switch
+- [x] `kodra-refresh-starship` post theme switch
+- [x] Script to reload VS Code theme
+- [x] Reload btop with new theme
 
 ### #49 Multiple Wallpapers Per Theme 🟡 P1 ✅
 - [x] Theme-specific wallpaper directories (wallpapers/<theme>/)
@@ -448,10 +448,10 @@ Located in `themes/` directory:
 - [x] Auto-apply btop theme on theme switch
 - [x] Match terminal color palette
 
-### #52 nvim Colorscheme Sync 🟡 P1
-- [ ] Auto-install nvim colorscheme plugins
-- [ ] Set colorscheme on theme switch
-- [ ] LazyVim integration
+### #52 nvim Colorscheme Sync 🟡 P1 ✅
+- [x] Auto-install nvim colorscheme plugins
+- [x] Set colorscheme on theme switch
+- [x] LazyVim integration
 
 ### #53 Theme Template System 🟢 P2
 - [ ] Template files with color placeholders
@@ -589,13 +589,13 @@ The following commands exist in `bin/kodra` and `bin/kodra-sub/`:
 - [x] Clean Homebrew cache
 - [x] Show space reclaimed
 
-### #69 `kodra backup` 🟡 P1
+### #69 `kodra backup` 🟡 P1 ✅
 - [x] Backup system exists (`lib/backup.sh`)
 - [x] `kodra restore` command exists
-- [ ] Backup dotfiles to tarball
-- [ ] Include: shell, ghostty, starship, vscode settings
+- [x] Backup dotfiles to tarball
+- [x] Include: shell, ghostty, starship, vscode settings
 - [ ] Exclude secrets
-- [ ] Timestamp filename
+- [x] Timestamp filename
 
 ### #70 `kodra status` 🟢 P2
 - [ ] System overview
@@ -664,7 +664,7 @@ The following commands exist in `bin/kodra` and `bin/kodra-sub/`:
 - [ ] User-customizable logo/branding file
 - [ ] Better GPU detection
 - [ ] Better display/monitor info
-- [ ] Package count (apt + snap + flatpak)
+- [x] Package count (apt + snap + flatpak)
 - [ ] Terminal detection improvement
 
 ---
@@ -679,10 +679,10 @@ The following commands exist in `bin/kodra` and `bin/kodra-sub/`:
 - [x] Kubernetes context display
 - [x] Azure subscription display
 - [ ] Minimal mode option (directory + git only)
-- [ ] Better git status symbols (ahead/behind/diverged)
-- [ ] Command timeout = 200ms
-- [ ] AWS profile display
-- [ ] Terraform workspace display
+- [x] Better git status symbols (ahead/behind/diverged)
+- [x] Command timeout = 200ms
+- [x] AWS profile display
+- [x] Terraform workspace display
 
 ---
 
@@ -703,23 +703,23 @@ The following commands exist in `bin/kodra` and `bin/kodra-sub/`:
 - [x] Shell aliases and functions
 - [ ] Printable PDF version
 
-### #80 Theme Creation Guide 🟡 P1
-- [ ] How to create a new theme
-- [ ] Required files
-- [ ] Color palette format
-- [ ] Testing themes
-- [ ] Contributing themes
+### #80 Theme Creation Guide 🟡 P1 ✅
+- [x] How to create a new theme
+- [x] Required files
+- [x] Color palette format
+- [x] Testing themes
+- [x] Contributing themes
 
 ---
 
 ## 🐧 GNOME Integration
 
-### #81 Extension Management 🟡 P1
+### #81 Extension Management 🟡 P1 ✅
 - [ ] Better extension auto-install
 - [ ] Extension settings backup/restore
-- [ ] `kodra extensions list`
-- [ ] `kodra extensions enable <name>`
-- [ ] `kodra extensions disable <name>`
+- [x] `kodra extensions list`
+- [x] `kodra extensions enable <name>`
+- [x] `kodra extensions disable <name>`
 
 ### #82 GTK Theme Sync 🟢 P2
 - [ ] Match GTK theme to Kodra theme
@@ -747,14 +747,14 @@ The following commands exist in `bin/kodra` and `bin/kodra-sub/`:
 - [ ] App switching gestures
 - [ ] Use libinput-gestures or touchegg
 
-### #87 Keyboard Shortcuts Sync 🟡 P1
-- [ ] `kodra shortcuts export` - Export to file
-- [ ] `kodra shortcuts import` - Import from file
+### #87 Keyboard Shortcuts Sync 🟡 P1 ✅
+- [x] `kodra shortcuts export` - Export to file
+- [x] `kodra shortcuts import` - Import from file
 - [ ] Share shortcuts across installs
 
-### #88 dconf Backup 🟡 P1
-- [ ] `kodra dconf backup` - Backup all settings
-- [ ] `kodra dconf restore` - Restore settings
+### #88 dconf Backup 🟡 P1 ✅
+- [x] `kodra dconf backup` - Backup all settings
+- [x] `kodra dconf restore` - Restore settings
 - [ ] Include in full backup
 
 ---
@@ -766,10 +766,10 @@ The following commands exist in `bin/kodra` and `bin/kodra-sub/`:
 - [ ] Downloadable offline package
 - [ ] Install from local cache
 
-### #90 Selective Install 🟡 P1
-- [ ] Choose components interactively
-- [ ] Skip categories (--skip-azure, --skip-docker)
-- [ ] Minimal install profile
+### #90 Selective Install 🟡 P1 ✅
+- [x] Choose components interactively
+- [x] Skip categories (--skip-azure, --skip-docker)
+- [x] Minimal install profile
 
 ### #91 Progress Indicators 🟡 P1
 - [ ] Real-time progress bar
