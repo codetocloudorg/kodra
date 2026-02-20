@@ -128,6 +128,122 @@ show_tmux_shortcuts() {
     echo ""
 }
 
+# Export shortcuts to file (#87)
+export_shortcuts() {
+    local output_file="${1:-$HOME/.kodra/backups/shortcuts-$(date +%Y%m%d-%H%M%S).conf}"
+    local backup_dir=$(dirname "$output_file")
+    
+    mkdir -p "$backup_dir"
+    
+    echo "# Kodra Keyboard Shortcuts Export" > "$output_file"
+    echo "# Exported: $(date)" >> "$output_file"
+    echo "# System: $(hostname)" >> "$output_file"
+    echo "" >> "$output_file"
+    
+    # Export GNOME custom keybindings
+    if command -v gsettings &>/dev/null; then
+        echo "[gnome.settings-daemon.plugins.media-keys]" >> "$output_file"
+        
+        # Get custom keybinding paths
+        local custom_list=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings 2>/dev/null || echo "[]")
+        echo "custom-keybindings=$custom_list" >> "$output_file"
+        echo "" >> "$output_file"
+        
+        # Export each custom keybinding
+        echo "$custom_list" | tr -d "[]'" | tr ',' '\n' | while read -r path; do
+            path=$(echo "$path" | xargs)
+            if [ -n "$path" ]; then
+                local name=$(dconf read "$path/name" 2>/dev/null | tr -d "'")
+                local command=$(dconf read "$path/command" 2>/dev/null | tr -d "'")
+                local binding=$(dconf read "$path/binding" 2>/dev/null | tr -d "'")
+                
+                echo "[$path]" >> "$output_file"
+                echo "name=$name" >> "$output_file"
+                echo "command=$command" >> "$output_file"
+                echo "binding=$binding" >> "$output_file"
+                echo "" >> "$output_file"
+            fi
+        done
+        
+        # Export standard GNOME shortcuts
+        echo "[gnome.desktop.wm.keybindings]" >> "$output_file"
+        for key in switch-to-workspace-1 switch-to-workspace-2 switch-to-workspace-3 switch-to-workspace-4 \
+                   move-to-workspace-1 move-to-workspace-2 move-to-workspace-3 move-to-workspace-4 \
+                   maximize minimize close; do
+            local value=$(gsettings get org.gnome.desktop.wm.keybindings "$key" 2>/dev/null || echo "")
+            [ -n "$value" ] && echo "$key=$value" >> "$output_file"
+        done
+        echo "" >> "$output_file"
+        
+        # Export shell shortcuts
+        echo "[gnome.shell.keybindings]" >> "$output_file"
+        for key in toggle-application-view toggle-overview; do
+            local value=$(gsettings get org.gnome.shell.keybindings "$key" 2>/dev/null || echo "")
+            [ -n "$value" ] && echo "$key=$value" >> "$output_file"
+        done
+    fi
+    
+    echo -e "${GREEN}✓${NC} Exported to: $output_file"
+}
+
+# Import shortcuts from file (#87)
+import_shortcuts() {
+    local input_file="$1"
+    
+    if [ -z "$input_file" ] || [ ! -f "$input_file" ]; then
+        echo -e "${RED}Error:${NC} File not found: $input_file"
+        echo "Usage: kodra shortcuts import <file>"
+        exit 1
+    fi
+    
+    echo -e "${CYAN}Importing shortcuts from:${NC} $input_file"
+    
+    if ! command -v gsettings &>/dev/null; then
+        echo -e "${RED}Error:${NC} gsettings not available"
+        exit 1
+    fi
+    
+    local current_section=""
+    local custom_path=""
+    
+    while IFS= read -r line || [ -n "$line" ]; do
+        # Skip comments and empty lines
+        [[ "$line" =~ ^#.*$ || -z "$line" ]] && continue
+        
+        # Section header
+        if [[ "$line" =~ ^\[.*\]$ ]]; then
+            current_section="${line:1:-1}"
+            if [[ "$current_section" == /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/* ]]; then
+                custom_path="$current_section"
+            else
+                custom_path=""
+            fi
+            continue
+        fi
+        
+        # Key=value
+        if [[ "$line" =~ ^([^=]+)=(.*)$ ]]; then
+            local key="${BASH_REMATCH[1]}"
+            local value="${BASH_REMATCH[2]}"
+            
+            if [ -n "$custom_path" ]; then
+                # Custom keybinding
+                dconf write "$custom_path/$key" "'$value'" 2>/dev/null || true
+            elif [[ "$current_section" == "gnome.desktop.wm.keybindings" ]]; then
+                gsettings set org.gnome.desktop.wm.keybindings "$key" "$value" 2>/dev/null || true
+            elif [[ "$current_section" == "gnome.shell.keybindings" ]]; then
+                gsettings set org.gnome.shell.keybindings "$key" "$value" 2>/dev/null || true
+            elif [[ "$current_section" == "gnome.settings-daemon.plugins.media-keys" ]]; then
+                if [ "$key" = "custom-keybindings" ]; then
+                    gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$value" 2>/dev/null || true
+                fi
+            fi
+        fi
+    done < "$input_file"
+    
+    echo -e "${GREEN}✓${NC} Shortcuts imported"
+}
+
 filter_shortcuts() {
     local query="$1"
     
@@ -162,12 +278,20 @@ case "${1:-}" in
             echo "Usage: kodra shortcuts search <query>"
         fi
         ;;
+    export)
+        export_shortcuts "${2:-}"
+        ;;
+    import)
+        import_shortcuts "${2:-}"
+        ;;
     -h|--help|help)
         echo "Usage: kodra shortcuts [options]"
         echo ""
         echo "Options:"
         echo "  (none)           Show all shortcuts"
         echo "  search <query>   Search shortcuts"
+        echo "  export [file]    Export shortcuts to file"
+        echo "  import <file>    Import shortcuts from file"
         echo "  gnome            Show GNOME shortcuts only"
         echo "  terminal         Show terminal shortcuts only"
         echo "  shell            Show shell shortcuts only"

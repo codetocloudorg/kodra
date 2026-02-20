@@ -167,12 +167,102 @@ echo "Your App installed successfully!"
 
 ## Adding a New Theme
 
+See the comprehensive [Theme Creation Guide](docs/THEME_GUIDE.md) for detailed instructions.
+
+Quick overview:
 1. Create `themes/your-theme/` directory
-2. Add theme files:
+2. Add required files:
    - `ghostty.conf` - Terminal colors
-   - `starship.toml` - Prompt configuration
+   - `starship.toml` - Prompt configuration  
    - `vscode-settings.json` - VS Code theme settings
-   - `wallpaper.png` or `wallpaper.jpg` (optional)
+3. Optional: Add `tmux.conf`, btop theme, wallpapers
+4. Update theme mappings in `bin/kodra-sub/theme.sh`
+5. Test with `kodra theme your-theme`
+
+## Adding a New Command
+
+1. Create `bin/kodra-sub/your-command.sh`:
+
+```bash
+#!/usr/bin/env bash
+#
+# Kodra Your Command
+# Brief description
+#
+
+set -e
+
+KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
+source "$KODRA_DIR/lib/utils.sh"
+
+show_help() {
+    echo "Usage: kodra your-command [options]"
+    echo ""
+    echo "Options:"
+    echo "  help    Show this help"
+}
+
+case "${1:-}" in
+    help|--help|-h)
+        show_help
+        ;;
+    *)
+        # Your command logic
+        ;;
+esac
+```
+
+2. Add to dispatcher in `bin/kodra`:
+
+```bash
+your-command)
+    shift
+    bash "$KODRA_DIR/bin/kodra-sub/your-command.sh" "$@"
+    ;;
+```
+
+3. Add to help message in `show_help()` function
+4. Update tab completions in `configs/completions/`
+5. Document in `docs/CHEATSHEET.md`
+
+## Bug Reports
+
+### Before opening a bug report
+
+1. Check existing issues - your problem may already be reported
+2. Run `kodra doctor` to identify common issues
+3. Try running with debug mode:
+   ```bash
+   ./install.sh --debug
+   ```
+4. Check the troubleshooting guide: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+
+### What to include
+
+```markdown
+## Description
+[Clear description of the problem]
+
+## Steps to Reproduce
+1. [First step]
+2. [Second step]
+3. [etc.]
+
+## Expected Behavior
+[What should happen]
+
+## Actual Behavior
+[What actually happens]
+
+## System Information
+- Ubuntu Version: [e.g., 24.04.3 LTS]
+- Kodra Version: [run `kodra version`]
+- Installation Mode: [normal/debug/minimal]
+
+## Logs
+[Paste relevant log output or run:]
+cat ~/.config/kodra/install.log | nc termbin.com 9999
+```
 
 ## Coding Guidelines
 

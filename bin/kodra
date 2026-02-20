@@ -50,6 +50,7 @@ show_help() {
     echo "  install <app>     Install an additional application"
     echo "  uninstall <app>   Remove an application"
     echo "  repair            Re-apply all configs without reinstalling"
+    echo "  backup [cmd]      Backup/export dotfiles and dconf settings"
     echo "  restore [cmd]     Restore backed up dotfiles"
     echo "  resume [cmd]      Resume incomplete installation"
     echo "  doctor            Check system health"
@@ -60,6 +61,8 @@ show_help() {
     echo "  font [name]       Change terminal font"
     echo "  screenshot [type] Take screenshots (full/region/window)"
     echo "  cleanup [what]    Clear system caches and free space"
+    echo "  refresh [what]    Hot-reload theme components without logout"
+    echo "  extensions [cmd]  Manage GNOME extensions"
     echo "  lock              Lock the screen"
     echo "  suspend           Suspend the system"
     echo "  restart           Restart the system"
@@ -107,7 +110,11 @@ case "${1:-help}" in
         shift
         bash "$KODRA_DIR/bin/kodra-sub/uninstall.sh" "$@"
         ;;
-    restore|backup)
+    backup)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/backup.sh" "$@"
+        ;;
+    restore)
         shift
         bash "$KODRA_DIR/bin/kodra-sub/restore.sh" "$@"
         ;;
@@ -183,6 +190,14 @@ case "${1:-help}" in
     cleanup|clean)
         shift
         bash "$KODRA_DIR/bin/kodra-sub/cleanup.sh" "$@"
+        ;;
+    refresh)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/refresh.sh" "$@"
+        ;;
+    extensions|ext)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/extensions.sh" "$@"
         ;;
     lock)
         if command -v loginctl &>/dev/null; then
