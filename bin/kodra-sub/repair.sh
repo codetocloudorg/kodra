@@ -90,7 +90,41 @@ repair_shell_integration() {
         echo "  ✓ Set EDITOR=nvim in ~/.zshrc"
     fi
     
+    # Install shell completions
+    install_completions
+    
     echo ""
+}
+
+# Install shell completions for kodra
+install_completions() {
+    local kodra_dir="${KODRA_DIR:-$HOME/.kodra}"
+    
+    # Bash completions
+    if [ -n "$BASH_VERSION" ] || [ -f "$HOME/.bashrc" ]; then
+        mkdir -p "$HOME/.local/share/bash-completion/completions"
+        if [ -f "$kodra_dir/configs/completions/kodra.bash" ]; then
+            cp "$kodra_dir/configs/completions/kodra.bash" "$HOME/.local/share/bash-completion/completions/kodra"
+            echo "  ✓ Installed bash completions"
+        fi
+    fi
+    
+    # Zsh completions
+    if [ -n "$ZSH_VERSION" ] || [ -f "$HOME/.zshrc" ]; then
+        mkdir -p "$HOME/.config/zsh/completions"
+        if [ -f "$kodra_dir/configs/completions/_kodra" ]; then
+            cp "$kodra_dir/configs/completions/_kodra" "$HOME/.config/zsh/completions/_kodra"
+            echo "  ✓ Installed zsh completions"
+            
+            # Ensure completions dir is in fpath
+            if [ -f "$HOME/.zshrc" ] && ! grep -q "zsh/completions" "$HOME/.zshrc"; then
+                echo "" >> "$HOME/.zshrc"
+                echo "# Kodra completions" >> "$HOME/.zshrc"
+                echo 'fpath=(~/.config/zsh/completions $fpath)' >> "$HOME/.zshrc"
+                echo 'autoload -Uz compinit && compinit' >> "$HOME/.zshrc"
+            fi
+        fi
+    fi
 }
 
 repair_app_desktop_files() {

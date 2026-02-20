@@ -57,6 +57,13 @@ show_help() {
     echo "  shortcuts         Display keyboard shortcuts"
     echo "  power [profile]   Set power profile (performance/balanced/power-saver)"
     echo "  nightlight        Toggle night light (blue light filter)"
+    echo "  font [name]       Change terminal font"
+    echo "  screenshot [type] Take screenshots (full/region/window)"
+    echo "  cleanup [what]    Clear system caches and free space"
+    echo "  lock              Lock the screen"
+    echo "  suspend           Suspend the system"
+    echo "  restart           Restart the system"
+    echo "  shutdown          Shutdown the system"
     echo "  welcome           Show first-run welcome screen"
     echo "  version           Show version information"
     echo "  help              Show this help message"
@@ -164,6 +171,50 @@ case "${1:-help}" in
     db|database)
         shift
         bash "$KODRA_DIR/bin/kodra-sub/db.sh" "$@"
+        ;;
+    font)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/font.sh" "$@"
+        ;;
+    screenshot|ss)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/screenshot.sh" "$@"
+        ;;
+    cleanup|clean)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/cleanup.sh" "$@"
+        ;;
+    lock)
+        if command -v loginctl &>/dev/null; then
+            loginctl lock-session
+        elif command -v gnome-screensaver-command &>/dev/null; then
+            gnome-screensaver-command -l
+        else
+            echo "Lock not supported on this system"
+            exit 1
+        fi
+        ;;
+    suspend)
+        if command -v systemctl &>/dev/null; then
+            systemctl suspend
+        else
+            echo "Suspend not supported on this system"
+            exit 1
+        fi
+        ;;
+    restart|reboot)
+        if command -v systemctl &>/dev/null; then
+            systemctl reboot
+        else
+            sudo reboot
+        fi
+        ;;
+    shutdown|poweroff)
+        if command -v systemctl &>/dev/null; then
+            systemctl poweroff
+        else
+            sudo shutdown -h now
+        fi
         ;;
     version|-v|--version)
         show_version

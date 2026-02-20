@@ -1,0 +1,197 @@
+#compdef kodra
+# Zsh completion for Kodra
+# Install: copy to ~/.config/zsh/completions/_kodra or /usr/local/share/zsh/site-functions/_kodra
+
+_kodra() {
+    local -a commands themes power_profiles databases dev_commands desktop_commands
+    local -a motd_styles nightlight_commands wallpaper_commands apps font_commands
+    local -a screenshot_commands cleanup_commands dev_languages
+
+    commands=(
+        'theme:Switch color themes'
+        'wallpaper:Change desktop wallpaper'
+        'desktop:Configure GNOME desktop'
+        'motd:Set terminal banner style'
+        'setup:Run first-time setup'
+        'fetch:Show system info'
+        'dev:Install language runtimes'
+        'db:Start database containers'
+        'update:Update Kodra and packages'
+        'install:Install additional apps'
+        'uninstall:Remove applications'
+        'repair:Re-apply all configs'
+        'restore:Restore backed up dotfiles'
+        'resume:Resume incomplete installation'
+        'doctor:Check system health'
+        'menu:Interactive main menu'
+        'shortcuts:Display keyboard shortcuts'
+        'power:Set power profile'
+        'nightlight:Toggle blue light filter'
+        'font:Change terminal font'
+        'screenshot:Take screenshots'
+        'cleanup:Clear system caches'
+        'lock:Lock screen'
+        'suspend:Suspend system'
+        'restart:Restart system'
+        'shutdown:Shutdown system'
+        'welcome:Show welcome screen'
+        'version:Show version info'
+        'help:Show help message'
+    )
+
+    themes=(
+        'tokyo-night:Purple-blue dark theme (default)'
+        'ghostty-blue:Blue-focused dark theme'
+        'gruvbox:Retro warm dark theme'
+        'catppuccin:Soothing pastel dark theme'
+        'nord:Arctic blue-gray theme'
+        'rose-pine:Soft muted dark theme'
+    )
+
+    power_profiles=(
+        'performance:Maximum performance'
+        'balanced:Balance performance and battery'
+        'power-saver:Maximum battery life'
+        'status:Show current profile'
+    )
+
+    databases=(
+        'postgres:Start PostgreSQL container'
+        'mysql:Start MySQL container'
+        'redis:Start Redis container'
+        'mongo:Start MongoDB container'
+        'list:List running databases'
+        'stop-all:Stop all database containers'
+        'clean:Remove containers and volumes'
+    )
+
+    dev_commands=(
+        'setup:Install a language runtime'
+        'list:Show installed runtimes'
+        'available:List available runtimes'
+    )
+
+    dev_languages=(
+        'node:Node.js JavaScript runtime'
+        'python:Python interpreter'
+        'ruby:Ruby interpreter'
+        'go:Go programming language'
+        'rust:Rust programming language'
+        'java:OpenJDK Java'
+        'deno:Deno JavaScript runtime'
+        'bun:Bun JavaScript runtime'
+        'dotnet:.NET SDK'
+    )
+
+    desktop_commands=(
+        'setup:Run full desktop setup'
+        'refresh:Re-apply desktop settings'
+        'dock:Configure dock'
+        'extensions:Manage GNOME extensions'
+    )
+
+    motd_styles=(
+        'banner:Full ASCII art banner'
+        'minimal:One-line status'
+        'none:Disable MOTD'
+    )
+
+    nightlight_commands=(
+        'on:Enable night light'
+        'off:Disable night light'
+        'toggle:Toggle night light'
+        'temp:Set color temperature'
+        'status:Show current status'
+        'schedule:Set schedule'
+    )
+
+    wallpaper_commands=(
+        'list:List all wallpapers'
+        'set:Set specific wallpaper'
+        'next:Cycle to next wallpaper'
+        'prev:Cycle to previous wallpaper'
+        'random:Set random wallpaper'
+        'current:Show current wallpaper'
+        'theme:List theme-specific wallpapers'
+    )
+
+    font_commands=(
+        'list:List available fonts'
+        'set:Set terminal font'
+    )
+
+    screenshot_commands=(
+        'full:Capture full screen'
+        'region:Select area to capture'
+        'window:Capture active window'
+    )
+
+    cleanup_commands=(
+        'all:Clean everything'
+        'apt:Clean apt cache'
+        'snap:Clean snap cache'
+        'journal:Clean system logs'
+        'temp:Clean temp files'
+    )
+
+    apps=(
+        'discord:Discord chat app'
+        'spotify:Spotify music player'
+        'docker-ce:Docker Community Edition'
+        'lazydocker:Docker TUI'
+        'podman:Podman container engine'
+        'postman:API testing tool'
+        'bitwarden:Password manager'
+    )
+
+    case "${words[2]}" in
+        theme)
+            _describe -t themes 'theme' themes
+            ;;
+        power)
+            _describe -t power_profiles 'profile' power_profiles
+            ;;
+        db|database)
+            _describe -t databases 'database' databases
+            ;;
+        dev)
+            case "${words[3]}" in
+                setup)
+                    _describe -t dev_languages 'language' dev_languages
+                    ;;
+                *)
+                    _describe -t dev_commands 'command' dev_commands
+                    ;;
+            esac
+            ;;
+        desktop)
+            _describe -t desktop_commands 'command' desktop_commands
+            ;;
+        motd|banner)
+            _describe -t motd_styles 'style' motd_styles
+            ;;
+        nightlight|night-light|nl)
+            _describe -t nightlight_commands 'command' nightlight_commands
+            ;;
+        wallpaper|wp)
+            _describe -t wallpaper_commands 'command' wallpaper_commands
+            ;;
+        font)
+            _describe -t font_commands 'command' font_commands
+            ;;
+        screenshot)
+            _describe -t screenshot_commands 'command' screenshot_commands
+            ;;
+        cleanup)
+            _describe -t cleanup_commands 'command' cleanup_commands
+            ;;
+        install|uninstall)
+            _describe -t apps 'application' apps
+            ;;
+        *)
+            _describe -t commands 'command' commands
+            ;;
+    esac
+}
+
+_kodra "$@"
