@@ -268,14 +268,14 @@
 
 ## 🔐 Security
 
-### #33 Security Audit 🟡 P1
-- [ ] Review all download URLs (HTTPS only)
-- [ ] Verify GPG signatures on packages
-- [ ] Don't run scripts with eval
-- [ ] Sanitize user input
-- [ ] Don't store credentials
-- [ ] Add SECURITY.md
-- [ ] Set up Dependabot
+### #33 Security Audit 🟡 P1 ✅
+- [x] Review all download URLs (HTTPS only)
+- [x] Verify GPG signatures on packages
+- [x] Don't run scripts with eval
+- [x] Sanitize user input
+- [x] Don't store credentials
+- [x] Add SECURITY.md
+- [x] Set up Dependabot
 
 ---
 
