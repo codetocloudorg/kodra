@@ -44,6 +44,8 @@ show_help() {
     echo "  motd [style]      Set terminal banner (banner, minimal, none)"
     echo "  setup             Run first-time setup (GitHub, Azure, Git)"
     echo "  fetch             Show beautiful system info"
+    echo "  dev [setup]       Install language runtimes (node, python, go...)"
+    echo "  db <database>     Start database containers (postgres, mysql, redis...)"
     echo "  update            Update Kodra and installed packages"
     echo "  install <app>     Install an additional application"
     echo "  uninstall <app>   Remove an application"
@@ -154,6 +156,14 @@ case "${1:-help}" in
     nightlight|night-light|nl)
         shift
         bash "$KODRA_DIR/bin/kodra-sub/nightlight.sh" "$@"
+        ;;
+    dev)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/dev.sh" "$@"
+        ;;
+    db|database)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/db.sh" "$@"
         ;;
     version|-v|--version)
         show_version

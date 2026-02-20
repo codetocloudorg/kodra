@@ -601,3 +601,96 @@ fi
 if command -v helm &>/dev/null; then
     complete -o default -F __start_helm h 2>/dev/null || true
 fi
+
+# ─────────────────────────────────────────────────────────────
+# Tmux Dev Layouts (#42)
+# ─────────────────────────────────────────────────────────────
+
+# Tmux layout: web dev (editor + server + shell)
+# Usage: tml web [session-name]
+tml() {
+    local layout="${1:-web}"
+    local session="${2:-dev}"
+    
+    if ! command -v tmux &>/dev/null; then
+        echo "tmux required. Install with: brew install tmux"
+        return 1
+    fi
+    
+    case "$layout" in
+        web)
+            # 3-pane layout: large editor, small server & shell
+            tmux new-session -d -s "$session" -n main
+            tmux send-keys -t "$session:main" "nvim ." Enter
+            tmux split-window -t "$session:main" -h -l 40%
+            tmux split-window -t "$session:main.2" -v -l 30%
+            tmux select-pane -t "$session:main.1"
+            tmux attach -t "$session"
+            ;;
+        api)
+            # 4-pane layout for API dev: editor, logs, tests, shell
+            tmux new-session -d -s "$session" -n main
+            tmux send-keys -t "$session:main" "nvim ." Enter
+            tmux split-window -t "$session:main" -h -l 45%
+            tmux split-window -t "$session:main.2" -v -l 50%
+            tmux split-window -t "$session:main.2" -v -l 50%
+            tmux select-pane -t "$session:main.1"
+            tmux attach -t "$session"
+            ;;
+        k8s)
+            # Kubernetes: editor, k9s, logs
+            tmux new-session -d -s "$session" -n main
+            tmux send-keys -t "$session:main" "nvim ." Enter
+            tmux split-window -t "$session:main" -h -l 50%
+            tmux send-keys -t "$session:main.2" "k9s" Enter
+            tmux select-pane -t "$session:main.1"
+            tmux attach -t "$session"
+            ;;
+        *)
+            echo "Usage: tml <layout> [session-name]"
+            echo ""
+            echo "Layouts:"
+            echo "  web    Editor + server + shell (default)"
+            echo "  api    Editor + logs + tests + shell"
+            echo "  k8s    Editor + k9s"
+            echo ""
+            echo "Example: tml web myproject"
+            ;;
+    esac
+}
+
+# New instance: create/attach with current directory as session name
+# Usage: nic
+nic() {
+    local session_name=$(basename "$PWD" | tr '.' '-' | tr ' ' '-')
+    
+    if ! command -v tmux &>/dev/null; then
+        echo "tmux required. Install with: brew install tmux"
+        return 1
+    fi
+    
+    # Check if session exists
+    if tmux has-session -t "$session_name" 2>/dev/null; then
+        tmux attach -t "$session_name"
+    else
+        tmux new-session -s "$session_name"
+    fi
+}
+
+# New instance extended: like nic but with web layout
+# Usage: nicx
+nicx() {
+    local session_name=$(basename "$PWD" | tr '.' '-' | tr ' ' '-')
+    
+    if ! command -v tmux &>/dev/null; then
+        echo "tmux required. Install with: brew install tmux"
+        return 1
+    fi
+    
+    # Check if session exists
+    if tmux has-session -t "$session_name" 2>/dev/null; then
+        tmux attach -t "$session_name"
+    else
+        tml web "$session_name"
+    fi
+}
