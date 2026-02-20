@@ -281,35 +281,35 @@
 
 ## 🖥️ Shell & Terminal Enhancements
 
-### #34 Tab-Cycle Completion 🔴 P0
-- [ ] Add `menu-complete` to inputrc
-- [ ] Add `menu-complete-backward` for Shift+Tab
-- [ ] Set `menu-complete-display-prefix on`
+### #34 Tab-Cycle Completion 🔴 P0 ✅
+- [x] Add `menu-complete` to inputrc
+- [x] Add `menu-complete-backward` for Shift+Tab
+- [x] Set `menu-complete-display-prefix on`
 
 ### #35 Dynamic Theme Loading 🔴 P0 ✅
 - [x] Ghostty `config-file` directive for theme import
 - [x] Theme updates without terminal restart
 - [x] Create theme-specific ghostty configs
 
-### #36 Enhanced Shell Aliases 🔴 P0
-- [ ] `open()` - Silent xdg-open wrapper with background
-- [ ] `n()` - Smart nvim (dir or file)
-- [ ] `zd()` - zoxide with visual feedback and icons (basic `z` via zoxide exists)
-- [ ] `t` - tmux attach or new session
+### #36 Enhanced Shell Aliases 🔴 P0 ✅
+- [x] `open()` - Silent xdg-open wrapper with background
+- [x] `n()` - Smart nvim (dir or file)
+- [x] `zd()` - zoxide with visual feedback and icons
+- [x] `t` - tmux attach or new session
 - [x] `fe()` - Fuzzy edit file (implemented as `fe()`)
 
-### #37 SSH Port Forwarding Functions 🟡 P1
-- [ ] `fip` - Forward local port to remote
-- [ ] `dip` - Dynamic SOCKS proxy
-- [ ] `lip` - List active port forwards
+### #37 SSH Port Forwarding Functions 🟡 P1 ✅
+- [x] `fip` - Forward local port to remote
+- [x] `dip` - Dynamic SOCKS proxy
+- [x] `lip` - List active port forwards
 
-### #38 Media Transcoding Functions 🟡 P1
-- [ ] `img2jpg` - Convert images to JPEG
-- [ ] `img2png` - Convert images to PNG
-- [ ] `img2webp` - Convert images to WebP
+### #38 Media Transcoding Functions 🟡 P1 ✅
+- [x] `img2jpg` - Convert images to JPEG
+- [x] `img2png` - Convert images to PNG
+- [x] `img2webp` - Convert images to WebP
 - [x] `compress` - Smart file/folder compression
-- [ ] `transcode-video-1080p` - Video transcoding
-- [ ] `transcode-video-720p` - Video transcoding
+- [x] `transcode-video-1080p` - Video transcoding
+- [x] `transcode-video-720p` - Video transcoding
 
 ### #39 Disk Utilities 🟢 P2
 - [ ] `iso2sd` - Write ISO to USB drive
@@ -344,19 +344,19 @@ The following shell functions already exist in `configs/shell/kodra.sh`:
 
 ## 🖥️ Tmux Integration
 
-### #41 Tmux Configuration 🔴 P0
-- [ ] Create themed `tmux.conf`
-- [ ] Status bar top position with theme colors
-- [ ] Vi mode for copy/paste
-- [ ] Mouse support enabled
-- [ ] Prefix key: Ctrl+Space
-- [ ] Split keybinds: | for vertical, - for horizontal
+### #41 Tmux Configuration 🔴 P0 ✅
+- [x] Create themed `tmux.conf`
+- [x] Status bar top position with theme colors
+- [x] Vi mode for copy/paste
+- [x] Mouse support enabled
+- [x] Prefix key: Ctrl+Space
+- [x] Split keybinds: | for vertical, - for horizontal
 
-### #42 Tmux Dev Layouts 🟡 P1
-- [ ] `tml` function - Create tmux layout with command
-- [ ] `nic` function - Editor + AI (opencode) + terminal
-- [ ] `nicx` function - Editor + Claude + terminal
-- [ ] Auto-attach or create session
+### #42 Tmux Dev Layouts 🟡 P1 ✅
+- [x] `tml` function - Create tmux layout (web/api/k8s)
+- [x] `nic` function - New session named after current directory
+- [x] `nicx` function - nic with web layout applied
+- [x] Auto-attach or create session
 
 ---
 
@@ -373,35 +373,39 @@ Located in `themes/` directory:
   - [x] Starship prompt
   - [x] VS Code settings
 
-### #43 Gruvbox Theme 🔴 P0
-- [ ] Ghostty colors
-- [ ] Starship colors
-- [ ] VS Code settings (Gruvbox extension)
-- [ ] btop theme
+### #43 Gruvbox Theme 🔴 P0 ✅
+- [x] Ghostty colors
+- [x] Starship colors
+- [x] VS Code settings (Gruvbox extension)
+- [x] btop theme
+- [x] tmux theme
 - [ ] Wallpapers (3+)
 - [ ] GNOME accent color
 
-### #44 Catppuccin Theme 🔴 P0
-- [ ] Ghostty colors (Mocha variant)
-- [ ] Starship colors
-- [ ] VS Code settings (Catppuccin extension)
-- [ ] btop theme
+### #44 Catppuccin Theme 🔴 P0 ✅
+- [x] Ghostty colors (Mocha variant)
+- [x] Starship colors
+- [x] VS Code settings (Catppuccin extension)
+- [x] btop theme
+- [x] tmux theme
 - [ ] Wallpapers (3+)
 - [ ] GNOME accent color
 
-### #45 Nord Theme 🔴 P0
-- [ ] Ghostty colors
-- [ ] Starship colors
-- [ ] VS Code settings (Nord extension)
-- [ ] btop theme
+### #45 Nord Theme 🔴 P0 ✅
+- [x] Ghostty colors
+- [x] Starship colors
+- [x] VS Code settings (Nord extension)
+- [x] btop theme
+- [x] tmux theme
 - [ ] Wallpapers (3+)
 - [ ] GNOME accent color
 
-### #46 Rose Pine Theme 🟡 P1
-- [ ] Ghostty colors
-- [ ] Starship colors
-- [ ] VS Code settings (Rose Pine extension)
-- [ ] btop theme
+### #46 Rose Pine Theme 🟡 P1 ✅
+- [x] Ghostty colors
+- [x] Starship colors
+- [x] VS Code settings (Rose Pine extension)
+- [x] btop theme
+- [x] tmux theme
 - [ ] Wallpapers (3+)
 - [ ] GNOME accent color
 
@@ -425,23 +429,24 @@ Located in `themes/` directory:
 - [ ] Script to reload VS Code theme
 - [ ] Reload btop with new theme
 
-### #49 Multiple Wallpapers Per Theme 🟡 P1
-- [ ] 3+ wallpapers per theme
-- [ ] `kodra wallpaper next` - Cycle wallpapers
-- [ ] `kodra wallpaper prev` - Previous wallpaper
-- [ ] `kodra wallpaper list` - Show available
-- [ ] `kodra wallpaper set <n>` - Set specific
+### #49 Multiple Wallpapers Per Theme 🟡 P1 ✅
+- [x] Theme-specific wallpaper directories (wallpapers/<theme>/)
+- [x] `kodra wallpaper next` - Cycle wallpapers
+- [x] `kodra wallpaper prev` - Previous wallpaper
+- [x] `kodra wallpaper list` - Show available
+- [x] `kodra wallpaper set <name>` - Set specific
+- [x] `kodra wallpaper theme` - List theme-specific wallpapers
 
 ### #50 Visual Wallpaper Picker 🟢 P2
 - [ ] Interactive wallpaper selection dialog
 - [ ] Thumbnail previews (zenity/yad)
 - [ ] Works with current theme wallpapers
 
-### #51 btop Theme Sync 🔴 P0
+### #51 btop Theme Sync 🔴 P0 ✅
 - [x] btop config exists with Tokyo Night theme
-- [ ] Create btop theme for each Kodra theme
-- [ ] Auto-apply btop theme on theme switch
-- [ ] Match terminal color palette
+- [x] Create btop theme for each Kodra theme
+- [x] Auto-apply btop theme on theme switch
+- [x] Match terminal color palette
 
 ### #52 nvim Colorscheme Sync 🟡 P1
 - [ ] Auto-install nvim colorscheme plugins
@@ -477,19 +482,19 @@ The following commands exist in `bin/kodra` and `bin/kodra-sub/`:
 - [x] `kodra version` - Show version and current theme
 - [x] `kodra help` - Show help message
 
-### #54 `kodra menu` 🔴 P0
-- [ ] Interactive gum-based main menu
-- [ ] Nested submenus for categories
-- [ ] Options: Theme, Wallpaper, Install, Update, System
-- [ ] Keyboard navigation
-- [ ] Color-coded by category
+### #54 `kodra menu` 🔴 P0 ✅
+- [x] Interactive gum-based main menu
+- [x] Nested submenus for categories
+- [x] Options: Theme, Wallpaper, Install, Update, System
+- [x] Keyboard navigation
+- [x] Color-coded by category
 
-### #55 `kodra shortcuts` 🔴 P0
-- [ ] Display all GNOME keybindings
-- [ ] Parse gsettings for custom shortcuts
-- [ ] Format as readable table
-- [ ] Group by category
-- [ ] Search/filter option
+### #55 `kodra shortcuts` 🔴 P0 ✅
+- [x] Display all GNOME keybindings
+- [x] Parse gsettings for custom shortcuts
+- [x] Format as readable table
+- [x] Group by category
+- [x] Search/filter option
 
 ### #56 `kodra font` 🟡 P1
 - [ ] `kodra font list` - Show available Nerd Fonts
@@ -517,19 +522,19 @@ The following commands exist in `bin/kodra` and `bin/kodra-sub/`:
 - [ ] Copy HEX to clipboard
 - [ ] Use gpick or gcolor3
 
-### #60 `kodra power` 🔴 P0
-- [ ] `kodra power` - Show current profile
-- [ ] `kodra power performance` - Set performance
-- [ ] `kodra power balanced` - Set balanced
-- [ ] `kodra power saver` - Set power saver
-- [ ] Use powerprofilesctl
+### #60 `kodra power` 🔴 P0 ✅
+- [x] `kodra power` - Show current profile
+- [x] `kodra power performance` - Set performance
+- [x] `kodra power balanced` - Set balanced
+- [x] `kodra power saver` - Set power saver
+- [x] Use powerprofilesctl
 
-### #61 `kodra nightlight` 🔴 P0
-- [ ] `kodra nightlight` - Toggle on/off
-- [ ] `kodra nightlight on` - Enable
-- [ ] `kodra nightlight off` - Disable
-- [ ] `kodra nightlight temp <K>` - Set temperature
-- [ ] Use gsettings for GNOME Night Light
+### #61 `kodra nightlight` 🔴 P0 ✅
+- [x] `kodra nightlight` - Toggle on/off
+- [x] `kodra nightlight on` - Enable
+- [x] `kodra nightlight off` - Disable
+- [x] `kodra nightlight temp <K>` - Set temperature
+- [x] Use gsettings for GNOME Night Light
 
 ### #62 System Power Commands 🟡 P1
 - [ ] `kodra lock` - Lock screen
@@ -605,26 +610,29 @@ The following commands exist in `bin/kodra` and `bin/kodra-sub/`:
 
 ## 💻 Development Tools
 
-### #72 Dev Environment Installers 🟡 P1
-- [ ] `kodra dev setup ruby` - rbenv/mise + bundler
-- [ ] `kodra dev setup node` - nvm/mise + npm/pnpm
-- [ ] `kodra dev setup python` - pyenv/mise + pip/poetry
-- [ ] `kodra dev setup go` - mise + go tools
-- [ ] `kodra dev setup rust` - rustup + cargo
-- [ ] `kodra dev setup java` - mise + maven/gradle
-- [ ] `kodra dev setup dotnet` - .NET SDK
-- [ ] `kodra dev setup elixir` - asdf/mise + mix
-- [ ] `kodra dev setup zig` - mise + zig
-- [ ] Each creates .tool-versions if mise
+### #72 Dev Environment Installers 🟡 P1 ✅
+- [x] `kodra dev setup ruby` - mise + bundler
+- [x] `kodra dev setup node` - mise + npm
+- [x] `kodra dev setup python` - mise + pip
+- [x] `kodra dev setup go` - mise + go tools
+- [x] `kodra dev setup rust` - mise + cargo
+- [x] `kodra dev setup java` - mise + java
+- [x] `kodra dev setup dotnet` - .NET SDK via mise
+- [x] `kodra dev setup deno` - Deno via mise
+- [x] `kodra dev setup bun` - Bun via mise
+- [x] `kodra dev list` - Show installed runtimes
+- [x] Interactive mode with gum
 
-### #73 Docker Database Commands 🟡 P1
-- [ ] `kodra db postgres` - Start PostgreSQL container
-- [ ] `kodra db mysql` - Start MySQL container
-- [ ] `kodra db redis` - Start Redis container
-- [ ] `kodra db mongo` - Start MongoDB container
-- [ ] `kodra db stop <name>` - Stop container
-- [ ] `kodra db list` - List running DBs
-- [ ] Persist data in Docker volumes
+### #73 Docker Database Commands 🟡 P1 ✅
+- [x] `kodra db postgres` - Start PostgreSQL container
+- [x] `kodra db mysql` - Start MySQL container
+- [x] `kodra db redis` - Start Redis container
+- [x] `kodra db mongo` - Start MongoDB container
+- [x] `kodra db stop <name>` - Stop container
+- [x] `kodra db list` - List running DBs
+- [x] `kodra db stop-all` - Stop all DBs
+- [x] `kodra db clean` - Remove containers and volumes
+- [x] Persist data in Docker volumes
 
 ### #74 Project Scaffolding 🟢 P2
 - [ ] `kodra new rails <name>` - Rails project
@@ -639,13 +647,13 @@ The following commands exist in `bin/kodra` and `bin/kodra-sub/`:
 
 ## ℹ️ Fastfetch Enhancement
 
-### #75 Enhanced Fastfetch 🔴 P0
+### #75 Enhanced Fastfetch 🔴 P0 ✅
 - [x] Custom Kodra branding/logo
 - [x] Sectioned layout (Hardware/Software/Cloud)
-- [ ] Show current Kodra theme name
+- [x] Show current Kodra theme name
 - [ ] Show system age (days since install)
 - [ ] Show last apt update timestamp
-- [ ] Show Kodra version
+- [x] Show Kodra version
 
 ### #76 Fastfetch Customization 🟡 P1
 - [x] Custom JSONC config exists
@@ -677,12 +685,12 @@ The following commands exist in `bin/kodra` and `bin/kodra-sub/`:
 
 ## 📖 Documentation
 
-### #78 AGENTS.md 🔴 P0
-- [ ] AI coding agent style guide
-- [ ] Code style conventions
-- [ ] Command naming patterns
-- [ ] File organization
-- [ ] Testing requirements
+### #78 AGENTS.md 🔴 P0 ✅
+- [x] AI coding agent style guide
+- [x] Code style conventions
+- [x] Command naming patterns
+- [x] File organization
+- [x] Testing requirements
 
 ### #79 Keybindings Cheatsheet 🟡 P1
 - [ ] All GNOME shortcuts documented
