@@ -167,11 +167,11 @@
 - [ ] `kodra profile list`
 - [ ] Ship default profiles (Full, Minimal, AKS Dev)
 
-### #19 Shell Completions 🟢 P2
-- [ ] Bash completion for `kodra`
-- [ ] Zsh completion for `kodra`
-- [ ] Tab complete themes, commands
-- [ ] Install completions during setup
+### #19 Shell Completions 🟢 P2 ✅
+- [x] Bash completion for `kodra`
+- [x] Zsh completion for `kodra`
+- [x] Tab complete themes, commands
+- [x] Install completions during setup/repair
 
 ### #20 Update Notifications 🟢 P2
 - [ ] Check for updates on shell startup (daily)
@@ -496,20 +496,20 @@ The following commands exist in `bin/kodra` and `bin/kodra-sub/`:
 - [x] Group by category
 - [x] Search/filter option
 
-### #56 `kodra font` 🟡 P1
-- [ ] `kodra font list` - Show available Nerd Fonts
-- [ ] `kodra font set <name>` - Change all fonts
-- [ ] Update Ghostty font
-- [ ] Update GNOME monospace font
-- [ ] Verify font exists before applying
+### #56 `kodra font` 🟡 P1 ✅
+- [x] `kodra font list` - Show available Nerd Fonts
+- [x] `kodra font set <name>` - Change all fonts
+- [x] Update Ghostty font
+- [x] Update GNOME monospace font
+- [x] Verify font exists before applying
 
-### #57 `kodra screenshot` 🟡 P1
-- [ ] `kodra screenshot` - Full screen
-- [ ] `kodra screenshot region` - Area selection
-- [ ] `kodra screenshot window` - Active window
-- [ ] `kodra screenshot edit` - Open in editor
-- [ ] Use gnome-screenshot or flameshot
-- [ ] Copy to clipboard + save to file
+### #57 `kodra screenshot` 🟡 P1 ✅
+- [x] `kodra screenshot` - Full screen
+- [x] `kodra screenshot region` - Area selection
+- [x] `kodra screenshot window` - Active window
+- [x] `kodra screenshot delay` - Delayed capture
+- [x] Use gnome-screenshot or scrot
+- [x] Copy to clipboard + save to file
 
 ### #58 `kodra screenrecord` 🟢 P2
 - [ ] `kodra screenrecord start` - Begin recording
@@ -536,12 +536,12 @@ The following commands exist in `bin/kodra` and `bin/kodra-sub/`:
 - [x] `kodra nightlight temp <K>` - Set temperature
 - [x] Use gsettings for GNOME Night Light
 
-### #62 System Power Commands 🟡 P1
-- [ ] `kodra lock` - Lock screen
-- [ ] `kodra suspend` - Suspend system
+### #62 System Power Commands 🟡 P1 ✅
+- [x] `kodra lock` - Lock screen
+- [x] `kodra suspend` - Suspend system
 - [ ] `kodra hibernate` - Hibernate (if enabled)
-- [ ] `kodra restart` - Restart system
-- [ ] `kodra shutdown` - Shutdown system
+- [x] `kodra restart` - Restart system
+- [x] `kodra shutdown` - Shutdown system
 
 ### #63 `kodra wifi` 🟢 P2
 - [ ] `kodra wifi list` - Show networks
@@ -578,13 +578,16 @@ The following commands exist in `bin/kodra` and `bin/kodra-sub/`:
 - [ ] Show time remaining
 - [ ] Use upower
 
-### #68 `kodra cleanup` 🟡 P1
-- [ ] Clean apt cache
-- [ ] Clean snap cache
-- [ ] Remove orphaned packages
-- [ ] Clean journal logs
-- [ ] Clean temp files
-- [ ] Show space reclaimed
+### #68 `kodra cleanup` 🟡 P1 ✅
+- [x] Clean apt cache
+- [x] Clean snap cache
+- [x] Clean flatpak unused runtimes
+- [x] Remove orphaned packages
+- [x] Clean journal logs
+- [x] Clean temp files
+- [x] Clean Docker unused data
+- [x] Clean Homebrew cache
+- [x] Show space reclaimed
 
 ### #69 `kodra backup` 🟡 P1
 - [x] Backup system exists (`lib/backup.sh`)
@@ -692,11 +695,12 @@ The following commands exist in `bin/kodra` and `bin/kodra-sub/`:
 - [x] File organization
 - [x] Testing requirements
 
-### #79 Keybindings Cheatsheet 🟡 P1
-- [ ] All GNOME shortcuts documented
-- [ ] Kodra command reference
-- [ ] Ghostty keybindings
-- [ ] tmux keybindings
+### #79 Keybindings Cheatsheet 🟡 P1 ✅
+- [x] All GNOME shortcuts documented
+- [x] Kodra command reference
+- [x] Ghostty keybindings
+- [x] tmux keybindings
+- [x] Shell aliases and functions
 - [ ] Printable PDF version
 
 ### #80 Theme Creation Guide 🟡 P1
