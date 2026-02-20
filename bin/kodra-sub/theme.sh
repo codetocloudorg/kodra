@@ -107,11 +107,40 @@ apply_theme() {
         case "$theme" in
             tokyo-night)  accent_color="purple" ;;
             ghostty-blue) accent_color="blue" ;;
+            gruvbox)      accent_color="orange" ;;
+            catppuccin)   accent_color="pink" ;;
+            nord)         accent_color="blue" ;;
             *)            accent_color="blue" ;;
         esac
         
         if gsettings set org.gnome.desktop.interface accent-color "$accent_color" 2>/dev/null; then
             log_success "Accent color set to $accent_color"
+        fi
+    fi
+    
+    # btop theme
+    local btop_theme="$KODRA_DIR/configs/btop/themes/${theme}.theme"
+    if [ -f "$btop_theme" ]; then
+        mkdir -p "$HOME/.config/btop/themes"
+        cp "$btop_theme" "$HOME/.config/btop/themes/${theme}.theme"
+        # Update btop config to use theme
+        local btop_conf="$HOME/.config/btop/btop.conf"
+        if [ -f "$btop_conf" ]; then
+            sed -i "s/color_theme = .*/color_theme = \"${theme}\"/" "$btop_conf" 2>/dev/null || true
+        fi
+        log_success "btop theme applied"
+    fi
+    
+    # Tmux theme
+    if [ -f "$theme_dir/tmux.conf" ]; then
+        mkdir -p "$HOME/.config/tmux"
+        cp "$theme_dir/tmux.conf" "$HOME/.config/tmux/theme.conf"
+        # If tmux is running, reload
+        if command -v tmux &>/dev/null && tmux list-sessions &>/dev/null; then
+            tmux source-file "$HOME/.config/tmux/tmux.conf" 2>/dev/null || true
+            log_success "Tmux theme applied (live reload)"
+        else
+            log_success "Tmux theme applied"
         fi
     fi
     

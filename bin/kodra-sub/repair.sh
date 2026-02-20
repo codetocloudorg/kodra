@@ -307,6 +307,39 @@ repair_terminal_configs() {
         fi
     fi
     
+    # inputrc (tab-cycle completion)
+    local inputrc_config="$HOME/.inputrc"
+    local kodra_inputrc="$KODRA_DIR/configs/shell/inputrc"
+    if [ -f "$kodra_inputrc" ]; then
+        cp "$kodra_inputrc" "$inputrc_config"
+        echo "  ✓ Applied inputrc (tab-cycle completion)"
+    fi
+    
+    # tmux config
+    local tmux_config="$HOME/.config/tmux/tmux.conf"
+    local kodra_tmux="$KODRA_DIR/configs/tmux/tmux.conf"
+    if [ -f "$kodra_tmux" ]; then
+        mkdir -p "$(dirname "$tmux_config")"
+        cp "$kodra_tmux" "$tmux_config"
+        echo "  ✓ Applied tmux config"
+        
+        # Apply tmux theme for current theme
+        local kodra_tmux_theme="$KODRA_DIR/themes/$current_theme/tmux.conf"
+        if [ -f "$kodra_tmux_theme" ]; then
+            cp "$kodra_tmux_theme" "$HOME/.config/tmux/theme.conf"
+            echo "  ✓ Applied tmux theme ($current_theme)"
+        fi
+    fi
+    
+    # Copy all btop themes
+    local btop_theme_dir="$HOME/.config/btop/themes"
+    local kodra_btop_themes="$KODRA_DIR/configs/btop/themes"
+    if [ -d "$kodra_btop_themes" ]; then
+        mkdir -p "$btop_theme_dir"
+        cp "$kodra_btop_themes"/*.theme "$btop_theme_dir/" 2>/dev/null || true
+        echo "  ✓ Copied all btop themes"
+    fi
+    
     echo ""
 }
 

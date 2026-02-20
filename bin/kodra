@@ -51,6 +51,10 @@ show_help() {
     echo "  restore [cmd]     Restore backed up dotfiles"
     echo "  resume [cmd]      Resume incomplete installation"
     echo "  doctor            Check system health"
+    echo "  menu              Interactive main menu"
+    echo "  shortcuts         Display keyboard shortcuts"
+    echo "  power [profile]   Set power profile (performance/balanced/power-saver)"
+    echo "  nightlight        Toggle night light (blue light filter)"
     echo "  welcome           Show first-run welcome screen"
     echo "  version           Show version information"
     echo "  help              Show this help message"
@@ -135,6 +139,21 @@ case "${1:-help}" in
         ;;
     welcome)
         bash "$KODRA_DIR/bin/kodra-sub/welcome.sh"
+        ;;
+    menu)
+        bash "$KODRA_DIR/bin/kodra-sub/menu.sh"
+        ;;
+    shortcuts|keys)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/shortcuts.sh" "$@"
+        ;;
+    power)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/power.sh" "$@"
+        ;;
+    nightlight|night-light|nl)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/nightlight.sh" "$@"
         ;;
     version|-v|--version)
         show_version

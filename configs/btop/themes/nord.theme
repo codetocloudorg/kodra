@@ -1,0 +1,95 @@
+# btop theme - Nord
+# Kodra implementation of Nord for btop
+
+# Main background
+theme[main_bg]="#2e3440"
+
+# Main text color
+theme[main_fg]="#eceff4"
+
+# Title color for boxes
+theme[title]="#81a1c1"
+
+# Highlight color for keyboard shortcuts
+theme[hi_fg]="#bf616a"
+
+# Background color of selected item
+theme[selected_bg]="#434c5e"
+
+# Foreground color of selected item
+theme[selected_fg]="#eceff4"
+
+# Color of inactive/disabled text
+theme[inactive_fg]="#4c566a"
+
+# Color on top of graphs
+theme[graph_text]="#d8dee9"
+
+# Meter background
+theme[meter_bg]="#3b4252"
+
+# Process graphs
+theme[proc_misc]="#a3be8c"
+
+# CPU graph colors
+theme[cpu_box]="#88c0d0"
+
+# Memory graph colors
+theme[mem_box]="#81a1c1"
+
+# Network graph colors
+theme[net_box]="#ebcb8b"
+
+# Disk graph colors
+theme[disk]="#b48ead"
+
+# Processes cpu (top) graph colors
+theme[process]="#bf616a"
+
+# Box border colors
+theme[border]="#434c5e"
+
+# Temperature colors
+theme[temp_start]="#a3be8c"
+theme[temp_mid]="#ebcb8b"
+theme[temp_end]="#bf616a"
+
+# CPU colors
+theme[cpu_start]="#88c0d0"
+theme[cpu_mid]="#81a1c1"
+theme[cpu_end]="#5e81ac"
+
+# Free memory colors
+theme[free_start]="#a3be8c"
+theme[free_mid]="#8fbcbb"
+theme[free_end]="#88c0d0"
+
+# Cached memory colors
+theme[cached_start]="#81a1c1"
+theme[cached_mid]="#8fbcbb"
+theme[cached_end]="#a3be8c"
+
+# Available memory colors
+theme[available_start]="#ebcb8b"
+theme[available_mid]="#d08770"
+theme[available_end]="#bf616a"
+
+# Used memory colors
+theme[used_start]="#bf616a"
+theme[used_mid]="#d08770"
+theme[used_end]="#b48ead"
+
+# Download graph colors
+theme[download_start]="#a3be8c"
+theme[download_mid]="#8fbcbb"
+theme[download_end]="#81a1c1"
+
+# Upload graph colors
+theme[upload_start]="#ebcb8b"
+theme[upload_mid]="#d08770"
+theme[upload_end]="#bf616a"
+
+# Process graph gradient
+theme[process_start]="#a3be8c"
+theme[process_mid]="#ebcb8b"
+theme[process_end]="#bf616a"
