@@ -1,72 +1,35 @@
 # Kodra Tests
 
-Test scripts to validate Kodra before deploying.
-
-## Quick Reference
+## Quick Start
 
 ```bash
-# Local syntax/structure tests (works on macOS/Linux)
+# Full user experience test (runs in Docker - safe, isolated)
 ./tests/test.sh
 
-# Full system tests (requires Docker)
-docker run --rm -v $(pwd):/kodra ubuntu:24.04 bash /kodra/tests/test-full.sh
+# Local syntax check only (fast, no Docker needed)
+./tests/test.sh --local
 ```
 
-## Test Scripts
+## What It Tests
 
-### test.sh — Local Validation
-
-Fast tests that run on any system (macOS, Linux):
-
-- **Syntax check** — All shell scripts pass `bash -n`
-- **Source check** — All libraries can be sourced
-- **Theme validation** — Theme files have required properties
-- **Structure check** — Required directories and files exist
-- **VERSION check** — Version file is valid semver
-
-Run before every commit:
+The test simulates exactly what a real user would do:
 
 ```bash
-./tests/test.sh
+wget -qO- https://kodra.codetocloud.io/boot.sh | bash
 ```
 
-### test-full.sh — Container Simulation
+It runs in an isolated Ubuntu 24.04 Docker container so your local system is never touched.
 
-Full installation test in Ubuntu 24.04 container:
+### Test Phases
 
-- Installs prerequisites (curl, git, sudo, etc.)
-- Creates test user with sudo access
-- Sources all libraries
-- Tests utility functions
-- Validates theme application
-- Tests shell integration
+1. **Prerequisites** - Install wget, curl, git
+2. **wget Install** - Run the real installer from the website
+3. **Verify Installation** - Check kodra directory and theme
+4. **Test Commands** - Run `kodra theme`, `kodra doctor`, etc.
+5. **Theme Switching** - Test all 6 themes
+6. **Tool Verification** - Check which tools installed
 
-Run for major changes:
+## Requirements
 
-```bash
-docker run --rm -v $(pwd):/kodra ubuntu:24.04 bash /kodra/tests/test-full.sh
-```
-
-## CI Integration
-
-GitHub Actions runs these tests on every push. See `.github/workflows/ci.yml`.
-
-## Writing Tests
-
-When adding new functionality:
-
-1. Add syntax tests to `test.sh` if adding new scripts
-2. Add functional tests to `test-full.sh` if adding new features
-3. Ensure tests are idempotent (can run multiple times)
-
-## Debugging
-
-```bash
-# Run with verbose output
-bash -x ./tests/test.sh
-
-# Interactive container for debugging
-docker run -it --rm -v $(pwd):/kodra ubuntu:24.04 bash
-cd /kodra
-# ... manual testing ...
-```
+- Docker (for full test)
+- Bash (for syntax check)

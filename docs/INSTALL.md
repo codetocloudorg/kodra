@@ -65,7 +65,7 @@ KODRA_SKIP="spotify,discord" ./install.sh
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `KODRA_THEME` | Pre-select theme | `tokyo-night`, `ghostty-blue` |
+| `KODRA_THEME` | Pre-select theme | `tokyo-night`, `ghostty-blue`, `catppuccin`, `gruvbox`, `nord`, `rose-pine` |
 | `KODRA_MINIMAL` | Skip optional apps | `1` |
 | `KODRA_SKIP` | Comma-separated apps to skip | `spotify,discord` |
 | `KODRA_SKIP_BACKUP` | Don't backup existing dotfiles | `1` |
