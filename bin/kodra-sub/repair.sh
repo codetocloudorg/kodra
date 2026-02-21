@@ -90,7 +90,41 @@ repair_shell_integration() {
         echo "  ✓ Set EDITOR=nvim in ~/.zshrc"
     fi
     
+    # Install shell completions
+    install_completions
+    
     echo ""
+}
+
+# Install shell completions for kodra
+install_completions() {
+    local kodra_dir="${KODRA_DIR:-$HOME/.kodra}"
+    
+    # Bash completions
+    if [ -n "$BASH_VERSION" ] || [ -f "$HOME/.bashrc" ]; then
+        mkdir -p "$HOME/.local/share/bash-completion/completions"
+        if [ -f "$kodra_dir/configs/completions/kodra.bash" ]; then
+            cp "$kodra_dir/configs/completions/kodra.bash" "$HOME/.local/share/bash-completion/completions/kodra"
+            echo "  ✓ Installed bash completions"
+        fi
+    fi
+    
+    # Zsh completions
+    if [ -n "$ZSH_VERSION" ] || [ -f "$HOME/.zshrc" ]; then
+        mkdir -p "$HOME/.config/zsh/completions"
+        if [ -f "$kodra_dir/configs/completions/_kodra" ]; then
+            cp "$kodra_dir/configs/completions/_kodra" "$HOME/.config/zsh/completions/_kodra"
+            echo "  ✓ Installed zsh completions"
+            
+            # Ensure completions dir is in fpath
+            if [ -f "$HOME/.zshrc" ] && ! grep -q "zsh/completions" "$HOME/.zshrc"; then
+                echo "" >> "$HOME/.zshrc"
+                echo "# Kodra completions" >> "$HOME/.zshrc"
+                echo 'fpath=(~/.config/zsh/completions $fpath)' >> "$HOME/.zshrc"
+                echo 'autoload -Uz compinit && compinit' >> "$HOME/.zshrc"
+            fi
+        fi
+    fi
 }
 
 repair_app_desktop_files() {
@@ -305,6 +339,39 @@ repair_terminal_configs() {
             cp "$kodra_ff" "$ff_config"
             echo "  ✓ Applied fastfetch config"
         fi
+    fi
+    
+    # inputrc (tab-cycle completion)
+    local inputrc_config="$HOME/.inputrc"
+    local kodra_inputrc="$KODRA_DIR/configs/shell/inputrc"
+    if [ -f "$kodra_inputrc" ]; then
+        cp "$kodra_inputrc" "$inputrc_config"
+        echo "  ✓ Applied inputrc (tab-cycle completion)"
+    fi
+    
+    # tmux config
+    local tmux_config="$HOME/.config/tmux/tmux.conf"
+    local kodra_tmux="$KODRA_DIR/configs/tmux/tmux.conf"
+    if [ -f "$kodra_tmux" ]; then
+        mkdir -p "$(dirname "$tmux_config")"
+        cp "$kodra_tmux" "$tmux_config"
+        echo "  ✓ Applied tmux config"
+        
+        # Apply tmux theme for current theme
+        local kodra_tmux_theme="$KODRA_DIR/themes/$current_theme/tmux.conf"
+        if [ -f "$kodra_tmux_theme" ]; then
+            cp "$kodra_tmux_theme" "$HOME/.config/tmux/theme.conf"
+            echo "  ✓ Applied tmux theme ($current_theme)"
+        fi
+    fi
+    
+    # Copy all btop themes
+    local btop_theme_dir="$HOME/.config/btop/themes"
+    local kodra_btop_themes="$KODRA_DIR/configs/btop/themes"
+    if [ -d "$kodra_btop_themes" ]; then
+        mkdir -p "$btop_theme_dir"
+        cp "$kodra_btop_themes"/*.theme "$btop_theme_dir/" 2>/dev/null || true
+        echo "  ✓ Copied all btop themes"
     fi
     
     echo ""

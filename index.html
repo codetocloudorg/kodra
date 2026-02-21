@@ -50,7 +50,7 @@
         "description": "Kodra: One-command Ubuntu setup for Azure cloud-native developers. GitHub CLI, Docker, Kubernetes, AI-powered workflows. From fresh install to production in minutes.",
         "url": "https://kodra.codetocloud.io",
         "downloadUrl": "https://kodra.codetocloud.io/boot.sh",
-        "softwareVersion": "0.4.1",
+        "softwareVersion": "0.4.2",
         "creator": {
             "@type": "Organization",
             "name": "Code To Cloud",
@@ -1066,6 +1066,7 @@
                 <a href="#features">Features</a>
                 <a href="#tools">Tools</a>
                 <a href="#themes">Themes</a>
+                <a href="#faq">FAQ</a>
                 <a href="https://discord.gg/vwfwq2EpXJ" class="nav-btn" style="background: #5865F2; border-color: #5865F2;">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                         <path d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.19 12.19 0 0 0-3.658 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.041.041 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032c.001.014.01.028.021.037a13.276 13.276 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019c.308-.42.582-.863.818-1.329a.05.05 0 0 0-.01-.059.051.051 0 0 0-.018-.011 8.875 8.875 0 0 1-1.248-.595.05.05 0 0 1-.02-.066.051.051 0 0 1 .015-.019c.084-.063.168-.129.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.052.052 0 0 1 .053.007c.08.066.164.132.248.195a.051.051 0 0 1-.004.085 8.254 8.254 0 0 1-1.249.594.05.05 0 0 0-.03.03.052.052 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.235 13.235 0 0 0 4.001-2.02.049.049 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.034.034 0 0 0-.02-.019Zm-8.198 7.307c-.789 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612Zm5.316 0c-.788 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612Z"/>
@@ -1086,7 +1087,7 @@
     <section class="hero">
         <div class="hero-badge">
             <span class="hero-badge-dot"></span>
-            v0.4.1 &mdash; GitHub Copilot CLI now installs via npm (@github/copilot)
+            v0.4.2 &mdash; Improved install resilience, GitHub Copilot CLI graceful fallback
         </div>
         
         <pre class="ascii-art">
@@ -1577,6 +1578,133 @@
         </div>
     </section>
 
+    <!-- How It Works Section -->
+    <section id="how-it-works" style="padding: 5rem 2rem; max-width: 1200px; margin: 0 auto;">
+        <div class="section-header">
+            <span class="section-label">Simple Setup</span>
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">
+                Three steps from fresh Ubuntu to productive Azure development.
+            </p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 3rem;">
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 12px; padding: 2rem; text-align: center;">
+                <div style="width: 64px; height: 64px; background: rgba(88, 166, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem;">
+                    1️⃣
+                </div>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Run One Command</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                    Copy the install command and paste it into your terminal. Kodra handles everything automatically.
+                </p>
+                <code style="display: block; margin-top: 1rem; background: var(--bg-tertiary); padding: 0.75rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent-cyan);">
+                    curl -fsSL kodra.codetocloud.io/boot.sh | bash
+                </code>
+            </div>
+            
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 12px; padding: 2rem; text-align: center;">
+                <div style="width: 64px; height: 64px; background: rgba(163, 113, 247, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem;">
+                    2️⃣
+                </div>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Pick Your Theme</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                    Choose from 6 beautiful themes. The installer applies colors across terminal, VS Code, and desktop.
+                </p>
+                <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem;">
+                    <span style="width: 24px; height: 24px; background: #7aa2f7; border-radius: 50%;" title="Tokyo Night"></span>
+                    <span style="width: 24px; height: 24px; background: #79c0ff; border-radius: 50%;" title="Ghostty Blue"></span>
+                    <span style="width: 24px; height: 24px; background: #d5c4a1; border-radius: 50%;" title="Gruvbox"></span>
+                    <span style="width: 24px; height: 24px; background: #f5c2e7; border-radius: 50%;" title="Catppuccin"></span>
+                    <span style="width: 24px; height: 24px; background: #88c0d0; border-radius: 50%;" title="Nord"></span>
+                    <span style="width: 24px; height: 24px; background: #ebbcba; border-radius: 50%;" title="Rose Pine"></span>
+                </div>
+            </div>
+            
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 12px; padding: 2rem; text-align: center;">
+                <div style="width: 64px; height: 64px; background: rgba(63, 185, 80, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem;">
+                    3️⃣
+                </div>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Start Building</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                    Open a new terminal and you're ready. Azure CLI, Docker, kubectl, GitHub CLI&mdash;all configured.
+                </p>
+                <div style="margin-top: 1rem; color: var(--accent-green); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+                    ✓ Ready in ~15 minutes
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" style="padding: 5rem 2rem; max-width: 800px; margin: 0 auto;">
+        <div class="section-header">
+            <span class="section-label">Questions</span>
+            <h2 class="section-title">Frequently Asked</h2>
+        </div>
+        
+        <div style="margin-top: 3rem; display: flex; flex-direction: column; gap: 1rem;">
+            <details style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 8px; padding: 1rem 1.5rem;">
+                <summary style="cursor: pointer; font-weight: 600; font-size: 1rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                    What Ubuntu versions are supported?
+                    <span style="color: var(--text-muted); font-size: 1.25rem;">+</span>
+                </summary>
+                <p style="margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">
+                    Kodra is designed for Ubuntu 24.04 LTS and newer. It also works on Ubuntu in WSL2 for Windows users. Ubuntu 22.04 may work but is not officially supported.
+                </p>
+            </details>
+            
+            <details style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 8px; padding: 1rem 1.5rem;">
+                <summary style="cursor: pointer; font-weight: 600; font-size: 1rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                    Is an Azure subscription required?
+                    <span style="color: var(--text-muted); font-size: 1.25rem;">+</span>
+                </summary>
+                <p style="margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">
+                    No. Kodra installs the Azure tools, but you can use them with any subscription (or no subscription). The Docker, Kubernetes, and terminal features work completely standalone. You can even skip Azure tools entirely with <code style="background: var(--bg-tertiary); padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">--skip-azure</code>.
+                </p>
+            </details>
+            
+            <details style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 8px; padding: 1rem 1.5rem;">
+                <summary style="cursor: pointer; font-weight: 600; font-size: 1rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                    Will it break my existing setup?
+                    <span style="color: var(--text-muted); font-size: 1.25rem;">+</span>
+                </summary>
+                <p style="margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">
+                    Kodra backs up your existing dotfiles (bashrc, zshrc, gitconfig, etc.) before making changes. You can restore them anytime with <code style="background: var(--bg-tertiary); padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">kodra restore</code>. It's designed to be safe on existing systems.
+                </p>
+            </details>
+            
+            <details style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 8px; padding: 1rem 1.5rem;">
+                <summary style="cursor: pointer; font-weight: 600; font-size: 1rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                    Can I customize what gets installed?
+                    <span style="color: var(--text-muted); font-size: 1.25rem;">+</span>
+                </summary>
+                <p style="margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">
+                    Yes! The installer has an interactive prompt for optional apps. You can also use flags: <code style="background: var(--bg-tertiary); padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">--skip-azure</code>, <code style="background: var(--bg-tertiary); padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">--skip-docker</code>, <code style="background: var(--bg-tertiary); padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">--minimal</code> for terminal-only setup.
+                </p>
+            </details>
+            
+            <details style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 8px; padding: 1rem 1.5rem;">
+                <summary style="cursor: pointer; font-weight: 600; font-size: 1rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                    How do I uninstall Kodra?
+                    <span style="color: var(--text-muted); font-size: 1.25rem;">+</span>
+                </summary>
+                <p style="margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">
+                    Run <code style="background: var(--bg-tertiary); padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">kodra uninstall</code> for interactive removal. You can uninstall specific components or everything. Kodra can restore your original dotfiles during uninstall.
+                </p>
+            </details>
+            
+            <details style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 8px; padding: 1rem 1.5rem;">
+                <summary style="cursor: pointer; font-weight: 600; font-size: 1rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                    Is it free and open source?
+                    <span style="color: var(--text-muted); font-size: 1.25rem;">+</span>
+                </summary>
+                <p style="margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">
+                    Yes! Kodra is completely free under the MIT license. The code is on <a href="https://github.com/codetocloudorg/kodra" style="color: var(--accent-blue); text-decoration: none;">GitHub</a>. Contributions are welcome!
+                </p>
+            </details>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer>
         <div class="footer-content">
@@ -1606,6 +1734,8 @@
                     <li><a href="#features">Features</a></li>
                     <li><a href="#tools">Tools</a></li>
                     <li><a href="#themes">Themes</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#faq">FAQ</a></li>
                     <li><a href="https://github.com/codetocloudorg/kodra/blob/main/docs/ROADMAP.md">Roadmap</a></li>
                 </ul>
             </div>

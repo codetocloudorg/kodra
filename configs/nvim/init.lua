@@ -143,4 +143,16 @@ vim.api.nvim_set_hl(0, 'NormalFloat', { bg = 'none' })
 vim.api.nvim_set_hl(0, 'SignColumn', { bg = 'none' })
 vim.api.nvim_set_hl(0, 'EndOfBuffer', { bg = 'none' })
 
+-- Kodra Theme Sync (#52)
+-- Load colorscheme from kodra theme command if available
+local kodra_theme_path = vim.fn.expand('~/.config/nvim/kodra-theme.lua')
+if vim.fn.filereadable(kodra_theme_path) == 1 then
+    local ok, kodra = pcall(dofile, kodra_theme_path)
+    if ok and kodra and kodra.apply then
+        vim.defer_fn(function()
+            kodra.apply()
+        end, 100)  -- Defer to allow plugins to load
+    end
+end
+
 print('Kodra Neovim loaded! Press <Space> for leader commands.')

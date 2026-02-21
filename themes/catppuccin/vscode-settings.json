@@ -1,0 +1,24 @@
+{
+    "workbench.colorTheme": "Catppuccin Mocha",
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.productIconTheme": "material-product-icons",
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'Fira Code', Consolas, monospace",
+    "editor.fontSize": 14,
+    "editor.fontLigatures": true,
+    "editor.cursorBlinking": "smooth",
+    "editor.cursorSmoothCaretAnimation": "on",
+    "editor.smoothScrolling": true,
+    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font', monospace",
+    "terminal.integrated.fontSize": 13,
+    "workbench.colorCustomizations": {
+        "editorCursor.foreground": "#f5e0dc",
+        "terminalCursor.foreground": "#f5e0dc",
+        "editor.selectionBackground": "#45475a",
+        "editor.selectionHighlightBackground": "#45475a44",
+        "activityBar.background": "#1e1e2e",
+        "sideBar.background": "#181825",
+        "editor.background": "#1e1e2e",
+        "statusBar.background": "#89b4fa",
+        "statusBar.foreground": "#1e1e2e"
+    }
+}

@@ -1,0 +1,20 @@
+# Dependabot configuration for Kodra
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # GitHub Actions - keep workflows up to date
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
+      - "ci"
+    groups:
+      github-actions:
+        patterns:
+          - "*"

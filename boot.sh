@@ -142,6 +142,58 @@ echo ""
 # Action menu
 cd "$KODRA_DIR"
 
+# Interactive menu function using gum (if available and TTY)
+show_interactive_menu() {
+    # Only show menu if we have a TTY and gum
+    if [ -t 0 ] && [ -t 1 ] && command -v gum &>/dev/null; then
+        echo -e "    ${C_CYAN}What would you like to do?${C_RESET}"
+        echo ""
+        
+        local choice=$(gum choose \
+            "🚀 Install Kodra" \
+            "🔄 Update Kodra" \
+            "🎨 Change Theme" \
+            "🗑️  Uninstall Kodra" \
+            "❌ Exit" \
+            --cursor.foreground="33" \
+            --item.foreground="255" \
+            --selected.foreground="33")
+        
+        case "$choice" in
+            "🚀 Install Kodra")
+                echo ""
+                echo -e "    ${C_PURPLE}Starting installation...${C_RESET}"
+                echo ""
+                bash ./install.sh "$@"
+                ;;
+            "🔄 Update Kodra")
+                echo ""
+                echo -e "    ${C_CYAN}Updating Kodra...${C_RESET}"
+                echo ""
+                bash ./bin/kodra update
+                ;;
+            "🎨 Change Theme")
+                echo ""
+                bash ./bin/kodra theme
+                ;;
+            "🗑️  Uninstall Kodra")
+                echo ""
+                echo -e "    ${C_YELLOW}Preparing to uninstall...${C_RESET}"
+                echo ""
+                bash ./uninstall.sh
+                ;;
+            "❌ Exit"|"")
+                echo ""
+                echo -e "    ${C_GRAY}Goodbye!${C_RESET}"
+                exit 0
+                ;;
+        esac
+    else
+        # No TTY or no gum - use automatic behavior
+        return 1
+    fi
+}
+
 # Handle actions - default to install for fresh installs, update for existing
 if [ -n "$KODRA_ACTION" ]; then
     # Explicit action from command line
@@ -163,10 +215,14 @@ if [ -n "$KODRA_ACTION" ]; then
             ;;
     esac
 elif [ "$KODRA_EXISTS" = true ]; then
-    # Existing installation - run update
-    echo -e "    ${C_CYAN}Updating existing installation...${C_RESET}"
-    echo ""
-    bash ./bin/kodra update
+    # Existing installation - try interactive menu first, fallback to update
+    if show_interactive_menu "$@"; then
+        : # Menu handled the action
+    else
+        echo -e "    ${C_CYAN}Updating existing installation...${C_RESET}"
+        echo ""
+        bash ./bin/kodra update
+    fi
 else
     # Fresh install - go straight to installation
     echo -e "    ${C_PURPLE}Starting installation...${C_RESET}"

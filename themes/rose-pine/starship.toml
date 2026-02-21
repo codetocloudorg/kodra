@@ -1,0 +1,97 @@
+# Rose Pine Starship Theme
+# Soft, muted palette inspired by rosepinetheme.com
+
+format = """
+[](fg:#31748f)\
+$os\
+[](fg:#31748f bg:#26233a)\
+$directory\
+[](fg:#26233a bg:#403d52)\
+$git_branch\
+$git_status\
+[](fg:#403d52 bg:#1f1d2e)\
+$nodejs\
+$rust\
+$golang\
+$python\
+$azure\
+$docker_context\
+[](fg:#1f1d2e)\
+$character"""
+
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Timeout for commands executed by starship
+command_timeout = 1000
+
+# Disable the blank line at the start of the prompt
+add_newline = false
+
+[os]
+format = '[ $symbol]($style)'
+style = 'fg:#191724 bg:#31748f'
+disabled = false
+
+[os.symbols]
+Ubuntu = ""
+Arch = "󰣇"
+Macos = ""
+Linux = ""
+Windows = ""
+
+[directory]
+style = "fg:#e0def4 bg:#26233a"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙"
+"Downloads" = ""
+"Music" = ""
+"Pictures" = ""
+
+[git_branch]
+symbol = ""
+style = "fg:#ebbcba bg:#403d52"
+format = '[ $symbol $branch ]($style)'
+
+[git_status]
+style = "fg:#ebbcba bg:#403d52"
+format = '[$all_status$ahead_behind ]($style)'
+
+[nodejs]
+symbol = ""
+style = "fg:#9ccfd8 bg:#1f1d2e"
+format = '[ $symbol ($version) ]($style)'
+
+[rust]
+symbol = ""
+style = "fg:#f6c177 bg:#1f1d2e"
+format = '[ $symbol ($version) ]($style)'
+
+[golang]
+symbol = ""
+style = "fg:#9ccfd8 bg:#1f1d2e"
+format = '[ $symbol ($version) ]($style)'
+
+[python]
+symbol = ""
+style = "fg:#f6c177 bg:#1f1d2e"
+format = '[ $symbol ($version) ]($style)'
+
+[azure]
+disabled = false
+symbol = "󰠅"
+style = "fg:#9ccfd8 bg:#1f1d2e"
+format = '[ $symbol ($subscription) ]($style)'
+
+[docker_context]
+symbol = ""
+style = "fg:#9ccfd8 bg:#1f1d2e"
+format = '[ $symbol $context ]($style)'
+
+[character]
+success_symbol = '[ ](fg:#31748f)'
+error_symbol = '[ ](fg:#eb6f92)'

@@ -1,0 +1,96 @@
+# Kodra Theme: Nord
+# Starship prompt configuration with Nord arctic color palette
+
+format = """
+[░▒▓](#81a1c1)\
+$os\
+$username\
+[](bg:#88c0d0 fg:#81a1c1)\
+$directory\
+[](fg:#88c0d0 bg:#434c5e)\
+$git_branch\
+$git_status\
+[](fg:#434c5e bg:#2e3440)\
+$nodejs\
+$rust\
+$golang\
+$python\
+$azure\
+$kubernetes\
+$docker_context\
+[](fg:#2e3440)\
+$line_break$character"""
+
+[os]
+disabled = false
+style = "bg:#81a1c1 fg:#2e3440"
+format = "[ $symbol ]($style)"
+
+[os.symbols]
+Ubuntu = ""
+Linux = "󰌽"
+Windows = "󰍲"
+Macos = "󰀵"
+
+[username]
+show_always = true
+style_user = "bg:#81a1c1 fg:#2e3440"
+style_root = "bg:#bf616a fg:#eceff4"
+format = '[ $user ]($style)'
+disabled = false
+
+[directory]
+style = "bg:#88c0d0 fg:#2e3440"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = ""
+style = "bg:#434c5e fg:#eceff4"
+format = '[ $symbol $branch ]($style)'
+
+[git_status]
+style = "bg:#434c5e fg:#eceff4"
+format = '[$all_status$ahead_behind ]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:#2e3440 fg:#a3be8c"
+format = '[ $symbol ($version) ]($style)'
+
+[rust]
+symbol = ""
+style = "bg:#2e3440 fg:#bf616a"
+format = '[ $symbol ($version) ]($style)'
+
+[golang]
+symbol = ""
+style = "bg:#2e3440 fg:#8fbcbb"
+format = '[ $symbol ($version) ]($style)'
+
+[python]
+symbol = ""
+style = "bg:#2e3440 fg:#ebcb8b"
+format = '[ $symbol ($version) ]($style)'
+
+[azure]
+disabled = false
+symbol = "󰠅 "
+style = "bg:#2e3440 fg:#81a1c1"
+format = '[ $symbol($subscription) ]($style)'
+
+[kubernetes]
+disabled = false
+symbol = "󱃾 "
+style = "bg:#2e3440 fg:#81a1c1"
+format = '[ $symbol$context(\($namespace\)) ]($style)'
+
+[docker_context]
+symbol = " "
+style = "bg:#2e3440 fg:#8fbcbb"
+format = '[ $symbol$context ]($style)'
+
+[character]
+success_symbol = "[❯](bold #a3be8c)"
+error_symbol = "[❯](bold #bf616a)"
