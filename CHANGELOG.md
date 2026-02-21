@@ -5,6 +5,22 @@ All notable changes to Kodra will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2026-02-21
+
+### Fixed
+- **GitHub Copilot CLI installer** now handles missing dependencies gracefully
+  - Tries gh extension first (requires `gh auth login`)
+  - Falls back to npm install if available
+  - No longer fails the overall installation if neither method works
+  - Provides helpful instructions for manual installation later
+
+### Added
+- Azure VM test script for feature branch QA (`tests/test-feature-branch.sh`)
+- Bug report template (`tests/BUG_REPORT.md`)
+
+### Changed
+- Improved install resilience - optional components don't fail the install
+
 ## [0.4.1] - 2026-02-17
 
 ### Changed

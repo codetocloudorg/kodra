@@ -14,11 +14,52 @@
 
 # Parse arguments
 export KODRA_DEBUG="false"
+export KODRA_SKIP_AZURE="false"
+export KODRA_SKIP_DOCKER="false"
+export KODRA_SKIP_DESKTOP="false"
+export KODRA_MINIMAL="false"
 for arg in "$@"; do
     case $arg in
         --debug|--resilient|-d)
             export KODRA_DEBUG="true"
             shift
+            ;;
+        --skip-azure|--no-azure)
+            export KODRA_SKIP_AZURE="true"
+            shift
+            ;;
+        --skip-docker|--no-docker|--skip-containers)
+            export KODRA_SKIP_DOCKER="true"
+            shift
+            ;;
+        --skip-desktop|--no-desktop|--headless)
+            export KODRA_SKIP_DESKTOP="true"
+            shift
+            ;;
+        --minimal|--min)
+            export KODRA_MINIMAL="true"
+            export KODRA_SKIP_AZURE="true"
+            export KODRA_SKIP_DOCKER="true"
+            shift
+            ;;
+        --help|-h)
+            echo "Kodra Install Script"
+            echo ""
+            echo "Usage: ./install.sh [options]"
+            echo ""
+            echo "Options:"
+            echo "  --debug, --resilient  Continue on errors, log everything"
+            echo "  --skip-azure          Skip Azure CLI and cloud tools"
+            echo "  --skip-docker         Skip Docker/container runtime"
+            echo "  --skip-desktop        Skip GNOME desktop configuration"
+            echo "  --minimal             Minimal install (terminal + shell only)"
+            echo "  --help                Show this help"
+            echo ""
+            echo "Environment Variables:"
+            echo "  KODRA_THEME           Pre-select theme (e.g., tokyo-night)"
+            echo "  KODRA_SKIP_BACKUP=1   Skip dotfiles backup"
+            echo ""
+            exit 0
             ;;
     esac
 done
@@ -307,29 +348,39 @@ done
 # -----------------------------------------------------------------------------
 # Azure & Cloud Tools
 # -----------------------------------------------------------------------------
-section "Azure & Cloud Tools" "☁️"
+if [ "$KODRA_SKIP_AZURE" != "true" ]; then
+    section "Azure & Cloud Tools" "☁️"
 
-show_tools_group "Cloud-native toolchain (Azure CLI, Terraform, K8s)"
-for script in "$KODRA_DIR/install/required/azure/"*.sh; do
-    run_installer "$script"
-done
+    show_tools_group "Cloud-native toolchain (Azure CLI, Terraform, K8s)"
+    for script in "$KODRA_DIR/install/required/azure/"*.sh; do
+        run_installer "$script"
+    done
+else
+    echo ""
+    echo -e "    \033[33m⏭\033[0m  Skipping Azure & Cloud Tools (--skip-azure)"
+fi
 
 # -----------------------------------------------------------------------------
 # Container Runtime
 # -----------------------------------------------------------------------------
-section "Container Development" "🐳"
+if [ "$KODRA_SKIP_DOCKER" != "true" ]; then
+    section "Container Development" "🐳"
 
-show_tools_group "Container runtime and management tools"
-case "$KODRA_CONTAINER_RUNTIME" in
-    docker)
-        run_installer "$KODRA_DIR/applications/docker-ce.sh"
-        ;;
-    podman)
-        run_installer "$KODRA_DIR/applications/podman.sh"
-        ;;
-esac
+    show_tools_group "Container runtime and management tools"
+    case "$KODRA_CONTAINER_RUNTIME" in
+        docker)
+            run_installer "$KODRA_DIR/applications/docker-ce.sh"
+            ;;
+        podman)
+            run_installer "$KODRA_DIR/applications/podman.sh"
+            ;;
+    esac
 
-run_installer "$KODRA_DIR/applications/lazydocker.sh"
+    run_installer "$KODRA_DIR/applications/lazydocker.sh"
+else
+    echo ""
+    echo -e "    \033[33m⏭\033[0m  Skipping Container Development (--skip-docker)"
+fi
 
 # -----------------------------------------------------------------------------
 # Optional Applications
@@ -350,16 +401,25 @@ fi
 # -----------------------------------------------------------------------------
 # Desktop & Theme Setup
 # -----------------------------------------------------------------------------
-section "Desktop Environment" "🎨"
+if [ "$KODRA_SKIP_DESKTOP" != "true" ]; then
+    section "Desktop Environment" "🎨"
 
-show_tools_group "Beautiful GNOME desktop with Tokyo Night theme"
-for script in "$KODRA_DIR/install/desktop/"*.sh; do
-    run_installer "$script"
-done
+    show_tools_group "Beautiful GNOME desktop with Tokyo Night theme"
+    for script in "$KODRA_DIR/install/desktop/"*.sh; do
+        run_installer "$script"
+    done
 
-show_installing "Applying $KODRA_THEME theme"
-run_installer "$KODRA_DIR/bin/kodra-sub/theme.sh" "$KODRA_THEME"
-show_success "$KODRA_THEME theme applied"
+    show_installing "Applying $KODRA_THEME theme"
+    run_installer "$KODRA_DIR/bin/kodra-sub/theme.sh" "$KODRA_THEME"
+    show_success "$KODRA_THEME theme applied"
+else
+    echo ""
+    echo -e "    \033[33m⏭\033[0m  Skipping Desktop Environment (--skip-desktop)"
+    # Still apply terminal theme even without desktop
+    show_installing "Applying $KODRA_THEME theme (terminal only)"
+    KODRA_NO_REFRESH=1 "$KODRA_DIR/bin/kodra-sub/theme.sh" "$KODRA_THEME" 2>/dev/null || true
+    show_success "$KODRA_THEME theme applied"
+fi
 
 # -----------------------------------------------------------------------------
 # Finalization

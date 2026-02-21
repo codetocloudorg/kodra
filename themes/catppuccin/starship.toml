@@ -1,0 +1,96 @@
+# Kodra Theme: Catppuccin Mocha
+# Starship prompt configuration with Catppuccin pastel colors
+
+format = """
+[░▒▓](#89b4fa)\
+$os\
+$username\
+[](bg:#cba6f7 fg:#89b4fa)\
+$directory\
+[](fg:#cba6f7 bg:#45475a)\
+$git_branch\
+$git_status\
+[](fg:#45475a bg:#1e1e2e)\
+$nodejs\
+$rust\
+$golang\
+$python\
+$azure\
+$kubernetes\
+$docker_context\
+[](fg:#1e1e2e)\
+$line_break$character"""
+
+[os]
+disabled = false
+style = "bg:#89b4fa fg:#1e1e2e"
+format = "[ $symbol ]($style)"
+
+[os.symbols]
+Ubuntu = ""
+Linux = "󰌽"
+Windows = "󰍲"
+Macos = "󰀵"
+
+[username]
+show_always = true
+style_user = "bg:#89b4fa fg:#1e1e2e"
+style_root = "bg:#f38ba8 fg:#1e1e2e"
+format = '[ $user ]($style)'
+disabled = false
+
+[directory]
+style = "bg:#cba6f7 fg:#1e1e2e"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = ""
+style = "bg:#45475a fg:#cdd6f4"
+format = '[ $symbol $branch ]($style)'
+
+[git_status]
+style = "bg:#45475a fg:#cdd6f4"
+format = '[$all_status$ahead_behind ]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:#1e1e2e fg:#a6e3a1"
+format = '[ $symbol ($version) ]($style)'
+
+[rust]
+symbol = ""
+style = "bg:#1e1e2e fg:#f38ba8"
+format = '[ $symbol ($version) ]($style)'
+
+[golang]
+symbol = ""
+style = "bg:#1e1e2e fg:#94e2d5"
+format = '[ $symbol ($version) ]($style)'
+
+[python]
+symbol = ""
+style = "bg:#1e1e2e fg:#f9e2af"
+format = '[ $symbol ($version) ]($style)'
+
+[azure]
+disabled = false
+symbol = "󰠅 "
+style = "bg:#1e1e2e fg:#89b4fa"
+format = '[ $symbol($subscription) ]($style)'
+
+[kubernetes]
+disabled = false
+symbol = "󱃾 "
+style = "bg:#1e1e2e fg:#89b4fa"
+format = '[ $symbol$context(\($namespace\)) ]($style)'
+
+[docker_context]
+symbol = " "
+style = "bg:#1e1e2e fg:#94e2d5"
+format = '[ $symbol$context ]($style)'
+
+[character]
+success_symbol = "[❯](bold #a6e3a1)"
+error_symbol = "[❯](bold #f38ba8)"

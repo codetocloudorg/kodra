@@ -4,217 +4,255 @@ Quick reference for all aliases, keyboard shortcuts, and keybindings included wi
 
 ---
 
-## 🖥️ Desktop Shortcuts
+## 🖥️ Desktop Shortcuts (GNOME)
 
-### Window Tiling (via Tactile)
+### Window Management
 
 | Shortcut | Action |
 |----------|--------|
-| `Super + T` | Show tiling grid overlay |
+| `Super + T` | Show tiling grid overlay (Tactile) |
 | `Super + ←` | Tile window to left half |
 | `Super + →` | Tile window to right half |
 | `Super + ↑` | Maximize window |
 | `Super + ↓` | Restore/minimize window |
-| `Ctrl + Super + ←` | Tile to left edge |
-| `Ctrl + Super + →` | Tile to right edge |
-| `Ctrl + Super + ↑` | Tile to top edge |
-| `Ctrl + Super + ↓` | Tile to bottom edge |
-| `Ctrl + Alt + U` | Tile to top-left corner |
-| `Ctrl + Alt + I` | Tile to top-right corner |
-| `Ctrl + Alt + J` | Tile to bottom-left corner |
-| `Ctrl + Alt + K` | Tile to bottom-right corner |
+| `Ctrl + Super + ←/→/↑/↓` | Tile to edges |
+| `Ctrl + Alt + U/I/J/K` | Tile to corners |
 
-### App Launcher & System
+### Workspaces
 
 | Shortcut | Action |
 |----------|--------|
-| `Super + Space` | Open Ulauncher (app search) |
-| `Super + Return` | Open terminal (Ghostty) |
-| `Ctrl + Alt + T` | Open terminal (alternative) |
-| `Shift + Super + 3` | Screenshot (full screen) |
-| `Shift + Super + 4` | Screenshot (area selection) |
-| `Shift + Super + 5` | Screenshot (window) |
+| `Super + Page Up/Down` | Switch workspace |
+| `Shift + Super + Page Up/Down` | Move window to workspace |
+| `Super + 1-9` | Switch to workspace 1-9 |
+
+### System
+
+| Shortcut | Action |
+|----------|--------|
+| `Super + Space` | Open Ulauncher |
+| `Super + Return` | Open Ghostty terminal |
+| `Ctrl + Alt + T` | Open terminal (alt) |
+| `Super + L` | Lock screen |
+| `Shift + Super + 3/4/5` | Screenshot (full/area/window) |
 
 ---
 
-## ⌨️ Terminal Keybindings (Ghostty)
+## ⌨️ Terminal (Ghostty)
 
 | Shortcut | Action |
 |----------|--------|
-| `Ctrl + Shift + C` | Copy to clipboard |
-| `Ctrl + Shift + V` | Paste from clipboard |
-| `Ctrl + Shift + N` | New window |
-| `Ctrl + Shift + T` | New tab |
-| `Ctrl + Shift + W` | Close tab/window |
-| `Ctrl + +` | Increase font size |
-| `Ctrl + -` | Decrease font size |
-| `Ctrl + 0` | Reset font size |
+| `Ctrl + Shift + C/V` | Copy / Paste |
+| `Ctrl + Shift + N/T` | New window / tab |
+| `Ctrl + +/-/0` | Font size up/down/reset |
+| `Ctrl + Shift + O/E` | Split horizontal/vertical |
+
+---
+
+## 📟 Tmux (Prefix: `Ctrl + Space`)
+
+### Windows & Sessions
+
+| Shortcut | Action |
+|----------|--------|
+| `Prefix + c` | New window |
+| `Prefix + n/p` | Next/previous window |
+| `Prefix + 0-9` | Switch to window |
+| `Prefix + d` | Detach session |
+| `Shift + ←/→` | Switch windows (no prefix) |
+
+### Panes
+
+| Shortcut | Action |
+|----------|--------|
+| `Prefix + \|` | Split vertical |
+| `Prefix + -` | Split horizontal |
+| `Prefix + h/j/k/l` | Navigate panes |
+| `Alt + Arrow` | Navigate (no prefix) |
+| `Prefix + x` | Close pane |
+| `Prefix + z` | Zoom pane |
+
+### Copy Mode
+
+| Shortcut | Action |
+|----------|--------|
+| `Prefix + Enter` | Enter copy mode |
+| `v` | Start selection |
+| `y` | Copy selection |
 
 ---
 
 ## 🐚 Shell Aliases
 
-### Modern CLI Replacements
+### Modern CLI
 
-These aliases upgrade classic commands with modern alternatives:
+| Alias | Replaces | Description |
+|-------|----------|-------------|
+| `ls/ll/la/lt` | `eza` | Modern ls with icons |
+| `cat` | `bat` | Syntax highlighting |
+| `grep` | `rg` | Ripgrep |
+| `find` | `fd` | Fast find |
+| `du` | `dust` | Disk usage |
+| `top` | `btop` | System monitor |
+| `vim/vi` | `nvim` | Neovim |
 
-| Alias | Command | Description |
-|-------|---------|-------------|
-| `cat` | `bat --paging=never` | Syntax-highlighted file viewer |
-| `catp` | `bat` | Same with pager enabled |
-| `ls` | `eza --icons` | Modern ls with icons |
-| `ll` | `eza -l --icons` | Long listing with icons |
-| `la` | `eza -la --icons` | Long listing including hidden |
-| `lt` | `eza --tree --icons` | Tree view with icons |
-| `l` | `eza -l --icons` | Quick long listing |
-| `find` | `fd` | Fast, user-friendly find |
+### Git
 
-### Git Shortcuts
+| Alias | Command |
+|-------|---------|
+| `g/gs/ga/gc/gp` | git status/add/commit/push |
+| `gpl/gd/gco/gl` | pull/diff/checkout/log |
+| `lg` | lazygit |
 
-| Alias | Command | Description |
-|-------|---------|-------------|
-| `g` | `git` | Short git |
-| `gs` | `git status` | Check repo status |
-| `ga` | `git add` | Stage files |
-| `gc` | `git commit` | Commit changes |
-| `gp` | `git push` | Push to remote |
-| `gl` | `git pull` | Pull from remote |
-| `gd` | `git diff` | Show diff |
-| `gco` | `git checkout` | Checkout branch/file |
-| `gb` | `git branch` | List/manage branches |
-| `glog` | `git log --oneline --graph --decorate` | Pretty git log |
-| `lg` | `lazygit` | TUI git client |
+### Kubernetes
 
-### Docker Shortcuts
+| Alias | Command |
+|-------|---------|
+| `k/kx/kn` | kubectl/kubectx/kubens |
+| `kgp/kgs/kgd/kga` | get pods/svc/deploy/all |
+| `kaf/kdf` | apply -f / delete -f |
+| `kl/klf/ke/kpf` | logs/logs -f/exec/port-forward |
 
-| Alias | Command | Description |
-|-------|---------|-------------|
-| `d` | `docker` | Short docker |
-| `dc` | `docker compose` | Docker Compose |
-| `dps` | `docker ps` | List containers |
-| `di` | `docker images` | List images |
-| `dex` | `docker exec -it` | Exec into container |
-| `dlogs` | `docker logs -f` | Follow container logs |
-| `lzd` | `lazydocker` | TUI docker manager |
+### Helm
 
-### Azure Shortcuts
+| Alias | Command |
+|-------|---------|
+| `h/hl/hi/hu/hs` | helm list/install/upgrade/search |
 
-| Alias | Command | Description |
-|-------|---------|-------------|
-| `az-login` | `az login` | Login to Azure |
-| `az-sub` | `az account show --query name -o tsv` | Show current subscription |
-| `az-subs` | `az account list ...` | List all subscriptions |
-| `az-switch` | `az account set --subscription` | Switch subscription |
-| `azd-init` | `azd init` | Initialize azd project |
-| `azd-up` | `azd up` | Deploy infrastructure + app |
-| `azd-down` | `azd down` | Tear down deployment |
-| `azd-deploy` | `azd deploy` | Deploy app only |
+### Azure
 
-### GitHub Copilot CLI ✨
+| Alias | Command |
+|-------|---------|
+| `azl/azup` | az login/upgrade |
+| `azdeploy/azinit` | azd up/init |
+| `tf` | terraform |
+| `dc` | docker compose |
+| `posh` | pwsh |
 
-| Alias | Command | Description |
-|-------|---------|-------------|
-| `??` | `gh copilot suggest -t shell` | Ask Copilot for shell commands |
-| `git?` | `gh copilot suggest -t git` | Ask Copilot for git commands |
-| `gh?` | `gh copilot suggest -t gh` | Ask Copilot for gh CLI commands |
-| `explain` | `gh copilot explain` | Explain a command |
+### Copilot CLI
 
-**Examples:**
-```bash
-?? "find all .ts files modified in the last week"
-git? "undo last commit but keep changes"
-explain "tar -xzvf archive.tar.gz"
-```
+| Alias | Usage |
+|-------|-------|
+| `??` | Ask for shell commands |
+| `git?` | Ask for git commands |
+| `explain` | Explain a command |
 
-### Terraform / OpenTofu
+### Utilities
 
-| Alias | Command | Description |
-|-------|---------|-------------|
-| `tf` | `terraform` | Short terraform |
-| `tfi` | `terraform init` | Initialize workspace |
-| `tfp` | `terraform plan` | Plan changes |
-| `tfa` | `terraform apply` | Apply changes |
-| `tfd` | `terraform destroy` | Destroy resources |
-| `tofu-init` | `tofu init` | OpenTofu init |
-| `tofu-plan` | `tofu plan` | OpenTofu plan |
-| `tofu-apply` | `tofu apply` | OpenTofu apply |
-
-### Utility Shortcuts
-
-| Alias | Command | Description |
-|-------|---------|-------------|
-| `c` | `clear` | Clear terminal |
-| `h` | `history` | Show command history |
-| `ports` | `netstat -tulanp` | Show open ports |
-| `path` | `echo $PATH` | Show PATH (one per line) |
-| `now` | `date +"%Y-%m-%d %H:%M:%S"` | Current timestamp |
-| `vim`, `vi`, `v` | `nvim` | Open Neovim |
-| `..` | `cd ..` | Go up one directory |
-| `...` | `cd ../..` | Go up two directories |
-| `....` | `cd ../../..` | Go up three directories |
-
-### Functions
-
-| Function | Usage | Description |
-|----------|-------|-------------|
-| `mkcd` | `mkcd my-project` | Create directory and cd into it |
-
-### Kodra Management
-
-| Alias | Command | Description |
-|-------|---------|-------------|
-| `kodra-theme` | `kodra theme` | Change theme |
-| `kodra-update` | `kodra update` | Update Kodra |
-| `kodra-repair` | `kodra repair` | Re-apply all configs |
-| `kodra-doctor` | `kodra doctor` | Diagnose issues |
+| Alias | Description |
+|-------|-------------|
+| `serve` | Python HTTP server |
+| `ports` | Show listening ports |
+| `myip` | Public IP |
+| `t` | tmux attach/new |
 
 ---
 
-## 🎨 Theme Sync
+## 🔧 Shell Functions
 
-Both themes (Tokyo Night / Ghostty Blue) are synchronized across:
+### Navigation
 
-- **Terminal** — Ghostty color scheme
-- **Editor** — VS Code theme + settings
-- **Prompt** — Starship prompt colors
-- **Desktop** — GNOME accent colors
+| Function | Description |
+|----------|-------------|
+| `open <file>` | Open in background |
+| `n [path]` | Smart nvim |
+| `zd` | Fuzzy cd + preview |
+| `fe` | Fuzzy edit file |
+| `extract <archive>` | Extract any archive |
 
-Switch themes anytime:
+### Git
+
+| Function | Description |
+|----------|-------------|
+| `fco` | Fuzzy branch checkout |
+| `fgl` | Fuzzy git log |
+| `gclone <url>` | Clone and cd |
+
+### Docker
+
+| Function | Description |
+|----------|-------------|
+| `dsh` | Fuzzy container shell |
+| `dps [filter]` | Docker ps |
+| `fkill` | Fuzzy process kill |
+
+### SSH Tunnels
+
+| Function | Description |
+|----------|-------------|
+| `fip local remote port host` | Port forward |
+| `dip [port] host` | SOCKS proxy |
+| `lip` | List tunnels |
+
+### Media
+
+| Function | Description |
+|----------|-------------|
+| `img2jpg/png/webp` | Convert images |
+| `transcode-video-1080p/720p` | Video transcode |
+
+### Tmux Layouts
+
+| Function | Description |
+|----------|-------------|
+| `tml web/api/k8s` | Dev layouts |
+| `nic` | Session from dir name |
+| `nicx` | nic + web layout |
+
+---
+
+## 🎛️ Kodra Commands
+
+### Core
+`kodra theme/wallpaper/fetch/menu/help/version`
+
+### System
+`kodra power/nightlight/lock/suspend/restart/shutdown`
+
+### Desktop
+`kodra desktop/shortcuts/screenshot/font`
+
+### Development
+`kodra dev setup [lang]` | `kodra db postgres/mysql/redis/mongo`
+
+### Maintenance
+`kodra update/repair/cleanup/doctor/install/uninstall`
+
+---
+
+## 🎨 Themes
+
+`tokyo-night` | `ghostty-blue` | `gruvbox` | `catppuccin` | `nord` | `rose-pine`
+
 ```bash
-kodra theme
+kodra theme           # Interactive
+kodra theme gruvbox   # Direct
 ```
 
 ---
 
-## 📁 Configuration Locations
+## 📁 Config Locations
 
-| What | Location |
-|------|----------|
-| Shell aliases | `~/.kodra/configs/shell/aliases.sh` |
-| Shell integration | `~/.kodra/configs/shell/kodra.sh` |
-| Ghostty config | `~/.config/ghostty/config` |
-| Neovim config | `~/.config/nvim/init.lua` |
-| Starship prompt | `~/.config/starship.toml` |
-| VS Code settings | `~/.config/Code/User/settings.json` |
-| btop config | `~/.config/btop/btop.conf` |
-| fastfetch config | `~/.config/fastfetch/config.jsonc` |
+| Config | Location |
+|--------|----------|
+| Shell | `~/.kodra/configs/shell/kodra.sh` |
+| Ghostty | `~/.config/ghostty/config` |
+| Tmux | `~/.config/tmux/tmux.conf` |
+| Neovim | `~/.config/nvim/init.lua` |
+| Starship | `~/.config/starship.toml` |
+| Themes | `~/.kodra/themes/<name>/` |
 
 ---
 
 ## 💡 Pro Tips
 
-1. **Use `??` for anything** — GitHub Copilot CLI understands natural language
-   ```bash
-   ?? "compress this folder and upload to Azure blob storage"
-   ```
-
-2. **lazygit is your friend** — Type `lg` in any repo for a powerful TUI
-   
-3. **Quick Azure context** — Use `az-sub` to quickly see your current subscription
-
-4. **Tile windows fast** — `Super + T` then click grid positions
-
-5. **Search anything** — `Super + Space` opens Ulauncher for instant app/file search
+1. `??` - Ask Copilot anything: `?? "compress and upload to Azure"`
+2. `lg` - LazyGit for powerful TUI git
+3. `nic` - Quick tmux session from folder name
+4. `kodra db postgres` - Instant database
+5. `Tab` - Cycle completions, `Shift+Tab` - reverse
+6. `Ctrl+R` - Fuzzy history search
+7. `Super+T` - Window tiling grid
 
 ---
 

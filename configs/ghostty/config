@@ -40,6 +40,19 @@ keybind = ctrl+zero=reset_font_size
 
 # Performance
 gtk-single-instance = true
+async-backend = epoll
+
+# Mouse
+mouse-scroll-multiplier = 0.95
+
+# Split pane resize (Super+Ctrl+Shift+Arrow)
+keybind = super+ctrl+shift+up=resize_split:up,10
+keybind = super+ctrl+shift+down=resize_split:down,10
+keybind = super+ctrl+shift+left=resize_split:left,10
+keybind = super+ctrl+shift+right=resize_split:right,10
+
+# Unbind keys that conflict with tmux (Ctrl+Space is tmux prefix)
+keybind = ctrl+space=unbind
 
 # Import theme (set by kodra theme command)
 config-file = ~/.config/ghostty/theme

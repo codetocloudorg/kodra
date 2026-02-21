@@ -1,0 +1,96 @@
+# Kodra Theme: Gruvbox
+# Starship prompt configuration with Gruvbox color palette
+
+format = """
+[░▒▓](#d79921)\
+$os\
+$username\
+[](bg:#98971a fg:#d79921)\
+$directory\
+[](fg:#98971a bg:#504945)\
+$git_branch\
+$git_status\
+[](fg:#504945 bg:#282828)\
+$nodejs\
+$rust\
+$golang\
+$python\
+$azure\
+$kubernetes\
+$docker_context\
+[](fg:#282828)\
+$line_break$character"""
+
+[os]
+disabled = false
+style = "bg:#d79921 fg:#282828"
+format = "[ $symbol ]($style)"
+
+[os.symbols]
+Ubuntu = ""
+Linux = "󰌽"
+Windows = "󰍲"
+Macos = "󰀵"
+
+[username]
+show_always = true
+style_user = "bg:#d79921 fg:#282828"
+style_root = "bg:#cc241d fg:#ebdbb2"
+format = '[ $user ]($style)'
+disabled = false
+
+[directory]
+style = "bg:#98971a fg:#282828"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = ""
+style = "bg:#504945 fg:#ebdbb2"
+format = '[ $symbol $branch ]($style)'
+
+[git_status]
+style = "bg:#504945 fg:#ebdbb2"
+format = '[$all_status$ahead_behind ]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:#282828 fg:#b8bb26"
+format = '[ $symbol ($version) ]($style)'
+
+[rust]
+symbol = ""
+style = "bg:#282828 fg:#fb4934"
+format = '[ $symbol ($version) ]($style)'
+
+[golang]
+symbol = ""
+style = "bg:#282828 fg:#8ec07c"
+format = '[ $symbol ($version) ]($style)'
+
+[python]
+symbol = ""
+style = "bg:#282828 fg:#fabd2f"
+format = '[ $symbol ($version) ]($style)'
+
+[azure]
+disabled = false
+symbol = "󰠅 "
+style = "bg:#282828 fg:#83a598"
+format = '[ $symbol($subscription) ]($style)'
+
+[kubernetes]
+disabled = false
+symbol = "󱃾 "
+style = "bg:#282828 fg:#83a598"
+format = '[ $symbol$context(\($namespace\)) ]($style)'
+
+[docker_context]
+symbol = " "
+style = "bg:#282828 fg:#8ec07c"
+format = '[ $symbol$context ]($style)'
+
+[character]
+success_symbol = "[❯](bold #b8bb26)"
+error_symbol = "[❯](bold #fb4934)"

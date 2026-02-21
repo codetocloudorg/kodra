@@ -44,13 +44,29 @@ show_help() {
     echo "  motd [style]      Set terminal banner (banner, minimal, none)"
     echo "  setup             Run first-time setup (GitHub, Azure, Git)"
     echo "  fetch             Show beautiful system info"
+    echo "  dev [setup]       Install language runtimes (node, python, go...)"
+    echo "  db <database>     Start database containers (postgres, mysql, redis...)"
     echo "  update            Update Kodra and installed packages"
     echo "  install <app>     Install an additional application"
     echo "  uninstall <app>   Remove an application"
     echo "  repair            Re-apply all configs without reinstalling"
+    echo "  backup [cmd]      Backup/export dotfiles and dconf settings"
     echo "  restore [cmd]     Restore backed up dotfiles"
     echo "  resume [cmd]      Resume incomplete installation"
     echo "  doctor            Check system health"
+    echo "  menu              Interactive main menu"
+    echo "  shortcuts         Display keyboard shortcuts"
+    echo "  power [profile]   Set power profile (performance/balanced/power-saver)"
+    echo "  nightlight        Toggle night light (blue light filter)"
+    echo "  font [name]       Change terminal font"
+    echo "  screenshot [type] Take screenshots (full/region/window)"
+    echo "  cleanup [what]    Clear system caches and free space"
+    echo "  refresh [what]    Hot-reload theme components without logout"
+    echo "  extensions [cmd]  Manage GNOME extensions"
+    echo "  lock              Lock the screen"
+    echo "  suspend           Suspend the system"
+    echo "  restart           Restart the system"
+    echo "  shutdown          Shutdown the system"
     echo "  welcome           Show first-run welcome screen"
     echo "  version           Show version information"
     echo "  help              Show this help message"
@@ -94,7 +110,11 @@ case "${1:-help}" in
         shift
         bash "$KODRA_DIR/bin/kodra-sub/uninstall.sh" "$@"
         ;;
-    restore|backup)
+    backup)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/backup.sh" "$@"
+        ;;
+    restore)
         shift
         bash "$KODRA_DIR/bin/kodra-sub/restore.sh" "$@"
         ;;
@@ -135,6 +155,81 @@ case "${1:-help}" in
         ;;
     welcome)
         bash "$KODRA_DIR/bin/kodra-sub/welcome.sh"
+        ;;
+    menu)
+        bash "$KODRA_DIR/bin/kodra-sub/menu.sh"
+        ;;
+    shortcuts|keys)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/shortcuts.sh" "$@"
+        ;;
+    power)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/power.sh" "$@"
+        ;;
+    nightlight|night-light|nl)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/nightlight.sh" "$@"
+        ;;
+    dev)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/dev.sh" "$@"
+        ;;
+    db|database)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/db.sh" "$@"
+        ;;
+    font)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/font.sh" "$@"
+        ;;
+    screenshot|ss)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/screenshot.sh" "$@"
+        ;;
+    cleanup|clean)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/cleanup.sh" "$@"
+        ;;
+    refresh)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/refresh.sh" "$@"
+        ;;
+    extensions|ext)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/extensions.sh" "$@"
+        ;;
+    lock)
+        if command -v loginctl &>/dev/null; then
+            loginctl lock-session
+        elif command -v gnome-screensaver-command &>/dev/null; then
+            gnome-screensaver-command -l
+        else
+            echo "Lock not supported on this system"
+            exit 1
+        fi
+        ;;
+    suspend)
+        if command -v systemctl &>/dev/null; then
+            systemctl suspend
+        else
+            echo "Suspend not supported on this system"
+            exit 1
+        fi
+        ;;
+    restart|reboot)
+        if command -v systemctl &>/dev/null; then
+            systemctl reboot
+        else
+            sudo reboot
+        fi
+        ;;
+    shutdown|poweroff)
+        if command -v systemctl &>/dev/null; then
+            systemctl poweroff
+        else
+            sudo shutdown -h now
+        fi
         ;;
     version|-v|--version)
         show_version

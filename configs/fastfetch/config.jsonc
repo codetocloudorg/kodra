@@ -96,6 +96,10 @@
             "type": "editor"
         },
         {
+            "key": "│    Packages",
+            "type": "packages"
+        },
+        {
             "type": "custom",
             "format": "\u001b[1;36m├──────────────────────────────────────────────────────────────┤\u001b[0m"
         },
@@ -106,6 +110,24 @@
         {
             "key": "│   ",
             "type": "uptime"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m├──────────────────────────────────────────────────────────────┤\u001b[0m"
+        },
+        {
+            "type": "custom",
+            "format": "\u001b[1;36m│\u001b[0m  \u001b[1;34m☁  KODRA\u001b[0m                                                   \u001b[1;36m│\u001b[0m"
+        },
+        {
+            "key": "│    Version",
+            "type": "command",
+            "text": "cat ~/.kodra/VERSION 2>/dev/null || echo 'unknown'"
+        },
+        {
+            "key": "│    Theme",
+            "type": "command",
+            "text": "cat ~/.config/kodra/theme 2>/dev/null || echo 'tokyo-night'"
         },
         {
             "type": "custom",

@@ -4,6 +4,11 @@
 # Beautiful MOTD and shell enhancements
 #
 
+# Load enhanced readline config (tab-cycle completion)
+if [ -n "$BASH_VERSION" ] && [ -f "$HOME/.inputrc" ]; then
+    bind -f "$HOME/.inputrc" 2>/dev/null || true
+fi
+
 # Ensure XDG_DATA_DIRS includes Flatpak paths for app launcher discovery
 # This must be set on every shell start for GNOME to find Flatpak apps
 if [[ ! "$XDG_DATA_DIRS" =~ "flatpak" ]]; then
@@ -415,6 +420,162 @@ FZF-EOF"
 }
 
 # ─────────────────────────────────────────────────────────────
+# Extended Shell Helpers (v0.4.0)
+# ─────────────────────────────────────────────────────────────
+
+# Tmux: attach or new session
+alias t='tmux attach 2>/dev/null || tmux new-session'
+
+# Open files/URLs silently in background
+open() {
+    if [ -z "$1" ]; then
+        echo "Usage: open <file|url>"
+        return 1
+    fi
+    nohup xdg-open "$@" &>/dev/null &
+}
+
+# Smart nvim - opens directory with file explorer, file directly
+n() {
+    local target="${1:-.}"
+    if [ -d "$target" ]; then
+        (cd "$target" && nvim .)
+    else
+        nvim "$target"
+    fi
+}
+
+# Zoxide with visual feedback (enhanced z)
+zd() {
+    local dir
+    dir=$(zoxide query -l 2>/dev/null | fzf --height 40% --reverse --preview 'eza --tree --level=1 --icons {}' --preview-window=right:50%)
+    if [ -n "$dir" ]; then
+        cd "$dir" && eza --icons
+    fi
+}
+
+# ─────────────────────────────────────────────────────────────
+# SSH Port Forwarding Helpers
+# ─────────────────────────────────────────────────────────────
+
+# Forward local port to remote
+# Usage: fip <local_port> <remote_host> <remote_port> [ssh_host]
+fip() {
+    local local_port="${1:-8080}"
+    local remote_host="${2:-localhost}"
+    local remote_port="${3:-$local_port}"
+    local ssh_host="${4:-}"
+    
+    if [ -z "$ssh_host" ]; then
+        echo "Usage: fip <local_port> <remote_host> <remote_port> <ssh_host>"
+        echo "Example: fip 8080 localhost 80 user@server"
+        return 1
+    fi
+    
+    echo "Forwarding localhost:$local_port -> $remote_host:$remote_port via $ssh_host"
+    echo "Press Ctrl+C to stop"
+    ssh -N -L "$local_port:$remote_host:$remote_port" "$ssh_host"
+}
+
+# Dynamic SOCKS proxy
+# Usage: dip [port] <ssh_host>
+dip() {
+    local port="${1:-1080}"
+    local ssh_host="${2:-}"
+    
+    # If only one arg, treat it as ssh_host
+    if [ -z "$ssh_host" ]; then
+        ssh_host="$port"
+        port="1080"
+    fi
+    
+    if [ -z "$ssh_host" ]; then
+        echo "Usage: dip [port] <ssh_host>"
+        echo "Example: dip 1080 user@server"
+        echo "Then: configure browser SOCKS5 proxy to localhost:1080"
+        return 1
+    fi
+    
+    echo "Starting SOCKS5 proxy on localhost:$port via $ssh_host"
+    echo "Configure your browser SOCKS5 proxy to localhost:$port"
+    echo "Press Ctrl+C to stop"
+    ssh -N -D "$port" "$ssh_host"
+}
+
+# List active port forwards
+lip() {
+    echo "Active SSH tunnels:"
+    ps aux | grep 'ssh -[NL]' | grep -v grep | awk '{print $2, $11, $12, $13}'
+    echo ""
+    echo "Listening ports:"
+    ss -tlnp 2>/dev/null | grep -E ':(8080|1080|3000|5000|9090)' || echo "  No common dev ports forwarded"
+}
+
+# ─────────────────────────────────────────────────────────────
+# Media Transcoding Helpers
+# ─────────────────────────────────────────────────────────────
+
+# Convert image to JPEG
+img2jpg() {
+    if ! command -v convert &>/dev/null; then
+        echo "ImageMagick required. Install with: sudo apt install imagemagick"
+        return 1
+    fi
+    for img in "$@"; do
+        local out="${img%.*}.jpg"
+        convert "$img" -quality 90 "$out" && echo "Converted: $out"
+    done
+}
+
+# Convert image to PNG
+img2png() {
+    if ! command -v convert &>/dev/null; then
+        echo "ImageMagick required. Install with: sudo apt install imagemagick"
+        return 1
+    fi
+    for img in "$@"; do
+        local out="${img%.*}.png"
+        convert "$img" "$out" && echo "Converted: $out"
+    done
+}
+
+# Convert image to WebP
+img2webp() {
+    if ! command -v cwebp &>/dev/null; then
+        echo "WebP tools required. Install with: sudo apt install webp"
+        return 1
+    fi
+    for img in "$@"; do
+        local out="${img%.*}.webp"
+        cwebp -q 85 "$img" -o "$out" && echo "Converted: $out"
+    done
+}
+
+# Transcode video to 1080p
+transcode-video-1080p() {
+    if ! command -v ffmpeg &>/dev/null; then
+        echo "FFmpeg required. Install with: sudo apt install ffmpeg"
+        return 1
+    fi
+    local input="$1"
+    local output="${2:-${input%.*}_1080p.mp4}"
+    echo "Transcoding $input to 1080p..."
+    ffmpeg -i "$input" -vf "scale=-1:1080" -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 128k "$output"
+}
+
+# Transcode video to 720p
+transcode-video-720p() {
+    if ! command -v ffmpeg &>/dev/null; then
+        echo "FFmpeg required. Install with: sudo apt install ffmpeg"
+        return 1
+    fi
+    local input="$1"
+    local output="${2:-${input%.*}_720p.mp4}"
+    echo "Transcoding $input to 720p..."
+    ffmpeg -i "$input" -vf "scale=-1:720" -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 128k "$output"
+}
+
+# ─────────────────────────────────────────────────────────────
 # Completions (auto-loaded)
 # ─────────────────────────────────────────────────────────────
 
@@ -440,3 +601,96 @@ fi
 if command -v helm &>/dev/null; then
     complete -o default -F __start_helm h 2>/dev/null || true
 fi
+
+# ─────────────────────────────────────────────────────────────
+# Tmux Dev Layouts (#42)
+# ─────────────────────────────────────────────────────────────
+
+# Tmux layout: web dev (editor + server + shell)
+# Usage: tml web [session-name]
+tml() {
+    local layout="${1:-web}"
+    local session="${2:-dev}"
+    
+    if ! command -v tmux &>/dev/null; then
+        echo "tmux required. Install with: brew install tmux"
+        return 1
+    fi
+    
+    case "$layout" in
+        web)
+            # 3-pane layout: large editor, small server & shell
+            tmux new-session -d -s "$session" -n main
+            tmux send-keys -t "$session:main" "nvim ." Enter
+            tmux split-window -t "$session:main" -h -l 40%
+            tmux split-window -t "$session:main.2" -v -l 30%
+            tmux select-pane -t "$session:main.1"
+            tmux attach -t "$session"
+            ;;
+        api)
+            # 4-pane layout for API dev: editor, logs, tests, shell
+            tmux new-session -d -s "$session" -n main
+            tmux send-keys -t "$session:main" "nvim ." Enter
+            tmux split-window -t "$session:main" -h -l 45%
+            tmux split-window -t "$session:main.2" -v -l 50%
+            tmux split-window -t "$session:main.2" -v -l 50%
+            tmux select-pane -t "$session:main.1"
+            tmux attach -t "$session"
+            ;;
+        k8s)
+            # Kubernetes: editor, k9s, logs
+            tmux new-session -d -s "$session" -n main
+            tmux send-keys -t "$session:main" "nvim ." Enter
+            tmux split-window -t "$session:main" -h -l 50%
+            tmux send-keys -t "$session:main.2" "k9s" Enter
+            tmux select-pane -t "$session:main.1"
+            tmux attach -t "$session"
+            ;;
+        *)
+            echo "Usage: tml <layout> [session-name]"
+            echo ""
+            echo "Layouts:"
+            echo "  web    Editor + server + shell (default)"
+            echo "  api    Editor + logs + tests + shell"
+            echo "  k8s    Editor + k9s"
+            echo ""
+            echo "Example: tml web myproject"
+            ;;
+    esac
+}
+
+# New instance: create/attach with current directory as session name
+# Usage: nic
+nic() {
+    local session_name=$(basename "$PWD" | tr '.' '-' | tr ' ' '-')
+    
+    if ! command -v tmux &>/dev/null; then
+        echo "tmux required. Install with: brew install tmux"
+        return 1
+    fi
+    
+    # Check if session exists
+    if tmux has-session -t "$session_name" 2>/dev/null; then
+        tmux attach -t "$session_name"
+    else
+        tmux new-session -s "$session_name"
+    fi
+}
+
+# New instance extended: like nic but with web layout
+# Usage: nicx
+nicx() {
+    local session_name=$(basename "$PWD" | tr '.' '-' | tr ' ' '-')
+    
+    if ! command -v tmux &>/dev/null; then
+        echo "tmux required. Install with: brew install tmux"
+        return 1
+    fi
+    
+    # Check if session exists
+    if tmux has-session -t "$session_name" 2>/dev/null; then
+        tmux attach -t "$session_name"
+    else
+        tml web "$session_name"
+    fi
+}

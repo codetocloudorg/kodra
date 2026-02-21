@@ -318,3 +318,219 @@ cleanup_old_backups() {
         echo "Cleanup cancelled."
     fi
 }
+
+# Backup dconf settings (#88)
+backup_dconf() {
+    local output_file="${1:-$KODRA_BACKUP_DIR/dconf-$(date +%Y%m%d-%H%M%S).dump}"
+    
+    if ! command -v dconf &>/dev/null; then
+        log_error "dconf command not found"
+        return 1
+    fi
+    
+    mkdir -p "$(dirname "$output_file")"
+    
+    log_info "Backing up dconf settings..."
+    
+    if dconf dump / > "$output_file" 2>/dev/null; then
+        log_success "dconf settings backed up to: $output_file"
+        echo "$output_file"
+        return 0
+    else
+        log_error "Failed to backup dconf settings"
+        return 1
+    fi
+}
+
+# Restore dconf settings (#88)
+restore_dconf() {
+    local input_file="$1"
+    
+    if [ -z "$input_file" ] || [ ! -f "$input_file" ]; then
+        log_error "dconf dump file not found: $input_file"
+        return 1
+    fi
+    
+    if ! command -v dconf &>/dev/null; then
+        log_error "dconf command not found"
+        return 1
+    fi
+    
+    log_info "Restoring dconf settings from: $input_file"
+    
+    if dconf load / < "$input_file" 2>/dev/null; then
+        log_success "dconf settings restored"
+        return 0
+    else
+        log_error "Failed to restore dconf settings"
+        return 1
+    fi
+}
+
+# Create portable tarball of all dotfiles (#69)
+export_dotfiles_tarball() {
+    local output="${1:-$HOME/kodra-dotfiles-$(date +%Y%m%d-%H%M%S).tar.gz}"
+    local temp_dir=$(mktemp -d)
+    
+    log_info "Creating dotfiles export..."
+    
+    # Create export structure
+    local export_dir="$temp_dir/kodra-dotfiles"
+    mkdir -p "$export_dir/shell"
+    mkdir -p "$export_dir/config"
+    mkdir -p "$export_dir/vscode"
+    
+    # Copy shell configs
+    [ -f "$HOME/.bashrc" ] && cp "$HOME/.bashrc" "$export_dir/shell/"
+    [ -f "$HOME/.zshrc" ] && cp "$HOME/.zshrc" "$export_dir/shell/"
+    [ -f "$HOME/.gitconfig" ] && cp "$HOME/.gitconfig" "$export_dir/shell/"
+    [ -f "$HOME/.inputrc" ] && cp "$HOME/.inputrc" "$export_dir/shell/"
+    
+    # Copy application configs
+    [ -d "$HOME/.config/ghostty" ] && cp -r "$HOME/.config/ghostty" "$export_dir/config/"
+    [ -f "$HOME/.config/starship.toml" ] && cp "$HOME/.config/starship.toml" "$export_dir/config/"
+    [ -d "$HOME/.config/nvim" ] && cp -r "$HOME/.config/nvim" "$export_dir/config/"
+    [ -d "$HOME/.config/btop" ] && cp -r "$HOME/.config/btop" "$export_dir/config/"
+    [ -d "$HOME/.config/tmux" ] && cp -r "$HOME/.config/tmux" "$export_dir/config/"
+    [ -f "$HOME/.config/fastfetch/config.jsonc" ] && {
+        mkdir -p "$export_dir/config/fastfetch"
+        cp "$HOME/.config/fastfetch/config.jsonc" "$export_dir/config/fastfetch/"
+    }
+    
+    # Copy VS Code settings (exclude secrets)
+    local vscode_settings="$HOME/.config/Code/User/settings.json"
+    [ -f "$vscode_settings" ] && cp "$vscode_settings" "$export_dir/vscode/"
+    local vscode_keybindings="$HOME/.config/Code/User/keybindings.json"
+    [ -f "$vscode_keybindings" ] && cp "$vscode_keybindings" "$export_dir/vscode/"
+    
+    # Copy Kodra theme preference
+    [ -f "$HOME/.config/kodra/theme" ] && {
+        mkdir -p "$export_dir/kodra"
+        cp "$HOME/.config/kodra/theme" "$export_dir/kodra/"
+    }
+    
+    # Backup dconf to include in tarball
+    if command -v dconf &>/dev/null; then
+        dconf dump /org/gnome/desktop/ > "$export_dir/gnome-desktop.dconf" 2>/dev/null || true
+        dconf dump /org/gnome/shell/ > "$export_dir/gnome-shell.dconf" 2>/dev/null || true
+    fi
+    
+    # Create metadata
+    cat > "$export_dir/MANIFEST.txt" << EOF
+Kodra Dotfiles Export
+=====================
+Created: $(date)
+System: $(hostname)
+User: $USER
+Kodra Version: $(cat "$KODRA_DIR/VERSION" 2>/dev/null || echo "unknown")
+Theme: $(cat "$HOME/.config/kodra/theme" 2>/dev/null || echo "unknown")
+
+Contents:
+- shell/      Shell configuration files (.bashrc, .zshrc, .gitconfig)
+- config/     Application configs (ghostty, starship, nvim, btop, tmux)
+- vscode/     VS Code settings
+- kodra/      Kodra preferences
+- *.dconf     GNOME settings dumps
+
+To restore:
+1. Extract archive
+2. Copy files to appropriate locations
+3. Or use: kodra backup import <tarball>
+EOF
+    
+    # Create tarball
+    if tar -czf "$output" -C "$temp_dir" "kodra-dotfiles" 2>/dev/null; then
+        local size=$(du -h "$output" | cut -f1)
+        log_success "Created: $output ($size)"
+        echo "$output"
+    else
+        log_error "Failed to create tarball"
+        rm -rf "$temp_dir"
+        return 1
+    fi
+    
+    # Cleanup
+    rm -rf "$temp_dir"
+    return 0
+}
+
+# Import dotfiles from tarball (#69)
+import_dotfiles_tarball() {
+    local input="$1"
+    
+    if [ -z "$input" ] || [ ! -f "$input" ]; then
+        log_error "Tarball not found: $input"
+        return 1
+    fi
+    
+    local temp_dir=$(mktemp -d)
+    
+    log_info "Extracting dotfiles from: $input"
+    
+    if ! tar -xzf "$input" -C "$temp_dir" 2>/dev/null; then
+        log_error "Failed to extract tarball"
+        rm -rf "$temp_dir"
+        return 1
+    fi
+    
+    local export_dir="$temp_dir/kodra-dotfiles"
+    
+    if [ ! -d "$export_dir" ]; then
+        log_error "Invalid tarball format"
+        rm -rf "$temp_dir"
+        return 1
+    fi
+    
+    # Create backup before importing
+    backup_dotfiles
+    
+    log_info "Importing dotfiles..."
+    
+    # Import shell configs
+    [ -f "$export_dir/shell/.bashrc" ] && cp "$export_dir/shell/.bashrc" "$HOME/.bashrc"
+    [ -f "$export_dir/shell/.zshrc" ] && cp "$export_dir/shell/.zshrc" "$HOME/.zshrc"
+    [ -f "$export_dir/shell/.gitconfig" ] && cp "$export_dir/shell/.gitconfig" "$HOME/.gitconfig"
+    [ -f "$export_dir/shell/.inputrc" ] && cp "$export_dir/shell/.inputrc" "$HOME/.inputrc"
+    
+    # Import application configs
+    [ -d "$export_dir/config/ghostty" ] && {
+        mkdir -p "$HOME/.config/ghostty"
+        cp -r "$export_dir/config/ghostty"/* "$HOME/.config/ghostty/"
+    }
+    [ -f "$export_dir/config/starship.toml" ] && cp "$export_dir/config/starship.toml" "$HOME/.config/"
+    [ -d "$export_dir/config/nvim" ] && {
+        mkdir -p "$HOME/.config/nvim"
+        cp -r "$export_dir/config/nvim"/* "$HOME/.config/nvim/"
+    }
+    [ -d "$export_dir/config/btop" ] && {
+        mkdir -p "$HOME/.config/btop"
+        cp -r "$export_dir/config/btop"/* "$HOME/.config/btop/"
+    }
+    [ -d "$export_dir/config/tmux" ] && {
+        mkdir -p "$HOME/.config/tmux"
+        cp -r "$export_dir/config/tmux"/* "$HOME/.config/tmux/"
+    }
+    
+    # Import VS Code settings
+    [ -f "$export_dir/vscode/settings.json" ] && {
+        mkdir -p "$HOME/.config/Code/User"
+        cp "$export_dir/vscode/settings.json" "$HOME/.config/Code/User/"
+    }
+    [ -f "$export_dir/vscode/keybindings.json" ] && {
+        cp "$export_dir/vscode/keybindings.json" "$HOME/.config/Code/User/"
+    }
+    
+    # Import Kodra theme
+    [ -f "$export_dir/kodra/theme" ] && {
+        mkdir -p "$HOME/.config/kodra"
+        cp "$export_dir/kodra/theme" "$HOME/.config/kodra/"
+    }
+    
+    # Cleanup
+    rm -rf "$temp_dir"
+    
+    log_success "Dotfiles imported successfully"
+    log_info "You may need to restart your terminal or run 'source ~/.bashrc'"
+    
+    return 0
+}

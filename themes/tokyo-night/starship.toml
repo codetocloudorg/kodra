@@ -1,6 +1,9 @@
 # Kodra Theme: Tokyo Night
 # Starship prompt configuration with Tokyo Night color palette
 
+# Performance: timeout for slow commands
+command_timeout = 200
+
 format = """
 [░▒▓](#7aa2f7)\
 $os\
@@ -15,9 +18,12 @@ $nodejs\
 $rust\
 $golang\
 $python\
+$java\
 $azure\
 $kubernetes\
 $docker_context\
+$aws\
+$terraform\
 [](fg:#1a1b26)\
 $line_break$character"""
 
@@ -53,6 +59,16 @@ format = '[ $symbol $branch ]($style)'
 [git_status]
 style = "bg:#414868 fg:#c0caf5"
 format = '[$all_status$ahead_behind ]($style)'
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+conflicted = "="
+untracked = "?"
+stashed = "$"
+modified = "!"
+staged = "+"
+renamed = "»"
+deleted = "✘"
 
 [nodejs]
 symbol = ""
@@ -74,6 +90,11 @@ symbol = ""
 style = "bg:#1a1b26 fg:#e0af68"
 format = '[ $symbol ($version) ]($style)'
 
+[java]
+symbol = ""
+style = "bg:#1a1b26 fg:#f7768e"
+format = '[ $symbol ($version) ]($style)'
+
 [azure]
 disabled = false
 symbol = "󰠅 "
@@ -90,6 +111,18 @@ format = '[ $symbol$context(\($namespace\)) ]($style)'
 symbol = " "
 style = "bg:#1a1b26 fg:#7dcfff"
 format = '[ $symbol$context ]($style)'
+
+[aws]
+disabled = false
+symbol = "󰸏 "
+style = "bg:#1a1b26 fg:#e0af68"
+format = '[ $symbol($profile)(\($region\)) ]($style)'
+
+[terraform]
+disabled = false
+symbol = "󱁢 "
+style = "bg:#1a1b26 fg:#bb9af7"
+format = '[ $symbol$workspace ]($style)'
 
 [character]
 success_symbol = "[❯](bold #9ece6a)"

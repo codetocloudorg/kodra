@@ -1,0 +1,24 @@
+{
+    "workbench.colorTheme": "Gruvbox Dark Medium",
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.productIconTheme": "material-product-icons",
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'Fira Code', Consolas, monospace",
+    "editor.fontSize": 14,
+    "editor.fontLigatures": true,
+    "editor.cursorBlinking": "smooth",
+    "editor.cursorSmoothCaretAnimation": "on",
+    "editor.smoothScrolling": true,
+    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font', monospace",
+    "terminal.integrated.fontSize": 13,
+    "workbench.colorCustomizations": {
+        "editorCursor.foreground": "#d65d0e",
+        "terminalCursor.foreground": "#d65d0e",
+        "editor.selectionBackground": "#504945",
+        "editor.selectionHighlightBackground": "#50494544",
+        "activityBar.background": "#282828",
+        "sideBar.background": "#1d2021",
+        "editor.background": "#282828",
+        "statusBar.background": "#d79921",
+        "statusBar.foreground": "#282828"
+    }
+}

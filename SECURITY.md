@@ -61,7 +61,49 @@ When using Kodra:
 
 3. **Keep updated**: Run `kodra update` regularly to get security patches
 
-4. **Check signatures**: Verify GPG signatures when available (coming soon)
+4. **Check signatures**: GPG signatures are verified for all package repositories
+
+## Security Practices
+
+Kodra follows these security practices:
+
+### All Downloads Use HTTPS
+
+Every download URL in the codebase uses HTTPS. No insecure HTTP connections are made.
+
+### GPG Signature Verification
+
+All apt repositories are configured with GPG key verification:
+- Microsoft packages (Azure CLI, PowerShell)
+- Docker official packages
+- Kubernetes packages
+- HashiCorp packages (Terraform)
+- GitHub CLI packages
+- Charm packages (gum)
+
+### No Unsafe `eval` with User Input
+
+`eval` is only used with trusted output from known commands:
+- Shell initialization (brew shellenv, starship init, zoxide init, mise activate)
+- Never with raw user input
+
+### Input Validation
+
+User inputs are validated before use:
+- Theme names are checked against existing theme directories
+- Font names are verified with fc-list
+- File paths are validated and sanitized
+
+### No Credential Storage
+
+Kodra never stores credentials in config files:
+- Azure CLI handles its own auth (~/.azure)
+- GitHub CLI handles its own auth (~/.config/gh)
+- Kubernetes uses standard kubeconfig
+
+### Automated Dependency Updates
+
+Dependabot is configured to keep GitHub Actions up to date automatically.
 
 ## Acknowledgments
 

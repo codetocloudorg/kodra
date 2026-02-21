@@ -1,0 +1,95 @@
+# btop theme - Catppuccin Mocha
+# Kodra implementation of Catppuccin for btop
+
+# Main background
+theme[main_bg]="#1e1e2e"
+
+# Main text color
+theme[main_fg]="#cdd6f4"
+
+# Title color for boxes
+theme[title]="#89b4fa"
+
+# Highlight color for keyboard shortcuts
+theme[hi_fg]="#f38ba8"
+
+# Background color of selected item
+theme[selected_bg]="#45475a"
+
+# Foreground color of selected item
+theme[selected_fg]="#cdd6f4"
+
+# Color of inactive/disabled text
+theme[inactive_fg]="#6c7086"
+
+# Color on top of graphs
+theme[graph_text]="#a6adc8"
+
+# Meter background
+theme[meter_bg]="#313244"
+
+# Process graphs
+theme[proc_misc]="#a6e3a1"
+
+# CPU graph colors
+theme[cpu_box]="#94e2d5"
+
+# Memory graph colors
+theme[mem_box]="#89b4fa"
+
+# Network graph colors
+theme[net_box]="#f9e2af"
+
+# Disk graph colors
+theme[disk]="#cba6f7"
+
+# Processes cpu (top) graph colors
+theme[process]="#f38ba8"
+
+# Box border colors
+theme[border]="#45475a"
+
+# Temperature colors
+theme[temp_start]="#a6e3a1"
+theme[temp_mid]="#f9e2af"
+theme[temp_end]="#f38ba8"
+
+# CPU colors
+theme[cpu_start]="#94e2d5"
+theme[cpu_mid]="#89b4fa"
+theme[cpu_end]="#cba6f7"
+
+# Free memory colors
+theme[free_start]="#a6e3a1"
+theme[free_mid]="#94e2d5"
+theme[free_end]="#89b4fa"
+
+# Cached memory colors
+theme[cached_start]="#89b4fa"
+theme[cached_mid]="#94e2d5"
+theme[cached_end]="#a6e3a1"
+
+# Available memory colors
+theme[available_start]="#f9e2af"
+theme[available_mid]="#fab387"
+theme[available_end]="#f38ba8"
+
+# Used memory colors
+theme[used_start]="#f38ba8"
+theme[used_mid]="#eba0ac"
+theme[used_end]="#cba6f7"
+
+# Download graph colors
+theme[download_start]="#a6e3a1"
+theme[download_mid]="#94e2d5"
+theme[download_end]="#89b4fa"
+
+# Upload graph colors
+theme[upload_start]="#f9e2af"
+theme[upload_mid]="#fab387"
+theme[upload_end]="#f38ba8"
+
+# Process graph gradient
+theme[process_start]="#a6e3a1"
+theme[process_mid]="#f9e2af"
+theme[process_end]="#f38ba8"
