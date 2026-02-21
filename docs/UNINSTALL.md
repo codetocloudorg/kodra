@@ -7,7 +7,7 @@ How to cleanly remove Kodra from your system.
 The easiest way to uninstall:
 
 ```bash
-wget -qO- https://kodra.codetocloud.io/boot.sh | bash
+curl -fsSL https://kodra.codetocloud.io/boot.sh | bash
 ```
 
 Select **Uninstall** from the menu.

@@ -130,6 +130,10 @@ kodra theme tokyo-night  # Switch directly
 Available themes:
 - **Tokyo Night** - Purple-blue Tokyo city lights
 - **Ghostty Blue** - Deep navy with electric cyan
+- **Catppuccin** - Warm pastel colorscheme
+- **Gruvbox** - Retro earthy warm tones
+- **Nord** - Arctic cool blue palette
+- **Rosé Pine** - Warm and elegant muted tones
 
 ### How do I update Kodra?
 

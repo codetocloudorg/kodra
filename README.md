@@ -89,7 +89,7 @@ That's it. The installer will:
 ## Commands
 
 ```bash
-kodra theme       # Switch themes (tokyo-night, ghostty-blue)
+kodra theme       # Switch themes (tokyo-night, ghostty-blue, catppuccin, gruvbox, nord, rose-pine)
 kodra wallpaper   # Browse and set wallpapers
 kodra desktop     # Configure dock, tiling, login screen
 kodra repair      # Re-apply all configs without reinstalling
@@ -99,16 +99,36 @@ kodra setup       # Re-run first-time setup (GitHub, Azure login)
 kodra fetch       # Show system info (beautiful fastfetch)
 kodra doctor      # Check system health
 kodra update      # Update everything
+kodra dev         # Install language runtimes (node, python, go...)
+kodra db          # Start database containers (postgres, mysql, redis...)
+kodra install     # Install additional applications
+kodra uninstall   # Remove applications
+kodra backup      # Backup/export dotfiles and settings
+kodra restore     # Restore backed up dotfiles
+kodra resume      # Resume incomplete installation
+kodra cleanup     # Clear system caches and free space
+kodra refresh     # Hot-reload theme components
+kodra extensions  # Manage GNOME extensions
+kodra power       # Set power profile (performance/balanced/power-saver)
+kodra nightlight  # Toggle night light (blue light filter)
+kodra font        # Change terminal font
+kodra screenshot  # Take screenshots (full/region/window)
+kodra shortcuts   # Display keyboard shortcuts
+kodra menu        # Interactive main menu
 ```
 
 ## Themes
 
-Two beautiful themes that sync across terminal, editor, and desktop:
+Six beautiful themes that sync across terminal, editor, and desktop:
 
 | Theme | Vibe |
 |-------|------|
 | 🌃 **Tokyo Night** | Purple-blue Tokyo city lights |
 | 💙 **Ghostty Blue** | Deep navy with electric cyan |
+| 🐱 **Catppuccin** | Warm pastel colorscheme |
+| 🪴 **Gruvbox** | Retro earthy warm tones |
+| 🏔️ **Nord** | Arctic cool blue palette |
+| 🌹 **Rosé Pine** | Warm and elegant muted tones |
 
 ## Keyboard Shortcuts & Aliases
 

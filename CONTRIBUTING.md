@@ -8,7 +8,7 @@ Kodra is a **Code To Cloud** project, maintained under the MIT License.
 
 ## Current Version
 
-**v0.2.0** - See [VERSION](VERSION) for the current release.
+**v0.4.2** - See [VERSION](VERSION) for the current release.
 
 ## Versioning
 

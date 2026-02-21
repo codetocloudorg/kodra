@@ -403,7 +403,7 @@ If nothing works, you can uninstall and reinstall:
 ```bash
 kodra uninstall
 # Then reinstall fresh:
-curl -fsSL https://kodra.codetocloud.io/boot.sh | bash
+wget -qO- https://kodra.codetocloud.io/boot.sh | bash
 ```
 
 ### Get support
