@@ -208,6 +208,10 @@ case "${1:-help}" in
         shift
         bash "$KODRA_DIR/bin/kodra-sub/extensions.sh" "$@"
         ;;
+    ci-report|ci)
+        shift
+        bash "$KODRA_DIR/bin/kodra-sub/ci-report.sh" "$@"
+        ;;
     lock)
         if command -v loginctl &>/dev/null; then
             loginctl lock-session

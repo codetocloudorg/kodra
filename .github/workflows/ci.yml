@@ -226,10 +226,11 @@ jobs:
             echo "- **Hadolint**: ${hl_count} findings" >> "$GITHUB_STEP_SUMMARY"
           fi
           for suite in unit integration security; do
-            pass=$(grep -c '^ok' "test-results/${suite}.tap" 2>/dev/null || echo "0")
-            fail=$(grep -c '^not ok' "test-results/${suite}.tap" 2>/dev/null || echo "0")
-            total=$((pass + fail))
-            echo "- **${suite^} tests**: ✅ ${pass}/${total} passed" >> "$GITHUB_STEP_SUMMARY"
+            pass="$(grep -c '^ok' "test-results/${suite}.tap" 2>/dev/null)" || pass="0"
+            fail="$(grep -c '^not ok' "test-results/${suite}.tap" 2>/dev/null)" || fail="0"
+            total=$(( pass + fail ))
+            label="$(echo "$suite" | sed 's/./\U&/')"
+            echo "- **${label} tests**: ✅ ${pass}/${total} passed" >> "$GITHUB_STEP_SUMMARY"
           done
 
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

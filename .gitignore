@@ -38,3 +38,4 @@ tests/lib/bats-support/
 tests/lib/bats-assert/
 test-results/
 node_modules/
+ci-reports/
