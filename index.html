@@ -86,7 +86,7 @@
             /* Text */
             --text-primary: #e6edf3;
             --text-secondary: #8b949e;
-            --text-muted: #6e7681;
+            --text-muted: #8d96a0;
             
             /* Accent Colors */
             --accent-blue: #58a6ff;
@@ -1054,9 +1054,38 @@
                 padding: 2rem;
             }
         }
+        /* Accessibility: skip link for keyboard users */
+        .skip-link {
+            position: absolute;
+            left: -9999px;
+            top: auto;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            z-index: 9999;
+        }
+        .skip-link:focus {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            width: auto;
+            height: auto;
+            padding: 10px 20px;
+            background: var(--accent-primary);
+            color: white;
+            z-index: 9999;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        /* Accessibility: visible focus indicators */
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <!-- Navigation -->
     <nav>
         <div class="nav-content">
@@ -1086,6 +1115,7 @@
     </nav>
 
     <!-- Hero Section -->
+    <main id="main-content">
     <section class="hero">
         <div class="hero-badge">
             <span class="hero-badge-dot"></span>
@@ -1726,7 +1756,8 @@
     </section>
 
     <!-- Footer -->
-    <footer>
+    </main>
+    <footer role="contentinfo">
         <div class="footer-content">
             <div class="footer-brand">
                 <a href="#" class="logo">
