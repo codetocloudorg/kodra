@@ -20,7 +20,7 @@ init_state() {
     if [ ! -f "$KODRA_STATE_FILE" ]; then
         cat > "$KODRA_STATE_FILE" << 'EOF'
 {
-  "version": "0.2.0",
+  "version": "0.5.0",
   "install_started": null,
   "install_completed": null,
   "components": {},

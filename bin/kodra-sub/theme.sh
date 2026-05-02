@@ -125,9 +125,21 @@ apply_theme() {
         fi
         # Merge theme settings
         if command -v jq &> /dev/null; then
-            jq -s '.[0] * .[1]' "$VSCODE_DIR/settings.json" "$theme_dir/vscode-settings.json" > "$VSCODE_DIR/settings.json.tmp"
-            mv "$VSCODE_DIR/settings.json.tmp" "$VSCODE_DIR/settings.json"
-            log_success "VS Code theme applied"
+            # Validate JSON before merging
+            if [ -f "$VSCODE_DIR/settings.json" ] && [ -f "$theme_dir/vscode-settings.json" ]; then
+                if jq empty "$VSCODE_DIR/settings.json" 2>/dev/null && jq empty "$theme_dir/vscode-settings.json" 2>/dev/null; then
+                    # Create backup before merge
+                    cp "$VSCODE_DIR/settings.json" "$VSCODE_DIR/settings.json.bak"
+                    local merged=$(jq -s '.[0] * .[1]' "$VSCODE_DIR/settings.json" "$theme_dir/vscode-settings.json")
+                    if [ -n "$merged" ] && echo "$merged" | jq empty 2>/dev/null; then
+                        echo "$merged" > "$VSCODE_DIR/settings.json"
+                    else
+                        log_warning "JSON merge produced invalid output, skipping VS Code theme"
+                    fi
+                else
+                    log_warning "Invalid JSON in VS Code settings, skipping theme merge"
+                fi
+            fi
         fi
     fi
     
@@ -144,7 +156,7 @@ apply_theme() {
     
     if [ -f "$wallpaper" ]; then
         # gsettings may fail in containers or headless systems - that's OK
-        if command -v gsettings &> /dev/null && [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+        if command -v gsettings &>/dev/null && { [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; }; then
             if gsettings set org.gnome.desktop.background picture-uri "file://$wallpaper" 2>/dev/null; then
                 gsettings set org.gnome.desktop.background picture-uri-dark "file://$wallpaper" 2>/dev/null
                 gsettings set org.gnome.desktop.background picture-options "zoom" 2>/dev/null
@@ -155,7 +167,7 @@ apply_theme() {
     
     # GNOME accent color (Ubuntu 22.04+)
     # Available: blue, teal, green, yellow, orange, red, pink, purple, slate
-    if command -v gsettings &> /dev/null && [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+    if command -v gsettings &>/dev/null && { [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; }; then
         local accent_color=""
         case "$theme" in
             tokyo-night)  accent_color="purple" ;;

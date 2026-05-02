@@ -20,7 +20,12 @@ if command -v brew &> /dev/null; then
 else
     # Fallback: Official installer
     echo "Installing mise via official installer..."
-    curl https://mise.run | sh
+    # Safe download: fetch script, then execute
+    local mise_installer="/tmp/kodra-mise-install.sh"
+    curl -sSf --max-time 30 https://mise.run -o "$mise_installer"
+    chmod +x "$mise_installer"
+    sh "$mise_installer"
+    rm -f "$mise_installer"
     MISE_BIN="$HOME/.local/bin"
 fi
 

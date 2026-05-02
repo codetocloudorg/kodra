@@ -17,7 +17,7 @@ fi
 sudo apt-get install -y build-essential procps curl file git
 
 # Install Homebrew (non-interactive)
-NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL --max-time 30 https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # Add Homebrew to PATH
 BREW_PREFIX="/home/linuxbrew/.linuxbrew"

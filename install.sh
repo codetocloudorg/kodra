@@ -90,45 +90,115 @@ echo "Log file: $KODRA_LOG_FILE"
 echo "$(printf '%0.s═' $(seq 1 60))"
 echo ""
 
-# Error handler with verbose logging
+# Error trap system — catches failures and offers recovery options
 kodra_error_handler() {
     local exit_code=$?
     local line_no=$1
+    
+    # Prevent recursive error handling
+    [ "${KODRA_ERROR_HANDLING:-false}" = "true" ] && return
+    export KODRA_ERROR_HANDLING=true
+    
     echo ""
-    echo "╭$(printf '%0.s─' $(seq 1 60))╮"
-    printf "│  %-58s│\n" "INSTALLATION ERROR"
-    echo "╰$(printf '%0.s─' $(seq 1 60))╯"
+    echo "╭──────────────────────────────────────────────────────────────╮"
+    echo "│  ❌  INSTALLATION ERROR                                      │"
+    echo "╰──────────────────────────────────────────────────────────────╯"
     echo ""
-    echo "❌ Error occurred at line $line_no (exit code: $exit_code)"
-    echo ""
-    echo "Log file saved at: $KODRA_LOG_FILE"
-    echo ""
-    echo "To share this log for debugging:"
-    echo "  cat $KODRA_LOG_FILE | nc termbin.com 9999"
-    echo ""
-    echo "Or upload the file: $KODRA_LOG_FILE"
+    echo "  Error at line $line_no (exit code: $exit_code)"
+    if [ -n "${CURRENT_SCRIPT:-}" ]; then
+        echo "  Failed script: $CURRENT_SCRIPT"
+    fi
     echo ""
     
-    # Save system info
+    # Show log tail
+    if [ -f "$KODRA_LOG_FILE" ]; then
+        echo "  Last 10 lines of log:"
+        echo "  ─────────────────────"
+        tail -10 "$KODRA_LOG_FILE" 2>/dev/null | sed 's/^/    /'
+        echo "  ─────────────────────"
+        echo ""
+    fi
+    
+    # Save system info to log
     {
         echo ""
-        echo "═══════════════════════════════════════════════════════════════════"
-        echo "System Information at Error"
-        echo "═══════════════════════════════════════════════════════════════════"
-        echo "Ubuntu version: $(lsb_release -d 2>/dev/null || cat /etc/os-release)"
-        echo "Architecture: $(uname -m)"
-        echo "Disk space: $(df -h / | tail -1)"
-        echo "Memory: $(free -h | grep Mem)"
-        echo "Last 50 lines of dpkg log:"
-        tail -50 /var/log/dpkg.log 2>/dev/null || echo "(not available)"
-    } >> "$KODRA_LOG_FILE" 2>&1
+        echo "=== Error Details ==="
+        echo "Line: $line_no"
+        echo "Exit code: $exit_code"
+        echo "Script: ${CURRENT_SCRIPT:-install.sh}"
+        echo "Time: $(date '+%Y-%m-%d %H:%M:%S')"
+        echo "Ubuntu: $(. /etc/os-release 2>/dev/null && echo "$VERSION_ID" || echo "unknown")"
+        echo "Arch: $(uname -m)"
+        echo "Disk: $(df -h / 2>/dev/null | tail -1 | awk '{print $4}') free"
+        echo "Memory: $(free -h 2>/dev/null | grep Mem | awk '{print $4}') free"
+        echo "=== End Error Details ==="
+    } >> "$KODRA_LOG_FILE" 2>/dev/null
     
-    exit $exit_code
+    echo "  Log file: $KODRA_LOG_FILE"
+    echo ""
+    
+    # Offer options if interactive
+    if [ -t 0 ] && command -v gum &>/dev/null; then
+        local choice
+        choice=$(gum choose \
+            "Retry installation (resume from failure)" \
+            "View full log" \
+            "Upload log for support" \
+            "Exit" \
+            --header "What would you like to do?")
+        
+        case "$choice" in
+            "Retry"*)
+                export KODRA_ERROR_HANDLING=false
+                bash "$KODRA_DIR/install.sh" --debug
+                ;;
+            "View"*)
+                less "$KODRA_LOG_FILE" 2>/dev/null || cat "$KODRA_LOG_FILE"
+                ;;
+            "Upload"*)
+                if command -v curl &>/dev/null; then
+                    local url
+                    url=$(cat "$KODRA_LOG_FILE" | curl -s --max-time 15 -F 'file=@-' https://0x0.st 2>/dev/null || \
+                          cat "$KODRA_LOG_FILE" | curl -s --max-time 15 https://termbin.com/9999 2>/dev/null)
+                    if [ -n "$url" ]; then
+                        echo ""
+                        echo "  📋 Log uploaded: $url"
+                        echo "  Share this link when asking for help."
+                    else
+                        echo "  ❌ Upload failed. Share the log manually: $KODRA_LOG_FILE"
+                    fi
+                fi
+                ;;
+            *)
+                exit $exit_code
+                ;;
+        esac
+    else
+        echo "  To retry: bash $KODRA_DIR/install.sh --debug"
+        echo "  To share: cat $KODRA_LOG_FILE | curl -s https://termbin.com/9999"
+        echo ""
+        exit $exit_code
+    fi
 }
+
+# Exit cleanup handler
+kodra_exit_handler() {
+    local exit_code=$?
+    # Stop sudo keepalive if running
+    [ -n "${KODRA_SUDO_KEEPALIVE_PID:-}" ] && kill "$KODRA_SUDO_KEEPALIVE_PID" 2>/dev/null || true
+    # Restore screen lock if we disabled it
+    if [ "${KODRA_INHIBITED_SLEEP:-false}" = "true" ] && command -v gsettings &>/dev/null; then
+        gsettings set org.gnome.desktop.session idle-delay 300 2>/dev/null || true
+    fi
+    return $exit_code
+}
+
 trap 'kodra_error_handler $LINENO' ERR
+trap kodra_exit_handler EXIT
 
 # Source utility functions
 source "$KODRA_DIR/lib/utils.sh"
+source "$KODRA_DIR/lib/logging.sh"
 source "$KODRA_DIR/lib/ui.sh"
 
 # Reconnect stdin to terminal for interactive prompts (needed when run via curl | bash)

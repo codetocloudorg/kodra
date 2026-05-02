@@ -125,7 +125,7 @@ if [ -d "$KODRA_DIR" ]; then
     show_step "Updating existing Kodra installation..."
     cd "$KODRA_DIR"
     echo -e "    ${C_GRAY}Fetching latest changes from GitHub...${C_RESET}"
-    git fetch origin --progress < /dev/null 2>&1
+    git -c http.timeout=30 fetch origin --progress < /dev/null 2>&1
     # Reset to origin/main to handle divergent branches (e.g., after history purge)
     git reset --hard origin/main < /dev/null 2>&1
     show_done "Repository updated"
@@ -133,7 +133,7 @@ if [ -d "$KODRA_DIR" ]; then
 else
     show_step "Downloading Kodra from GitHub..."
     echo -e "    ${C_GRAY}This may take a moment on slower connections...${C_RESET}"
-    git clone --progress "$KODRA_REPO" "$KODRA_DIR" < /dev/null 2>&1
+    git clone -c http.timeout=30 --progress "$KODRA_REPO" "$KODRA_DIR" < /dev/null 2>&1
     show_done "Repository cloned to $KODRA_DIR"
     KODRA_EXISTS=false
 fi
