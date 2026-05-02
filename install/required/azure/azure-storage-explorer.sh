@@ -12,15 +12,27 @@ if snap list 2>/dev/null | grep -q "storage-explorer"; then
     exit 0
 fi
 
-# Snap requires snapd — skip gracefully in containers where it's unavailable
-if ! command -v snap &>/dev/null || ! systemctl is-active snapd &>/dev/null 2>&1; then
-    echo "[WARN] snapd not available (container environment?) — skipping Azure Storage Explorer"
+# Snap requires a fully functional snapd — test with an actual snap command
+# systemctl may report "active" even when snap is broken in containers
+if ! command -v snap &>/dev/null; then
+    echo "[WARN] snap not installed — skipping Azure Storage Explorer"
     echo "Install manually on a full system: sudo snap install storage-explorer"
     exit 0
 fi
 
-# Install via snap (official distribution method)
-sudo snap install storage-explorer
+# Test snap connectivity with timeout (catches broken snapd in containers)
+if ! timeout 10 snap list &>/dev/null; then
+    echo "[WARN] snapd not functional (container environment?) — skipping Azure Storage Explorer"
+    echo "Install manually on a full system: sudo snap install storage-explorer"
+    exit 0
+fi
+
+# Install via snap with timeout (large GUI app, give it 120s)
+if ! timeout 120 sudo snap install storage-explorer; then
+    echo "[WARN] snap install timed out or failed — skipping Azure Storage Explorer"
+    echo "Install manually: sudo snap install storage-explorer"
+    exit 0
+fi
 
 echo "Azure Storage Explorer installed successfully!"
 echo "Launch with: storage-explorer"

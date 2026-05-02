@@ -75,3 +75,43 @@ load '../helpers/setup'
     run grep "$version" "$KODRA_DIR/lib/ui.sh"
     assert_success
 }
+
+# ── CI Workflow hygiene ──────────────────────────────────────────
+
+@test "contract: no deprecated GitHub Actions versions (Node.js 20 EOL)" {
+    # These minimum versions support Node.js 24 (required after June 2, 2026)
+    # actions/checkout: v5+, actions/upload-artifact: v6+, dorny/test-reporter: v2+
+    local workflows_dir="$KODRA_DIR/.github/workflows"
+    [ -d "$workflows_dir" ] || skip "No workflows directory"
+
+    # Check for deprecated checkout versions
+    if grep -rq "actions/checkout@v[1-4]" "$workflows_dir"; then
+        fail "Deprecated actions/checkout found (need v5+ for Node.js 24)"
+    fi
+
+    # Check for deprecated upload-artifact versions
+    if grep -rq "actions/upload-artifact@v[1-5]" "$workflows_dir"; then
+        fail "Deprecated actions/upload-artifact found (need v6+ for Node.js 24)"
+    fi
+
+    # Check for deprecated test-reporter versions
+    if grep -rq "dorny/test-reporter@v1" "$workflows_dir"; then
+        fail "Deprecated dorny/test-reporter found (need v2+ for Node.js 24)"
+    fi
+}
+
+@test "contract: install scripts with snap use timeout guard" {
+    # Any script using 'snap install' must have a timeout or skip check
+    # to prevent hanging in container/CI environments
+    local found_unguarded=0
+
+    while IFS= read -r script; do
+        # Check the script has timeout or skip logic before snap install
+        if ! grep -q "timeout\|WARN.*skip\|exit 0" "$script"; then
+            found_unguarded=1
+            echo "Missing timeout/skip guard: $script"
+        fi
+    done < <(grep -rl "snap install" "$KODRA_DIR/install/" 2>/dev/null || true)
+
+    [ "$found_unguarded" -eq 0 ] || fail "Found snap install without timeout/skip guard"
+}
