@@ -13,7 +13,10 @@ if command -v az &> /dev/null; then
 fi
 
 # Install via Microsoft's official script
-curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+AZ_INSTALLER=$(mktemp "${TMPDIR:-/tmp}/kodra-azure-cli.XXXXXX")
+trap 'rm -f "$AZ_INSTALLER"' EXIT
+curl -sL https://aka.ms/InstallAzureCLIDeb -o "$AZ_INSTALLER"
+sudo bash "$AZ_INSTALLER"
 
 # Verify installation
 az version

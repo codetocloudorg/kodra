@@ -16,7 +16,10 @@ if ! command -v starship &> /dev/null; then
     else
         # Fallback: Official install script
         echo "Installing Starship via official installer..."
-        curl -sS https://starship.rs/install.sh | sh -s -- -y
+        STARSHIP_INSTALLER=$(mktemp "${TMPDIR:-/tmp}/kodra-starship.XXXXXX")
+        trap 'rm -f "$STARSHIP_INSTALLER"' EXIT
+        curl -sS https://starship.rs/install.sh -o "$STARSHIP_INSTALLER"
+        sh "$STARSHIP_INSTALLER" -y
     fi
 fi
 

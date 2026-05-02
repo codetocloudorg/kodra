@@ -18,7 +18,10 @@ if command -v brew &> /dev/null; then
     brew install helm
 else
     # Fallback: official install script
-    curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    HELM_INSTALLER=$(mktemp "${TMPDIR:-/tmp}/kodra-helm.XXXXXX")
+    trap 'rm -f "$HELM_INSTALLER"' EXIT
+    curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 -o "$HELM_INSTALLER"
+    bash "$HELM_INSTALLER"
 fi
 
 # Setup completions directory

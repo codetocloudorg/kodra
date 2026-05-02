@@ -12,9 +12,11 @@ if command -v code &> /dev/null; then
     echo "VS Code already installed: $(code --version | head -1)"
 else
     # Download and install VS Code .deb (use curl for better IPv4/IPv6 handling)
-    curl -fsSL -o /tmp/vscode.deb "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
-    sudo dpkg -i /tmp/vscode.deb || sudo apt-get install -f -y
-    rm /tmp/vscode.deb
+    TMP_VSC=$(mktemp "${TMPDIR:-/tmp}/kodra-vscode.XXXXXX.deb")
+    trap 'rm -f "$TMP_VSC"' EXIT
+    curl -fsSL -o "$TMP_VSC" "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
+    sudo dpkg -i "$TMP_VSC" || sudo apt-get install -f -y
+    rm -f "$TMP_VSC"
 
     # Verify installation
     code --version

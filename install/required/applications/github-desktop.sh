@@ -38,7 +38,8 @@ log_info "Downloading GitHub Desktop $VERSION..."
 
 # Download the deb package
 DEB_URL="https://github.com/shiftkey/desktop/releases/download/${LATEST_RELEASE}/GitHubDesktop-linux-amd64-${VERSION}.deb"
-TEMP_DEB="/tmp/github-desktop.deb"
+TEMP_DEB=$(mktemp "${TMPDIR:-/tmp}/kodra-github-desktop.XXXXXX.deb")
+trap 'rm -f "$TEMP_DEB"' EXIT
 
 if curl -sL "$DEB_URL" -o "$TEMP_DEB"; then
     sudo dpkg -i "$TEMP_DEB" 2>/dev/null || sudo apt-get install -f -y

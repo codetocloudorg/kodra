@@ -13,10 +13,11 @@ if command -v tofu &> /dev/null; then
 fi
 
 # Install OpenTofu via official installer
-curl --proto '=https' --tlsv1.2 -fsSL https://get.opentofu.org/install-opentofu.sh -o install-opentofu.sh
-chmod +x install-opentofu.sh
-./install-opentofu.sh --install-method deb
-rm install-opentofu.sh
+TOFU_INSTALLER=$(mktemp "${TMPDIR:-/tmp}/kodra-opentofu.XXXXXX")
+trap 'rm -f "$TOFU_INSTALLER"' EXIT
+curl --proto '=https' --tlsv1.2 -fsSL https://get.opentofu.org/install-opentofu.sh -o "$TOFU_INSTALLER"
+chmod +x "$TOFU_INSTALLER"
+"$TOFU_INSTALLER" --install-method deb
 
 # Verify installation
 tofu version

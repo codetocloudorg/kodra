@@ -31,13 +31,14 @@ for font in "${FONTS[@]}"; do
     echo "  Downloading $font..."
     
     # Download from Nerd Fonts releases (use curl for better IPv4/IPv6 handling)
-    curl -fsSL -o "/tmp/${font}.zip" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/${font}.zip"
+    tmp_font=$(mktemp "${TMPDIR:-/tmp}/kodra-font-${font}.XXXXXX.zip")
+    curl -fsSL -o "$tmp_font" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/${font}.zip"
     
     # Extract to fonts directory
-    unzip -qo "/tmp/${font}.zip" -d "$FONT_DIR/${font}" -x "*.md" -x "*.txt" -x "LICENSE*" 2>/dev/null || true
+    unzip -qo "$tmp_font" -d "$FONT_DIR/${font}" -x "*.md" -x "*.txt" -x "LICENSE*" 2>/dev/null || true
     
     # Cleanup
-    rm -f "/tmp/${font}.zip"
+    rm -f "$tmp_font"
     
     echo "    ✓ $font installed"
 done

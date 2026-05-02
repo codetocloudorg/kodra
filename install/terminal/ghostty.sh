@@ -79,7 +79,7 @@ if ! command -v ghostty &>/dev/null; then
                     DEB_URL=$(echo "$RELEASE_INFO" | grep -o "https://[^\"]*${ARCH}[^\"]*\.deb" | head -1)
                     
                     if [ -n "$DEB_URL" ]; then
-                        DEB_FILE="/tmp/ghostty-ubuntu.deb"
+                        DEB_FILE=$(mktemp "${TMPDIR:-/tmp}/kodra-ghostty.XXXXXX.deb")
                         echo "Downloading: $DEB_URL"
                         curl -fsSL -o "$DEB_FILE" "$DEB_URL"
                         sudo dpkg -i "$DEB_FILE" || sudo apt-get install -f -y

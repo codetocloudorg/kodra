@@ -17,7 +17,10 @@ fi
 sudo apt-get install -y build-essential procps curl file git
 
 # Install Homebrew (non-interactive)
-NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL --max-time 30 https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+BREW_INSTALLER=$(mktemp "${TMPDIR:-/tmp}/kodra-homebrew.XXXXXX")
+trap 'rm -f "$BREW_INSTALLER"' EXIT
+curl -fsSL --max-time 30 https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o "$BREW_INSTALLER"
+NONINTERACTIVE=1 /bin/bash "$BREW_INSTALLER"
 
 # Add Homebrew to PATH
 BREW_PREFIX="/home/linuxbrew/.linuxbrew"

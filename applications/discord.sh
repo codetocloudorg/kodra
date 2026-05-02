@@ -18,8 +18,10 @@ if command -v flatpak &> /dev/null; then
     echo "Discord installed via Flatpak!"
 else
     # Fallback: Download .deb
-    wget -O /tmp/discord.deb "https://discord.com/api/download?platform=linux&format=deb"
-    sudo dpkg -i /tmp/discord.deb || sudo apt-get install -f -y
-    rm /tmp/discord.deb
+    TMP_DISCORD=$(mktemp "${TMPDIR:-/tmp}/kodra-discord.XXXXXX.deb")
+    trap 'rm -f "$TMP_DISCORD"' EXIT
+    curl -fsSL -o "$TMP_DISCORD" "https://discord.com/api/download?platform=linux&format=deb"
+    sudo dpkg -i "$TMP_DISCORD" || sudo apt-get install -f -y
+    rm -f "$TMP_DISCORD"
     echo "Discord installed!"
 fi

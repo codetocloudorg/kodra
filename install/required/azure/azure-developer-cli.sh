@@ -12,7 +12,10 @@ if command -v azd &> /dev/null; then
 fi
 
 # Install via official script
-curl -fsSL https://aka.ms/install-azd.sh | bash
+AZD_INSTALLER=$(mktemp "${TMPDIR:-/tmp}/kodra-azd-install.XXXXXX")
+trap 'rm -f "$AZD_INSTALLER"' EXIT
+curl -fsSL https://aka.ms/install-azd.sh -o "$AZD_INSTALLER"
+bash "$AZD_INSTALLER"
 
 # Add to PATH for current session
 export PATH="$HOME/.azd/bin:$PATH"

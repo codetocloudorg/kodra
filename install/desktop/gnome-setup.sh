@@ -55,11 +55,13 @@ install_extension_zip() {
     
     # Download extension
     local download_url="https://extensions.gnome.org/extension-data/${ext_uuid}.v${ext_id}.shell-extension.zip"
-    curl -sL "https://extensions.gnome.org/download-extension/${ext_uuid}.shell-extension.zip?shell_version=${shell_version}" -o "/tmp/${ext_uuid}.zip" 2>/dev/null || true
+    local tmp_ext
+    tmp_ext=$(mktemp "${TMPDIR:-/tmp}/kodra-gnome-ext.XXXXXX.zip")
+    curl -sL "https://extensions.gnome.org/download-extension/${ext_uuid}.shell-extension.zip?shell_version=${shell_version}" -o "$tmp_ext" 2>/dev/null || true
     
-    if [ -f "/tmp/${ext_uuid}.zip" ]; then
-        unzip -qo "/tmp/${ext_uuid}.zip" -d "$ext_dir" 2>/dev/null || true
-        rm -f "/tmp/${ext_uuid}.zip"
+    if [ -s "$tmp_ext" ]; then
+        unzip -qo "$tmp_ext" -d "$ext_dir" 2>/dev/null || true
+        rm -f "$tmp_ext"
     fi
 }
 
@@ -71,10 +73,11 @@ DASH_TO_DOCK_DIR="$HOME/.local/share/gnome-shell/extensions/dash-to-dock@micxgx.
 if [ ! -d "$DASH_TO_DOCK_DIR" ]; then
     echo "   Downloading Dash to Dock..."
     mkdir -p "$DASH_TO_DOCK_DIR"
-    curl -sL "https://extensions.gnome.org/extension-data/dash-to-dockmicxgx.gmail.com.v84.shell-extension.zip" -o /tmp/dash-to-dock.zip 2>/dev/null || true
-    if [ -f /tmp/dash-to-dock.zip ]; then
-        unzip -qo /tmp/dash-to-dock.zip -d "$DASH_TO_DOCK_DIR" 2>/dev/null || true
-        rm -f /tmp/dash-to-dock.zip
+    tmp_ext=$(mktemp "${TMPDIR:-/tmp}/kodra-dash-to-dock.XXXXXX.zip")
+    curl -sL "https://extensions.gnome.org/extension-data/dash-to-dockmicxgx.gmail.com.v84.shell-extension.zip" -o "$tmp_ext" 2>/dev/null || true
+    if [ -s "$tmp_ext" ]; then
+        unzip -qo "$tmp_ext" -d "$DASH_TO_DOCK_DIR" 2>/dev/null || true
+        rm -f "$tmp_ext"
     fi
 fi
 
@@ -84,10 +87,11 @@ if [ ! -d "$TACTILE_DIR" ]; then
     echo "   Downloading Tactile (window tiling)..."
     mkdir -p "$TACTILE_DIR"
     # Tactile v3 for GNOME 45+
-    curl -sL "https://extensions.gnome.org/extension-data/tactilelundal.io.v4.shell-extension.zip" -o /tmp/tactile.zip 2>/dev/null || true
-    if [ -f /tmp/tactile.zip ]; then
-        unzip -qo /tmp/tactile.zip -d "$TACTILE_DIR" 2>/dev/null || true
-        rm -f /tmp/tactile.zip
+    tmp_ext=$(mktemp "${TMPDIR:-/tmp}/kodra-tactile.XXXXXX.zip")
+    curl -sL "https://extensions.gnome.org/extension-data/tactilelundal.io.v4.shell-extension.zip" -o "$tmp_ext" 2>/dev/null || true
+    if [ -s "$tmp_ext" ]; then
+        unzip -qo "$tmp_ext" -d "$TACTILE_DIR" 2>/dev/null || true
+        rm -f "$tmp_ext"
         echo "   ✓ Tactile installed (Super+T to tile windows)"
     fi
 fi
@@ -97,10 +101,11 @@ BLUR_DIR="$HOME/.local/share/gnome-shell/extensions/blur-my-shell@aunetx"
 if [ ! -d "$BLUR_DIR" ]; then
     echo "   Downloading Blur my Shell..."
     mkdir -p "$BLUR_DIR"
-    curl -sL "https://extensions.gnome.org/extension-data/blur-my-shellaunetx.v66.shell-extension.zip" -o /tmp/blur-my-shell.zip 2>/dev/null || true
-    if [ -f /tmp/blur-my-shell.zip ]; then
-        unzip -qo /tmp/blur-my-shell.zip -d "$BLUR_DIR" 2>/dev/null || true
-        rm -f /tmp/blur-my-shell.zip
+    tmp_ext=$(mktemp "${TMPDIR:-/tmp}/kodra-blur-my-shell.XXXXXX.zip")
+    curl -sL "https://extensions.gnome.org/extension-data/blur-my-shellaunetx.v66.shell-extension.zip" -o "$tmp_ext" 2>/dev/null || true
+    if [ -s "$tmp_ext" ]; then
+        unzip -qo "$tmp_ext" -d "$BLUR_DIR" 2>/dev/null || true
+        rm -f "$tmp_ext"
         echo "   ✓ Blur my Shell installed"
     fi
 fi
@@ -110,10 +115,11 @@ TOPHAT_DIR="$HOME/.local/share/gnome-shell/extensions/tophat@fflewddur.github.io
 if [ ! -d "$TOPHAT_DIR" ]; then
     echo "   Downloading TopHat (system monitor)..."
     mkdir -p "$TOPHAT_DIR"
-    curl -sL "https://extensions.gnome.org/extension-data/tophatfflewddur.github.io.v14.shell-extension.zip" -o /tmp/tophat.zip 2>/dev/null || true
-    if [ -f /tmp/tophat.zip ]; then
-        unzip -qo /tmp/tophat.zip -d "$TOPHAT_DIR" 2>/dev/null || true
-        rm -f /tmp/tophat.zip
+    tmp_ext=$(mktemp "${TMPDIR:-/tmp}/kodra-tophat.XXXXXX.zip")
+    curl -sL "https://extensions.gnome.org/extension-data/tophatfflewddur.github.io.v14.shell-extension.zip" -o "$tmp_ext" 2>/dev/null || true
+    if [ -s "$tmp_ext" ]; then
+        unzip -qo "$tmp_ext" -d "$TOPHAT_DIR" 2>/dev/null || true
+        rm -f "$tmp_ext"
         echo "   ✓ TopHat installed (CPU/RAM/Network in top bar)"
     fi
 fi
@@ -123,10 +129,11 @@ ALPHA_GRID_DIR="$HOME/.local/share/gnome-shell/extensions/AlphabeticalAppGrid@st
 if [ ! -d "$ALPHA_GRID_DIR" ]; then
     echo "   Downloading Alphabetical App Grid..."
     mkdir -p "$ALPHA_GRID_DIR"
-    curl -sL "https://extensions.gnome.org/extension-data/AlphabeticalAppGridstuarthayhurst.v37.shell-extension.zip" -o /tmp/alpha-grid.zip 2>/dev/null || true
-    if [ -f /tmp/alpha-grid.zip ]; then
-        unzip -qo /tmp/alpha-grid.zip -d "$ALPHA_GRID_DIR" 2>/dev/null || true
-        rm -f /tmp/alpha-grid.zip
+    tmp_ext=$(mktemp "${TMPDIR:-/tmp}/kodra-alpha-grid.XXXXXX.zip")
+    curl -sL "https://extensions.gnome.org/extension-data/AlphabeticalAppGridstuarthayhurst.v37.shell-extension.zip" -o "$tmp_ext" 2>/dev/null || true
+    if [ -s "$tmp_ext" ]; then
+        unzip -qo "$tmp_ext" -d "$ALPHA_GRID_DIR" 2>/dev/null || true
+        rm -f "$tmp_ext"
         echo "   ✓ Alphabetical App Grid installed"
     fi
 fi
@@ -136,10 +143,11 @@ SPACE_BAR_DIR="$HOME/.local/share/gnome-shell/extensions/space-bar@luchrioh"
 if [ ! -d "$SPACE_BAR_DIR" ]; then
     echo "   Downloading Space Bar (workspace indicator)..."
     mkdir -p "$SPACE_BAR_DIR"
-    curl -sL "https://extensions.gnome.org/extension-data/space-barluchrioh.v28.shell-extension.zip" -o /tmp/space-bar.zip 2>/dev/null || true
-    if [ -f /tmp/space-bar.zip ]; then
-        unzip -qo /tmp/space-bar.zip -d "$SPACE_BAR_DIR" 2>/dev/null || true
-        rm -f /tmp/space-bar.zip
+    tmp_ext=$(mktemp "${TMPDIR:-/tmp}/kodra-space-bar.XXXXXX.zip")
+    curl -sL "https://extensions.gnome.org/extension-data/space-barluchrioh.v28.shell-extension.zip" -o "$tmp_ext" 2>/dev/null || true
+    if [ -s "$tmp_ext" ]; then
+        unzip -qo "$tmp_ext" -d "$SPACE_BAR_DIR" 2>/dev/null || true
+        rm -f "$tmp_ext"
         echo "   ✓ Space Bar installed (workspace indicator in top bar)"
     fi
 fi

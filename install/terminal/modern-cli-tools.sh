@@ -38,16 +38,17 @@ if ! command -v fastfetch &> /dev/null; then
         # Fallback: download from GitHub releases
         echo "  Installing fastfetch from GitHub..."
         ARCH=$(uname -m)
-        case $ARCH in
+        case "$ARCH" in
             x86_64) FF_ARCH="amd64" ;;
             aarch64|arm64) FF_ARCH="aarch64" ;;
             *) FF_ARCH="" ;;
         esac
         if [ -n "$FF_ARCH" ]; then
             FF_VERSION=$(curl -s --max-time 10 https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | grep -Po '"tag_name": "\K[^"]*' || echo "2.8.10")
-            curl -sL --max-time 60 "https://github.com/fastfetch-cli/fastfetch/releases/download/${FF_VERSION}/fastfetch-linux-${FF_ARCH}.deb" -o /tmp/fastfetch.deb
-            sudo dpkg -i /tmp/fastfetch.deb 2>/dev/null || sudo apt-get install -f -y
-            rm -f /tmp/fastfetch.deb
+            TMP_FF=$(mktemp "${TMPDIR:-/tmp}/kodra-fastfetch.XXXXXX.deb")
+            curl -sL --max-time 60 "https://github.com/fastfetch-cli/fastfetch/releases/download/${FF_VERSION}/fastfetch-linux-${FF_ARCH}.deb" -o "$TMP_FF"
+            sudo dpkg -i "$TMP_FF" 2>/dev/null || sudo apt-get install -f -y
+            rm -f "$TMP_FF"
         fi
     }
 fi
@@ -99,7 +100,7 @@ else
             EZA_VERSION=$(curl -s --max-time 10 https://api.github.com/repos/eza-community/eza/releases/latest | grep -Po '"tag_name": "\K[^"]*' | tr -d 'v')
             if [ -n "$EZA_VERSION" ]; then
                 ARCH=$(uname -m)
-                case $ARCH in
+                case "$ARCH" in
                     x86_64) ARCH="x86_64" ;;
                     aarch64|arm64) ARCH="aarch64" ;;
                 esac
@@ -112,11 +113,11 @@ else
     if ! command -v zoxide &> /dev/null; then
         echo "Installing zoxide..."
         # Safe download: fetch script, then execute
-        local zoxide_installer="/tmp/kodra-zoxide-install.sh"
+        zoxide_installer=$(mktemp "${TMPDIR:-/tmp}/kodra-zoxide-install.XXXXXX")
+        trap 'rm -f "$zoxide_installer"' EXIT
         curl -sSf --max-time 30 https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh -o "$zoxide_installer"
         chmod +x "$zoxide_installer"
         bash "$zoxide_installer"
-        rm -f "$zoxide_installer"
     fi
     
     # Install lazygit
@@ -125,7 +126,7 @@ else
         LAZYGIT_VERSION=$(curl -s --max-time 10 https://api.github.com/repos/jesseduffield/lazygit/releases/latest | grep -Po '"tag_name": "\K[^"]*' | tr -d 'v')
         if [ -n "$LAZYGIT_VERSION" ]; then
             ARCH=$(uname -m)
-            case $ARCH in
+            case "$ARCH" in
                 x86_64) ARCH="x86_64" ;;
                 aarch64|arm64) ARCH="arm64" ;;
             esac

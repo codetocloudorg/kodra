@@ -31,7 +31,7 @@ fi
 
 # Remove any old versions
 for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
-    sudo apt-get remove -y $pkg 2>/dev/null || true
+    sudo apt-get remove -y "$pkg" 2>/dev/null || true
 done
 
 # Add Docker's official GPG key
@@ -52,7 +52,7 @@ sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # Add current user to docker group (avoids needing sudo)
-sudo usermod -aG docker $USER
+sudo usermod -aG docker "$USER"
 
 # Enable and start Docker service
 sudo systemctl enable docker
