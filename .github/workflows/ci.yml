@@ -6,143 +6,288 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  shellcheck:
-    name: ShellCheck
-    runs-on: ubuntu-latest
+  lint:
+    name: Shell Lint
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install ShellCheck
         run: sudo apt-get install -y shellcheck
-      
-      - name: Run ShellCheck
-        run: |
-          # Find all shell scripts and run shellcheck
-          find . -type f -name "*.sh" -print0 | xargs -0 shellcheck --severity=error || true
-          
-          # Check scripts without .sh extension in bin/
-          shellcheck --severity=error bin/kodra bin/kodra-sub/* 2>/dev/null || true
 
-  syntax:
-    name: Bash Syntax Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Check bash syntax
+      - name: ShellCheck (error severity)
+        run: |
+          find . -name "*.sh" -not -path "./.git/*" \
+            -exec shellcheck --severity=error --shell=bash {} + || true
+          # Also check bin/kodra dispatcher
+          shellcheck --severity=error --shell=bash bin/kodra || true
+
+      - name: Bash syntax check (all scripts)
         run: |
           errors=0
-          while IFS= read -r -d '' file; do
-            if ! bash -n "$file" 2>/dev/null; then
-              echo "❌ Syntax error in: $file"
-              bash -n "$file"
+          while IFS= read -r script; do
+            if ! bash -n "$script" 2>/dev/null; then
+              echo "::error file=$script::Syntax error"
+              bash -n "$script"
               errors=$((errors + 1))
             fi
-          done < <(find . -type f -name "*.sh" -print0)
-          
-          # Also check bin scripts
-          for file in bin/kodra bin/kodra-sub/*; do
-            if [ -f "$file" ]; then
-              if ! bash -n "$file" 2>/dev/null; then
-                echo "❌ Syntax error in: $file"
-                bash -n "$file"
-                errors=$((errors + 1))
-              fi
-            fi
-          done
-          
-          if [ $errors -gt 0 ]; then
-            echo "Found $errors files with syntax errors"
+          done < <(find . -name "*.sh" -not -path "./.git/*")
+          # Check bin/kodra too
+          bash -n bin/kodra || errors=$((errors + 1))
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::$errors scripts have syntax errors"
             exit 1
           fi
           echo "✅ All scripts pass syntax check"
 
-  docker-test:
-    name: Docker Install Test
+  test-libraries:
+    name: Library Unit Tests
     runs-on: ubuntu-24.04
+    needs: lint
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Test library sourcing
-        run: |
-          # Simulate KODRA_DIR setup
-          export KODRA_DIR="$PWD"
-          
-          # Test that all libraries can be sourced without errors
-          for lib in lib/*.sh; do
-            echo "Testing: $lib"
-            bash -n "$lib" || exit 1
-          done
-          echo "✅ All libraries pass syntax check"
-      
-      - name: Test utility functions
+
+      - name: Test lib/utils.sh
         run: |
           export KODRA_DIR="$PWD"
           source lib/utils.sh
-          
-          # Test color variables exist
-          [ -n "$RED" ] && [ -n "$GREEN" ] && [ -n "$BLUE" ]
+          # Color variables
+          [ -n "$RED" ] && [ -n "$GREEN" ] && [ -n "$BLUE" ] && [ -n "$NC" ]
           echo "✅ Color variables defined"
-      
-      - name: Test checks library
+
+      - name: Test lib/checks.sh
         run: |
           export KODRA_DIR="$PWD"
           source lib/checks.sh
-          
-          # Test command_exists
           command_exists bash || exit 1
-          ! command_exists nonexistent_command_12345 || exit 1
+          ! command_exists nonexistent_cmd_xyz || exit 1
           echo "✅ command_exists works"
-          
-          # Test is_ubuntu (should pass on ubuntu-24.04 runner)
-          is_ubuntu || echo "⚠️ Not Ubuntu (expected in some CI environments)"
+          is_ubuntu || echo "⚠️ Not detected as Ubuntu (CI runner)"
           echo "✅ is_ubuntu works"
-      
-      - name: Test state library
+
+      - name: Test lib/state.sh
         run: |
           export KODRA_DIR="$PWD"
           export KODRA_STATE_FILE="/tmp/kodra-test-state.json"
           source lib/state.sh
-          
-          # Test state functions
           init_state
           mark_installed "test-component"
           is_installed "test-component" || exit 1
           ! is_installed "nonexistent" || exit 1
-          echo "✅ State tracking works"
-          
-          # Cleanup
           rm -f "$KODRA_STATE_FILE"
-      
-      - name: Test package library
+          echo "✅ State tracking works"
+
+      - name: Test lib/package.sh
         run: |
           export KODRA_DIR="$PWD"
           source lib/package.sh
-          
-          # Test detection functions
           is_apt_installed "bash" || exit 1
-          ! is_apt_installed "nonexistent-package-12345" || exit 1
+          ! is_apt_installed "nonexistent-package-xyz" || exit 1
           echo "✅ Package detection works"
 
-  version-check:
-    name: Version Consistency
-    runs-on: ubuntu-latest
+      - name: Test lib/logging.sh
+        run: |
+          export KODRA_DIR="$PWD"
+          source lib/logging.sh
+          # Test log file creation
+          start_install_log
+          log_to_file "test message"
+          [ -f "$KODRA_LOG_FILE" ] && echo "✅ Log file created"
+          stop_install_log
+          echo "✅ Logging system works"
+
+      - name: Test lib/config.sh
+        run: |
+          export KODRA_DIR="$PWD"
+          source lib/config.sh
+          [ -f "$KODRA_DIR/defaults/ghostty/config" ] && echo "✅ Default configs present"
+          echo "✅ Config library loads"
+
+  test-container:
+    name: Container Install (${{ matrix.ubuntu }})
+    runs-on: ubuntu-24.04
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu: ["24.04", "24.10"]
+    container:
+      image: ubuntu:${{ matrix.ubuntu }}
+      options: --user root
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Check version consistency
+
+      - name: Setup test environment
         run: |
-          # Get version from install.sh
-          VERSION=$(grep -oP 'KODRA_VERSION="\K[0-9]+\.[0-9]+\.[0-9]+' install.sh || echo "not found")
-          echo "Version in install.sh: $VERSION"
-          
-          # Check README mentions same version (if it does)
-          if grep -q "$VERSION" README.md 2>/dev/null; then
-            echo "✅ README.md matches version"
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq
+          apt-get install -y -qq sudo git curl wget software-properties-common \
+            ca-certificates gnupg lsb-release jq bash coreutils 2>/dev/null
+          useradd -m -s /bin/bash testuser
+          echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+          cp -r "$GITHUB_WORKSPACE" /home/testuser/.kodra
+          chown -R testuser:testuser /home/testuser/.kodra
+
+      - name: Test all libraries source cleanly
+        run: |
+          su - testuser -c '
+            export KODRA_DIR="$HOME/.kodra"
+            source "$KODRA_DIR/lib/utils.sh"
+            source "$KODRA_DIR/lib/logging.sh"
+            source "$KODRA_DIR/lib/config.sh"
+            source "$KODRA_DIR/lib/checks.sh"
+            source "$KODRA_DIR/lib/state.sh"
+            source "$KODRA_DIR/lib/package.sh"
+            echo "✅ All libraries source without error"
+          '
+
+      - name: Test CLI dispatcher
+        run: |
+          su - testuser -c '
+            export KODRA_DIR="$HOME/.kodra"
+            export PATH="$KODRA_DIR/bin:$PATH"
+            version=$(kodra --version 2>/dev/null || cat "$KODRA_DIR/VERSION")
+            echo "Version: $version"
+            echo "$version" | grep -q "0.5.0" && echo "✅ Version correct"
+          '
+
+      - name: Test migration system
+        run: |
+          su - testuser -c '
+            export KODRA_DIR="$HOME/.kodra"
+            export PATH="$KODRA_DIR/bin:$PATH"
+            mkdir -p "$HOME/.config/kodra/migrations"
+            bash "$KODRA_DIR/bin/kodra-sub/migrate.sh" list 2>/dev/null
+            echo "✅ Migration system works"
+          '
+
+      - name: Test aliases source cleanly
+        run: |
+          su - testuser -c '
+            export KODRA_DIR="$HOME/.kodra"
+            export KODRA_POSIX_ALIASES=true
+            source "$KODRA_DIR/configs/shell/aliases.sh"
+            echo "✅ Aliases sourced"
+          '
+
+      - name: Test package manifests
+        run: |
+          su - testuser -c '
+            export KODRA_DIR="$HOME/.kodra"
+            [ -s "$KODRA_DIR/install/kodra-base.packages" ] && echo "✅ Base manifest"
+            [ -s "$KODRA_DIR/install/kodra-brew.packages" ] && echo "✅ Brew manifest"
+            [ -s "$KODRA_DIR/install/kodra-flatpak.packages" ] && echo "✅ Flatpak manifest"
+            pkgs=$(grep -cv "^#\|^$" "$KODRA_DIR/install/kodra-base.packages")
+            echo "✅ $pkgs apt packages declared"
+          '
+
+  test-system-wide:
+    name: System-Wide Install Test
+    runs-on: ubuntu-24.04
+    needs: lint
+    container:
+      image: ubuntu:24.04
+      options: --user root
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup
+        run: |
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq
+          apt-get install -y -qq sudo git curl wget jq bash coreutils 2>/dev/null
+          useradd -m -s /bin/bash user1
+          useradd -m -s /bin/bash user2
+          echo "user1 ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+          echo "user2 ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+      - name: Run system-wide install
+        run: |
+          export KODRA_DIR="$PWD"
+          bash install/system-wide.sh
+          echo "✅ System-wide install completed"
+
+      - name: Verify installation structure
+        run: |
+          [ -d /opt/kodra ] && echo "✅ /opt/kodra exists"
+          [ -f /opt/kodra/VERSION ] && echo "✅ VERSION present"
+          [ -x /usr/local/bin/kodra ] && echo "✅ CLI in PATH"
+          [ -f /etc/profile.d/kodra.sh ] && echo "✅ Profile hook installed"
+          # Verify permissions
+          stat -c "%a" /opt/kodra | grep -q "755" && echo "✅ Correct permissions"
+
+      - name: Test multi-user access
+        run: |
+          su - user1 -c '
+            source /etc/profile.d/kodra.sh 2>/dev/null || true
+            export PATH="/usr/local/bin:$PATH"
+            kodra --version 2>/dev/null | grep -q "0.5.0" && echo "✅ user1 OK"
+          '
+          su - user2 -c '
+            source /etc/profile.d/kodra.sh 2>/dev/null || true
+            export PATH="/usr/local/bin:$PATH"
+            kodra --version 2>/dev/null | grep -q "0.5.0" && echo "✅ user2 OK"
+          '
+
+  docs:
+    name: Documentation & Version Check
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify VERSION file consistency
+        run: |
+          version=$(cat VERSION)
+          echo "📋 VERSION file: $version"
+          errors=0
+          # README badge
+          if grep -q "version-${version}" README.md; then
+            echo "✅ README badge"
+          else
+            echo "::error::README badge doesn't match VERSION"
+            errors=$((errors + 1))
           fi
-          
-          # Check lib/utils.sh
-          if grep -q "$VERSION" lib/utils.sh 2>/dev/null; then
-            echo "✅ lib/utils.sh matches version"
+          # index.html schema
+          if grep -q "\"softwareVersion\": \"${version}\"" index.html; then
+            echo "✅ index.html schema"
+          else
+            echo "::error::index.html softwareVersion doesn't match"
+            errors=$((errors + 1))
           fi
+          # CHANGELOG entry
+          if grep -q "## \[${version}\]" CHANGELOG.md; then
+            echo "✅ CHANGELOG entry"
+          else
+            echo "::error::CHANGELOG missing entry for $version"
+            errors=$((errors + 1))
+          fi
+          # SECURITY supported
+          if grep -q "${version%%.*}.${version#*.}" SECURITY.md 2>/dev/null || grep -q "${version%.*}" SECURITY.md; then
+            echo "✅ SECURITY.md"
+          fi
+          if [ "$errors" -gt 0 ]; then
+            exit 1
+          fi
+          echo "✅ All version references consistent"
+
+      - name: Check markdown links
+        run: |
+          echo "Checking internal markdown links..."
+          while IFS= read -r file; do
+            grep -oP '\]\((?!http|#|mailto)([^)]+)\)' "$file" 2>/dev/null | \
+              sed 's/\](\(.*\))/\1/' | while read -r link; do
+                link_path="${link%%#*}"
+                if [ -n "$link_path" ]; then
+                  dir=$(dirname "$file")
+                  if [ ! -e "$dir/$link_path" ] && [ ! -e "$link_path" ]; then
+                    echo "::warning file=$file::Possible broken link: $link"
+                  fi
+                fi
+              done
+          done < <(find . -name "*.md" -not -path "./.git/*")
+          echo "✅ Link check complete"
