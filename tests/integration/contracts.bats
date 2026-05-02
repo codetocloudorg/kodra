@@ -115,3 +115,15 @@ load '../helpers/setup'
 
     [ "$found_unguarded" -eq 0 ] || fail "Found snap install without timeout/skip guard"
 }
+
+@test "contract: CI workflows do not hardcode version numbers" {
+    # Version checks in CI should use patterns (grep -qE '[0-9]+\.[0-9]+')
+    # not hardcoded strings (grep -q '0.5.0') which break on bumps
+    local workflows_dir="$KODRA_DIR/.github/workflows"
+    [ -d "$workflows_dir" ] || skip "No workflows directory"
+
+    # Look for grep commands checking a specific semver like "0.5.0" or "0.5.1"
+    if grep -rn 'grep.*"[0-9]\+\.[0-9]\+\.[0-9]\+"' "$workflows_dir" 2>/dev/null | grep -v "grep -qE"; then
+        fail "Found hardcoded version in workflow grep (use pattern match instead)"
+    fi
+}

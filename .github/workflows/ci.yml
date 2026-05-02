@@ -303,7 +303,7 @@ jobs:
             export PATH="$KODRA_DIR/bin:$PATH"
             version=$(kodra --version 2>/dev/null || cat "$KODRA_DIR/VERSION")
             echo "Version: $version"
-            echo "$version" | grep -q "0.5.0" && echo "✅ CLI version correct"
+            echo "$version" | grep -qE "[0-9]+\.[0-9]+\.[0-9]+" && echo "✅ CLI version correct"
           '
 
       # ── Stage 3/4: Migration system + aliases ──
@@ -447,7 +447,7 @@ jobs:
             su - "$user" -c '
               source /etc/profile.d/kodra.sh 2>/dev/null || true
               export PATH="/usr/local/bin:$PATH"
-              kodra --version 2>/dev/null | grep -q "0.5.0"
+              kodra --version 2>/dev/null | grep -qE "^Kodra v[0-9]"
             ' && echo "✅ $user OK"
           done
 
@@ -566,7 +566,7 @@ jobs:
           echo ""
           mkdir -p test-results
 
-          docker run --rm kodra:latest kodra --version | grep -q "0.5.0" && echo "✅ Version correct"
+          docker run --rm kodra:latest kodra --version | grep -qE "Kodra v[0-9]" && echo "✅ Version correct"
 
           cid=$(docker run -d kodra:latest sleep 30)
           docker exec "$cid" bash -c 'source /opt/kodra/lib/utils.sh && echo "✅ utils.sh"'
