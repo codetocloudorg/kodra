@@ -237,6 +237,28 @@ setup_copilot_cli() {
     fi
 }
 
+# Configure dock favorites now that GNOME session is active.
+# This is the reliable fallback for when gsettings fails during install
+# (no active GNOME session at install time).
+setup_dock() {
+    if ! command -v gnome-shell &> /dev/null; then
+        return 0
+    fi
+
+    echo ""
+    echo -e "${C_PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${C_RESET}"
+    echo -e "${C_WHITE}  Dock Favorites${C_RESET}"
+    echo -e "${C_PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${C_RESET}"
+    echo ""
+
+    # Run kodra dock if available (it handles finding apps and setting gsettings)
+    if [ -x "$KODRA_DIR/bin/kodra-sub/dock.sh" ]; then
+        bash "$KODRA_DIR/bin/kodra-sub/dock.sh" 2>/dev/null && return 0
+    fi
+
+    echo -e "${C_YELLOW}⚠${C_RESET} Could not configure dock. Run ${C_CYAN}kodra dock${C_RESET} manually."
+}
+
 # Display quick-start tips for Kodra commands and cloud-native workflows
 show_tips() {
     echo ""
@@ -272,6 +294,7 @@ run_first_run() {
     setup_github
     setup_copilot_cli
     setup_azure
+    setup_dock
     show_tips
     
     complete_first_run
