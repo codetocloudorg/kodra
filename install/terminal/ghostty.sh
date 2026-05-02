@@ -3,10 +3,15 @@
 # Ghostty Terminal Installer
 # https://ghostty.org/
 #
-# Installation methods:
+# Installation methods (in priority order):
 #   - Ubuntu 26.04+: Official apt repository (ghostty package)
 #   - Ubuntu 24.04:  Community PPA (ppa:mkasberg/ghostty-ubuntu)
+#   - Ubuntu 24.04:  Fallback — pre-built .deb from GitHub releases
 #   - macOS:         Homebrew cask
+#
+# Note: Ghostty is migrating off GitHub (2026). The GitHub .deb download
+# is kept as a fallback until the new hosting platform is announced.
+# Track: https://ghostty.org/ for updates on the migration.
 #
 
 set -e
@@ -29,7 +34,7 @@ if ! command -v ghostty &>/dev/null; then
         . /etc/os-release
         VERSION_NUM=$(echo "$VERSION_ID" | cut -d. -f1)
         
-        if [ "${ID}" != "ubuntu" ] && [ "${ID_LIKE}" != *"ubuntu"* ] && [ "${ID_LIKE}" != *"debian"* ]; then
+        if [ "${ID}" != "ubuntu" ] && [[ "${ID_LIKE}" != *"ubuntu"* ]] && [[ "${ID_LIKE}" != *"debian"* ]]; then
             echo "❌ Unsupported distribution: $ID"
             echo "   Install Ghostty manually from https://ghostty.org/download"
             exit 1
@@ -41,15 +46,56 @@ if ! command -v ghostty &>/dev/null; then
             sudo apt-get update -qq
             sudo apt-get install -y ghostty
         else
-            # Ubuntu 24.04/25.x — Use community PPA
-            echo "Installing from community PPA (Ubuntu $VERSION_ID)..."
+            # Ubuntu 24.04/25.x — Try PPA first, fall back to GitHub .deb
+            echo "Installing Ghostty on Ubuntu $VERSION_ID..."
             
-            if ! grep -q "mkasberg/ghostty" /etc/apt/sources.list.d/*.list 2>/dev/null; then
-                sudo add-apt-repository -y ppa:mkasberg/ghostty-ubuntu
-                sudo apt-get update -qq
+            # Method 1: Community PPA (preferred — auto-updates)
+            if command -v add-apt-repository &>/dev/null; then
+                echo "Trying community PPA..."
+                if ! grep -q "mkasberg/ghostty" /etc/apt/sources.list.d/*.list 2>/dev/null; then
+                    sudo add-apt-repository -y ppa:mkasberg/ghostty-ubuntu 2>/dev/null || true
+                    sudo apt-get update -qq 2>/dev/null || true
+                fi
+                
+                if sudo apt-get install -y ghostty 2>/dev/null; then
+                    echo "✅ Installed via PPA"
+                else
+                    echo "⚠️  PPA install failed, trying GitHub .deb..."
+                    install_from_github_deb=true
+                fi
+            else
+                install_from_github_deb=true
             fi
             
-            sudo apt-get install -y ghostty
+            # Method 2: Pre-built .deb from GitHub releases
+            # Source: https://github.com/mkasberg/ghostty-ubuntu/releases
+            if [ "${install_from_github_deb:-false}" = "true" ]; then
+                echo "Downloading pre-built .deb from GitHub..."
+                ARCH=$(dpkg --print-architecture)
+                RELEASE_INFO=$(curl -fsSL https://api.github.com/repos/mkasberg/ghostty-ubuntu/releases/latest 2>/dev/null)
+                
+                if [ -n "$RELEASE_INFO" ]; then
+                    # Find .deb matching architecture and Ubuntu version
+                    DEB_URL=$(echo "$RELEASE_INFO" | grep -o "https://[^\"]*${ARCH}[^\"]*\.deb" | head -1)
+                    
+                    if [ -n "$DEB_URL" ]; then
+                        DEB_FILE="/tmp/ghostty-ubuntu.deb"
+                        echo "Downloading: $DEB_URL"
+                        curl -fsSL -o "$DEB_FILE" "$DEB_URL"
+                        sudo dpkg -i "$DEB_FILE" || sudo apt-get install -f -y
+                        rm -f "$DEB_FILE"
+                        echo "✅ Installed from GitHub .deb"
+                    else
+                        echo "❌ No .deb found for $ARCH"
+                        echo "   Install manually from https://ghostty.org/download"
+                        exit 1
+                    fi
+                else
+                    echo "❌ Cannot reach GitHub API"
+                    echo "   Install manually from https://ghostty.org/download"
+                    exit 1
+                fi
+            fi
         fi
     else
         echo "❌ Cannot detect OS. Install Ghostty manually from https://ghostty.org/download"
