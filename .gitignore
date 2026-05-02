@@ -33,3 +33,8 @@ coverage/tests/results/
 .azure-vm-ip
 .azure-test-config
 *.pem
+# Test dependencies (installed at runtime)
+tests/lib/bats-support/
+tests/lib/bats-assert/
+test-results/
+node_modules/

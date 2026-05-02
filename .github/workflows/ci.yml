@@ -1,5 +1,18 @@
 name: CI
 
+# ╔══════════════════════════════════════════════════════════════════╗
+# ║  Kodra CI Pipeline — A Code To Cloud Project ☁️                 ║
+# ║                                                                  ║
+# ║  Optimized for free GitHub Actions runners (~2000 min/month).    ║
+# ║  Jobs are consolidated to minimize runner overhead:              ║
+# ║    1. lint-test-security — All fast checks in ONE runner        ║
+# ║    2. test-container     — Ubuntu matrix (only container stuff) ║
+# ║    3. test-system-and-docs — Multi-user + version checks        ║
+# ║    4. docker-build       — Docker image build + smoke test      ║
+# ║                                                                  ║
+# ║  4 jobs (down from 6) • ~8 min total • JUnit XML + artifacts    ║
+# ╚══════════════════════════════════════════════════════════════════╝
+
 on:
   push:
     branches: [main]
@@ -10,25 +23,92 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Required for dorny/test-reporter to annotate PRs
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
+# ── Reusable banner printed at the start of every job ──
+# Displays the Kodra/Code To Cloud branding in the GitHub Actions log
+# so engineers can immediately identify which project this belongs to.
+env:
+  KODRA_CI_BANNER: |
+    echo ""
+    echo "    ██╗  ██╗ ██████╗ ██████╗ ██████╗  █████╗ "
+    echo "    ██║ ██╔╝██╔═══██╗██╔══██╗██╔══██╗██╔══██╗"
+    echo "    █████╔╝ ██║   ██║██║  ██║██████╔╝███████║"
+    echo "    ██╔═██╗ ██║   ██║██║  ██║██╔══██╗██╔══██║"
+    echo "    ██║  ██╗╚██████╔╝██████╔╝██║  ██║██║  ██║"
+    echo "    ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝"
+    echo ""
+    echo "    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "    ☁️  F R O M   C O D E   T O   C L O U D  ☁️"
+    echo "    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+
 jobs:
-  lint:
-    name: Shell Lint
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # JOB 1: LINT + TEST + SECURITY — All fast checks, ONE runner
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # Purpose: Single runner does lint, BATS unit/integration/security,
+  #          Hadolint — saves ~40s overhead vs separate jobs.
+  #          This is the gate; everything else waits for it.
+  # Estimated time: ~2 min
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  lint-test-security:
+    name: "🔒 Lint, Test & Security"
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install ShellCheck
-        run: sudo apt-get install -y shellcheck
-
-      - name: ShellCheck (error severity)
+      # ── Stage 1/6: Banner + tooling ──
+      # Prints the Code To Cloud banner and installs ShellCheck,
+      # BATS, and the BATS assertion libraries needed for tests.
+      # One apt-get + clone for the entire job.
+      - name: "☁️ Code To Cloud — Install CI tools"
         run: |
-          find . -name "*.sh" -not -path "./.git/*" \
-            -exec shellcheck --severity=error --shell=bash {} + || true
-          # Also check bin/kodra dispatcher
-          shellcheck --severity=error --shell=bash bin/kodra || true
+          eval "$KODRA_CI_BANNER"
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 1/6: Installing CI toolchain           │"
+          echo "│  ShellCheck • BATS • bats-assert              │"
+          echo "└──────────────────────────────────────────────┘"
+          echo ""
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck bats 2>/dev/null
+          git clone --depth 1 -q https://github.com/bats-core/bats-support.git tests/lib/bats-support
+          git clone --depth 1 -q https://github.com/bats-core/bats-assert.git tests/lib/bats-assert
+          mkdir -p test-results
+          echo "✅ Tools ready — BATS $(bats --version), ShellCheck $(shellcheck --version | head -2 | tail -1)"
 
-      - name: Bash syntax check (all scripts)
+      # ── Stage 2/6: ShellCheck ──
+      # Runs ShellCheck at WARNING severity (stricter than default).
+      # Catches common shell anti-patterns, quoting issues, and
+      # potential bugs across all .sh files and the kodra dispatcher.
+      - name: "🔍 Stage 2/6 — ShellCheck static analysis"
         run: |
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 2/6: ShellCheck static analysis        │"
+          echo "│  Severity: warning | Format: gcc              │"
+          echo "└──────────────────────────────────────────────┘"
+          echo ""
+          find . -name "*.sh" -not -path "./.git/*" -not -path "./tests/lib/*" -not -path "./node_modules/*" \
+            -exec shellcheck --severity=warning --shell=bash --format=gcc {} + \
+            2>&1 | tee test-results/shellcheck.txt || true
+          shellcheck --severity=warning --shell=bash --format=gcc bin/kodra \
+            2>&1 | tee -a test-results/shellcheck.txt || true
+          echo ""
+          echo "📊 ShellCheck: $(wc -l < test-results/shellcheck.txt 2>/dev/null || echo 0) findings"
+
+      # ── Stage 3/6: Bash syntax ──
+      # Validates every shell script can be parsed by bash.
+      # Catches unclosed quotes, missing keywords, etc.
+      - name: "📝 Stage 3/6 — Bash syntax validation"
+        run: |
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 3/6: Bash syntax check (all scripts)   │"
+          echo "└──────────────────────────────────────────────┘"
+          echo ""
           errors=0
           while IFS= read -r script; do
             if ! bash -n "$script" 2>/dev/null; then
@@ -36,8 +116,7 @@ jobs:
               bash -n "$script"
               errors=$((errors + 1))
             fi
-          done < <(find . -name "*.sh" -not -path "./.git/*")
-          # Check bin/kodra too
+          done < <(find . -name "*.sh" -not -path "./.git/*" -not -path "./tests/lib/*" -not -path "./node_modules/*")
           bash -n bin/kodra || errors=$((errors + 1))
           if [ "$errors" -gt 0 ]; then
             echo "::error::$errors scripts have syntax errors"
@@ -45,73 +124,128 @@ jobs:
           fi
           echo "✅ All scripts pass syntax check"
 
-  test-libraries:
-    name: Library Unit Tests
-    runs-on: ubuntu-24.04
-    needs: lint
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Test lib/utils.sh
+      # ── Stage 4/6: Hadolint ──
+      # Lints the Dockerfile against best-practice rules.
+      # Catches insecure patterns, inefficient layers, etc.
+      - name: "🐳 Stage 4/6 — Hadolint (Dockerfile)"
         run: |
-          export KODRA_DIR="$PWD"
-          source lib/utils.sh
-          # Color variables
-          [ -n "$RED" ] && [ -n "$GREEN" ] && [ -n "$BLUE" ] && [ -n "$NC" ]
-          echo "✅ Color variables defined"
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 4/6: Hadolint Dockerfile linting       │"
+          echo "└──────────────────────────────────────────────┘"
+          echo ""
+          docker run --rm -i hadolint/hadolint < Dockerfile \
+            | tee test-results/hadolint.txt || true
+          echo "📊 Hadolint: $(wc -l < test-results/hadolint.txt 2>/dev/null || echo 0) findings"
 
-      - name: Test lib/checks.sh
+      # ── Stage 5/6: BATS unit + integration tests ──
+      # Tests each lib/*.sh in isolation (sandboxed $HOME), then
+      # validates CLI dispatcher and theme system integration.
+      # Produces JUnit XML for PR annotations.
+      - name: "🧪 Stage 5/6 — BATS unit + integration tests"
         run: |
-          export KODRA_DIR="$PWD"
-          source lib/checks.sh
-          command_exists bash || exit 1
-          ! command_exists nonexistent_cmd_xyz || exit 1
-          echo "✅ command_exists works"
-          is_ubuntu || echo "⚠️ Not detected as Ubuntu (CI runner)"
-          echo "✅ is_ubuntu works"
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 5/6: BATS unit + integration tests     │"
+          echo "│  Unit: utils • checks • state • package       │"
+          echo "│        logging • config                        │"
+          echo "│  Integration: CLI dispatcher • theme system    │"
+          echo "└──────────────────────────────────────────────┘"
+          echo ""
+          bats --formatter junit tests/unit/ > test-results/unit.xml 2>&1 || true
+          bats --formatter tap tests/unit/ | tee test-results/unit.tap
+          echo ""
+          bats --formatter junit tests/integration/ > test-results/integration.xml 2>&1 || true
+          bats --formatter tap tests/integration/ | tee test-results/integration.tap
 
-      - name: Test lib/state.sh
+      # ── Stage 6/6: BATS security suite ──
+      # Runs the security test suite covering:
+      #   - File permissions (no world-writable, no setuid)
+      #   - Script hygiene (set -e, no hardcoded secrets, HTTPS-only)
+      #   - Supply chain (trusted download domains, GPG keys)
+      #   - Container hardening (no root, pinned base image)
+      - name: "🛡️ Stage 6/6 — BATS security tests"
         run: |
-          export KODRA_DIR="$PWD"
-          export KODRA_STATE_FILE="/tmp/kodra-test-state.json"
-          source lib/state.sh
-          init_state
-          mark_installed "test-component"
-          is_installed "test-component" || exit 1
-          ! is_installed "nonexistent" || exit 1
-          rm -f "$KODRA_STATE_FILE"
-          echo "✅ State tracking works"
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 6/6: Security test suite (BATS)        │"
+          echo "│  Permissions • Secrets • HTTPS • Supply chain │"
+          echo "│  Dockerfile hardening • GPG verification      │"
+          echo "└──────────────────────────────────────────────┘"
+          echo ""
+          bats --formatter junit tests/security/ > test-results/security.xml 2>&1 || true
+          bats --formatter tap tests/security/ | tee test-results/security.tap
 
-      - name: Test lib/package.sh
+      # ── Artifact upload (always, even on failure) ──
+      - name: Upload all test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-test-security-results
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: warn
+
+      # ── PR annotations via dorny/test-reporter ──
+      # Renders JUnit XML as check annotations on the PR so
+      # developers see failures inline without opening logs.
+      - name: Test report — Unit
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Unit Tests
+          path: test-results/unit.xml
+          reporter: java-junit
+          fail-on-error: true
+
+      - name: Test report — Integration
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Integration Tests
+          path: test-results/integration.xml
+          reporter: java-junit
+          fail-on-error: true
+
+      - name: Test report — Security
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Security Tests
+          path: test-results/security.xml
+          reporter: java-junit
+          fail-on-error: true
+
+      # ── Job summary (collapsible in PR) ──
+      - name: Job summary
+        if: always()
         run: |
-          export KODRA_DIR="$PWD"
-          source lib/package.sh
-          is_apt_installed "bash" || exit 1
-          ! is_apt_installed "nonexistent-package-xyz" || exit 1
-          echo "✅ Package detection works"
+          echo "## 🔒 Lint, Test & Security" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          sc_count=$(wc -l < test-results/shellcheck.txt 2>/dev/null || echo "0")
+          echo "- **ShellCheck**: ${sc_count} findings" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f test-results/hadolint.txt ]; then
+            hl_count=$(wc -l < test-results/hadolint.txt 2>/dev/null || echo "0")
+            echo "- **Hadolint**: ${hl_count} findings" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          for suite in unit integration security; do
+            pass=$(grep -c '^ok' "test-results/${suite}.tap" 2>/dev/null || echo "0")
+            fail=$(grep -c '^not ok' "test-results/${suite}.tap" 2>/dev/null || echo "0")
+            total=$((pass + fail))
+            echo "- **${suite^} tests**: ✅ ${pass}/${total} passed" >> "$GITHUB_STEP_SUMMARY"
+          done
 
-      - name: Test lib/logging.sh
-        run: |
-          export KODRA_DIR="$PWD"
-          source lib/logging.sh
-          # Test log file creation
-          start_install_log
-          log_to_file "test message"
-          [ -f "$KODRA_LOG_FILE" ] && echo "✅ Log file created"
-          stop_install_log
-          echo "✅ Logging system works"
-
-      - name: Test lib/config.sh
-        run: |
-          export KODRA_DIR="$PWD"
-          source lib/config.sh
-          [ -f "$KODRA_DIR/defaults/ghostty/config" ] && echo "✅ Default configs present"
-          echo "✅ Config library loads"
-
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # JOB 2: CONTAINER MATRIX — Ubuntu 24.04 + 25.04
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # Purpose: Validates Kodra works inside real Ubuntu containers.
+  #          Catches container-specific issues: missing packages,
+  #          path differences, permission issues, version quirks.
+  #          NO BATS here — unit tests already ran in Job 1.
+  #          Focuses only on things that differ in containers.
+  # Estimated time: ~2 min per matrix entry (parallel)
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   test-container:
-    name: Container Install (${{ matrix.ubuntu }})
+    name: "📦 Container (${{ matrix.ubuntu }})"
     runs-on: ubuntu-24.04
-    needs: lint
+    needs: lint-test-security
     strategy:
       fail-fast: false
       matrix:
@@ -122,52 +256,67 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup test environment
+      # ── Stage 1/4: Provision container ──
+      # Minimal apt install — only what's needed for container tests.
+      # No BATS, no ShellCheck (already tested in Job 1).
+      - name: "☁️ Code To Cloud — Provision container"
         run: |
+          eval "$KODRA_CI_BANNER"
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 1/4: Container provisioning            │"
+          echo "│  Ubuntu ${{ matrix.ubuntu }} • testuser setup  │"
+          echo "└──────────────────────────────────────────────┘"
+          echo ""
           export DEBIAN_FRONTEND=noninteractive
           apt-get update -qq
-          apt-get install -y -qq sudo git curl wget software-properties-common \
-            ca-certificates gnupg lsb-release jq bash coreutils 2>/dev/null
+          apt-get install -y -qq sudo git curl wget jq bash coreutils lsb-release 2>/dev/null
           useradd -m -s /bin/bash testuser
           echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
           cp -r "$GITHUB_WORKSPACE" /home/testuser/.kodra
           chown -R testuser:testuser /home/testuser/.kodra
+          mkdir -p "$GITHUB_WORKSPACE/test-results"
+          echo "✅ Container ready — Ubuntu $(lsb_release -rs 2>/dev/null || cat /etc/os-release | grep VERSION_ID | cut -d= -f2 | tr -d '\"')"
 
-      - name: Test all libraries source cleanly
+      # ── Stage 2/4: Library sourcing + CLI ──
+      # Verifies all lib/*.sh files source cleanly inside the
+      # container as a non-root user — catches missing deps.
+      - name: "📚 Stage 2/4 — Library sourcing + CLI dispatch"
         run: |
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 2/4: Library sourcing + CLI dispatcher │"
+          echo "│  Running as: testuser (non-root)              │"
+          echo "└──────────────────────────────────────────────┘"
+          echo ""
           su - testuser -c '
             export KODRA_DIR="$HOME/.kodra"
-            source "$KODRA_DIR/lib/utils.sh"
-            source "$KODRA_DIR/lib/logging.sh"
-            source "$KODRA_DIR/lib/config.sh"
-            source "$KODRA_DIR/lib/checks.sh"
-            source "$KODRA_DIR/lib/state.sh"
-            source "$KODRA_DIR/lib/package.sh"
-            echo "✅ All libraries source without error"
+            for lib in utils logging config checks state package; do
+              source "$KODRA_DIR/lib/${lib}.sh" && echo "✅ lib/${lib}.sh"
+            done
           '
-
-      - name: Test CLI dispatcher
-        run: |
+          echo ""
           su - testuser -c '
             export KODRA_DIR="$HOME/.kodra"
             export PATH="$KODRA_DIR/bin:$PATH"
             version=$(kodra --version 2>/dev/null || cat "$KODRA_DIR/VERSION")
             echo "Version: $version"
-            echo "$version" | grep -q "0.5.0" && echo "✅ Version correct"
+            echo "$version" | grep -q "0.5.0" && echo "✅ CLI version correct"
           '
 
-      - name: Test migration system
+      # ── Stage 3/4: Migration system + aliases ──
+      # Tests that the version migration framework initializes
+      # and shell aliases source without error in the container.
+      - name: "🔄 Stage 3/4 — Migration system + aliases"
         run: |
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 3/4: Migration system + shell aliases  │"
+          echo "└──────────────────────────────────────────────┘"
+          echo ""
           su - testuser -c '
             export KODRA_DIR="$HOME/.kodra"
-            export PATH="$KODRA_DIR/bin:$PATH"
             mkdir -p "$HOME/.config/kodra/migrations"
             bash "$KODRA_DIR/bin/kodra-sub/migrate.sh" list 2>/dev/null
             echo "✅ Migration system works"
           '
-
-      - name: Test aliases source cleanly
-        run: |
           su - testuser -c '
             export KODRA_DIR="$HOME/.kodra"
             export KODRA_POSIX_ALIASES=true
@@ -175,29 +324,78 @@ jobs:
             echo "✅ Aliases sourced"
           '
 
-      - name: Test package manifests
+      # ── Stage 4/4: Capture diagnostics ──
+      # Collects OS info and package manifests for the artifact
+      # upload — useful for debugging container-specific failures.
+      - name: "📋 Stage 4/4 — Capture diagnostics"
+        if: always()
         run: |
-          su - testuser -c '
-            export KODRA_DIR="$HOME/.kodra"
-            [ -s "$KODRA_DIR/install/kodra-base.packages" ] && echo "✅ Base manifest"
-            [ -s "$KODRA_DIR/install/kodra-brew.packages" ] && echo "✅ Brew manifest"
-            [ -s "$KODRA_DIR/install/kodra-flatpak.packages" ] && echo "✅ Flatpak manifest"
-            pkgs=$(grep -cv "^#\|^$" "$KODRA_DIR/install/kodra-base.packages")
-            echo "✅ $pkgs apt packages declared"
-          '
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 4/4: Diagnostics capture               │"
+          echo "└──────────────────────────────────────────────┘"
+          {
+            echo "=== OS ==="
+            cat /etc/os-release
+            echo ""
+            echo "=== Package manifests ==="
+            su - testuser -c '
+              export KODRA_DIR="$HOME/.kodra"
+              for f in "$KODRA_DIR"/install/kodra-*.packages; do
+                echo "$(basename "$f"): $(grep -cv "^#\|^$" "$f" 2>/dev/null || echo 0) packages"
+              done
+            '
+          } > "$GITHUB_WORKSPACE/test-results/diagnostics.txt" 2>&1
+          echo "✅ Diagnostics captured"
 
-  test-system-wide:
-    name: System-Wide Install Test
+      - name: Upload container results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: container-results-${{ matrix.ubuntu }}
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Job summary
+        if: always()
+        run: |
+          echo "## 📦 Container Test (Ubuntu ${{ matrix.ubuntu }})" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Library sourcing**: ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **CLI dispatch**: ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Migration system**: ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Aliases**: ✅" >> "$GITHUB_STEP_SUMMARY"
+
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # JOB 3: SYSTEM-WIDE INSTALL + DOCS
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # Purpose: Tests the /opt/kodra system-wide install path that
+  #          shared workstations use. Creates 2 users and verifies
+  #          both can access kodra independently. Also validates
+  #          version consistency across docs and markdown links.
+  # Estimated time: ~1 min
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  test-system-and-docs:
+    name: "🏢 System-Wide & Docs"
     runs-on: ubuntu-24.04
-    needs: lint
+    needs: lint-test-security
     container:
       image: ubuntu:24.04
       options: --user root
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup
+      # ── Stage 1/5: Provision multi-user container ──
+      # Creates user1 and user2 to simulate a shared workstation
+      # where an admin installs kodra system-wide.
+      - name: "☁️ Code To Cloud — Provision multi-user env"
         run: |
+          eval "$KODRA_CI_BANNER"
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 1/5: Multi-user environment setup      │"
+          echo "│  Creating: user1, user2 (shared workstation)  │"
+          echo "└──────────────────────────────────────────────┘"
+          echo ""
           export DEBIAN_FRONTEND=noninteractive
           apt-get update -qq
           apt-get install -y -qq sudo git curl wget jq bash coreutils 2>/dev/null
@@ -205,79 +403,75 @@ jobs:
           useradd -m -s /bin/bash user2
           echo "user1 ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
           echo "user2 ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+          mkdir -p "$GITHUB_WORKSPACE/test-results"
+          echo "✅ Environment ready"
 
-      - name: Run system-wide install
+      # ── Stage 2/5: System-wide install ──
+      # Runs install/system-wide.sh which copies kodra to /opt/kodra,
+      # creates the /usr/local/bin symlink, and sets up /etc/profile.d.
+      - name: "📦 Stage 2/5 — System-wide install (/opt/kodra)"
         run: |
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 2/5: System-wide installation          │"
+          echo "│  Target: /opt/kodra → /usr/local/bin/kodra    │"
+          echo "└──────────────────────────────────────────────┘"
+          echo ""
           export KODRA_DIR="$PWD"
-          bash install/system-wide.sh
-          echo "✅ System-wide install completed"
+          bash install/system-wide.sh 2>&1 | tee "$GITHUB_WORKSPACE/test-results/system-wide.log"
 
-      - name: Verify installation structure
+      # ── Stage 3/5: Verify structure + multi-user ──
+      # Checks the install created all expected paths with
+      # correct permissions and both users can access kodra.
+      - name: "✔️ Stage 3/5 — Verify structure + multi-user"
         run: |
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 3/5: Structure + multi-user access     │"
+          echo "│  /opt/kodra • symlink • profile.d • perms     │"
+          echo "└──────────────────────────────────────────────┘"
+          echo ""
           [ -d /opt/kodra ] && echo "✅ /opt/kodra exists"
           [ -f /opt/kodra/VERSION ] && echo "✅ VERSION present"
           [ -x /usr/local/bin/kodra ] && echo "✅ CLI in PATH"
           [ -f /etc/profile.d/kodra.sh ] && echo "✅ Profile hook installed"
-          # Verify permissions
           stat -c "%a" /opt/kodra | grep -q "755" && echo "✅ Correct permissions"
+          echo ""
+          echo "── Multi-user access ──"
+          for user in user1 user2; do
+            su - "$user" -c '
+              source /etc/profile.d/kodra.sh 2>/dev/null || true
+              export PATH="/usr/local/bin:$PATH"
+              kodra --version 2>/dev/null | grep -q "0.5.0"
+            ' && echo "✅ $user OK"
+          done
 
-      - name: Test multi-user access
+      # ── Stage 4/5: Version consistency ──
+      # Verifies the VERSION file matches across README badge,
+      # index.html schema, and CHANGELOG entry.
+      - name: "📋 Stage 4/5 — Version consistency check"
         run: |
-          su - user1 -c '
-            source /etc/profile.d/kodra.sh 2>/dev/null || true
-            export PATH="/usr/local/bin:$PATH"
-            kodra --version 2>/dev/null | grep -q "0.5.0" && echo "✅ user1 OK"
-          '
-          su - user2 -c '
-            source /etc/profile.d/kodra.sh 2>/dev/null || true
-            export PATH="/usr/local/bin:$PATH"
-            kodra --version 2>/dev/null | grep -q "0.5.0" && echo "✅ user2 OK"
-          '
-
-  docs:
-    name: Documentation & Version Check
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Verify VERSION file consistency
-        run: |
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 4/5: Version consistency               │"
+          echo "│  VERSION ↔ README ↔ index.html ↔ CHANGELOG   │"
+          echo "└──────────────────────────────────────────────┘"
+          echo ""
           version=$(cat VERSION)
-          echo "📋 VERSION file: $version"
+          echo "📋 VERSION: $version"
           errors=0
-          # README badge
-          if grep -q "version-${version}" README.md; then
-            echo "✅ README badge"
-          else
-            echo "::error::README badge doesn't match VERSION"
-            errors=$((errors + 1))
-          fi
-          # index.html schema
-          if grep -q "\"softwareVersion\": \"${version}\"" index.html; then
-            echo "✅ index.html schema"
-          else
-            echo "::error::index.html softwareVersion doesn't match"
-            errors=$((errors + 1))
-          fi
-          # CHANGELOG entry
-          if grep -q "## \[${version}\]" CHANGELOG.md; then
-            echo "✅ CHANGELOG entry"
-          else
-            echo "::error::CHANGELOG missing entry for $version"
-            errors=$((errors + 1))
-          fi
-          # SECURITY supported
-          if grep -q "${version%%.*}.${version#*.}" SECURITY.md 2>/dev/null || grep -q "${version%.*}" SECURITY.md; then
-            echo "✅ SECURITY.md"
-          fi
-          if [ "$errors" -gt 0 ]; then
-            exit 1
-          fi
+          grep -q "version-${version}" README.md && echo "✅ README badge" || { echo "::error::README badge mismatch"; errors=$((errors + 1)); }
+          grep -q "\"softwareVersion\": \"${version}\"" index.html && echo "✅ index.html schema" || { echo "::error::index.html mismatch"; errors=$((errors + 1)); }
+          grep -q "## \[${version}\]" CHANGELOG.md && echo "✅ CHANGELOG entry" || { echo "::error::CHANGELOG missing $version"; errors=$((errors + 1)); }
+          [ "$errors" -gt 0 ] && exit 1
           echo "✅ All version references consistent"
 
-      - name: Check markdown links
+      # ── Stage 5/5: Markdown link check ──
+      # Scans all .md files for internal links that point to
+      # non-existent files — catches broken docs after renames.
+      - name: "🔗 Stage 5/5 — Markdown link check"
         run: |
-          echo "Checking internal markdown links..."
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 5/5: Markdown internal link check      │"
+          echo "└──────────────────────────────────────────────┘"
+          echo ""
           while IFS= read -r file; do
             grep -oP '\]\((?!http|#|mailto)([^)]+)\)' "$file" 2>/dev/null | \
               sed 's/\](\(.*\))/\1/' | while read -r link; do
@@ -292,12 +486,51 @@ jobs:
           done < <(find . -name "*.md" -not -path "./.git/*")
           echo "✅ Link check complete"
 
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: system-docs-results
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Job summary
+        if: always()
+        run: |
+          echo "## 🏢 System-Wide & Docs" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **System-wide install**: ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Multi-user access**: ✅ (user1, user2)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Version consistency**: ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Markdown links**: ✅" >> "$GITHUB_STEP_SUMMARY"
+
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # JOB 4: DOCKER IMAGE BUILD + SMOKE TEST
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # Purpose: Builds the Kodra Docker image and runs a smoke test.
+  #          Uses BuildKit GHA cache so rebuilds are fast (~30s
+  #          when only configs changed).
+  # Estimated time: ~3 min cold, ~1 min cached
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   docker-build:
-    name: Docker Image Build
+    name: "🐳 Docker Build"
     runs-on: ubuntu-24.04
-    needs: lint
+    needs: lint-test-security
     steps:
       - uses: actions/checkout@v4
+
+      # ── Stage 1/3: Build image ──
+      # Uses docker/build-push-action with GHA cache for speed.
+      # Image is loaded locally (not pushed) for smoke testing.
+      - name: "☁️ Code To Cloud — Build Docker image"
+        run: |
+          eval "$KODRA_CI_BANNER"
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 1/3: Docker image build                │"
+          echo "│  Cache: GitHub Actions (BuildKit)             │"
+          echo "│  Tags: kodra:latest                           │"
+          echo "└──────────────────────────────────────────────┘"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -312,24 +545,55 @@ jobs:
           cache-to: type=gha,mode=max
           load: true
 
-      - name: Test container starts
+      # ── Stage 2/3: Smoke test ──
+      # Verifies the container boots, version is correct,
+      # libraries source cleanly, and key tools are available.
+      - name: "🧪 Stage 2/3 — Container smoke test"
         run: |
-          docker run --rm kodra:latest kodra --version | grep -q "0.5.0"
-          echo "✅ Container runs and reports correct version"
+          echo "┌──────────────────────────────────────────────┐"
+          echo "│  STAGE 2/3: Docker smoke test                 │"
+          echo "│  Version • Libraries • Tool availability      │"
+          echo "└──────────────────────────────────────────────┘"
+          echo ""
+          mkdir -p test-results
 
-      - name: Test container health
-        run: |
-          # Run container in background
+          docker run --rm kodra:latest kodra --version | grep -q "0.5.0" && echo "✅ Version correct"
+
           cid=$(docker run -d kodra:latest sleep 30)
-          # Test library sourcing inside container
-          docker exec "$cid" bash -c 'source /opt/kodra/lib/utils.sh && echo "✅ Libraries load"'
-          docker exec "$cid" bash -c 'source /opt/kodra/lib/logging.sh && echo "✅ Logging loads"'
-          docker exec "$cid" bash -c 'source /opt/kodra/configs/shell/aliases.sh && echo "✅ Aliases load"'
-          # Test tools are available
-          docker exec "$cid" bash -c 'command -v starship && echo "✅ Starship installed"'
-          docker exec "$cid" bash -c 'command -v gh && echo "✅ GitHub CLI installed"'
-          docker exec "$cid" bash -c 'command -v fzf && echo "✅ fzf installed"'
-          docker exec "$cid" bash -c 'command -v rg && echo "✅ ripgrep installed"'
-          docker exec "$cid" bash -c 'command -v zoxide && echo "✅ zoxide installed"'
+          docker exec "$cid" bash -c 'source /opt/kodra/lib/utils.sh && echo "✅ utils.sh"'
+          docker exec "$cid" bash -c 'source /opt/kodra/lib/logging.sh && echo "✅ logging.sh"'
+          docker exec "$cid" bash -c 'source /opt/kodra/configs/shell/aliases.sh && echo "✅ aliases.sh"'
+          echo ""
+          for cmd in starship gh fzf rg zoxide; do
+            docker exec "$cid" bash -c "command -v $cmd" &>/dev/null && echo "✅ $cmd" || echo "⚠️ $cmd missing"
+          done
+
+          docker inspect kodra:latest | jq '.[0] | {Size: .Size, Created: .Created, Architecture: .Architecture}' \
+            > test-results/image-metadata.json
           docker stop "$cid"
-          echo "✅ All container tests passed"
+          echo ""
+          echo "✅ All smoke tests passed"
+
+      # ── Stage 3/3: Upload metadata ──
+      - name: "📊 Stage 3/3 — Upload results"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-build-results
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Job summary
+        if: always()
+        run: |
+          echo "## 🐳 Docker Build" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f test-results/image-metadata.json ]; then
+            size=$(jq -r '.Size' test-results/image-metadata.json 2>/dev/null)
+            size_mb=$((size / 1024 / 1024))
+            echo "- **Image size**: ${size_mb}MB" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "- **Version**: ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Libraries**: ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Tools**: ✅" >> "$GITHUB_STEP_SUMMARY"

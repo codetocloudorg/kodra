@@ -219,6 +219,37 @@ jobs:
           fi
           echo "✅ Installation completed successfully"
 
+      - name: Job summary
+        if: always()
+        run: |
+          echo "## 🚀 E2E Full Install (Ubuntu ${{ matrix.ubuntu }})" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          exit_code="${{ steps.install.outputs.install_exit }}"
+          if [ "$exit_code" = "0" ] || [ -z "$exit_code" ]; then
+            echo "✅ **Installation succeeded**" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "❌ **Installation failed** (exit code: $exit_code)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          # Tool inventory from log
+          if [ -f "${{ github.workspace }}/test-output/full-install-log.txt" ]; then
+            echo "<details><summary>Tool Availability</summary>" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            grep -E '✅|❌' "${{ github.workspace }}/test-output/full-install-log.txt" | head -30 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "</details>" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f "${{ github.workspace }}/test-output/disk-usage.txt" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "<details><summary>Disk Usage</summary>" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat "${{ github.workspace }}/test-output/disk-usage.txt" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "</details>" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Cleanup
         if: always()
         run: |
@@ -281,6 +312,20 @@ jobs:
           name: e2e-minimal-install-logs
           path: test-output/minimal-install-log.txt
           retention-days: 14
+
+      - name: Job summary
+        if: always()
+        run: |
+          echo "## 🔧 E2E Minimal Install (Headless)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f test-output/minimal-install-log.txt ]; then
+            echo "<details><summary>Verification Results</summary>" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            grep -E 'Version:|OK|MISSING|✅|❌' test-output/minimal-install-log.txt | head -20 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "</details>" >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Cleanup
         if: always()
@@ -356,6 +401,20 @@ jobs:
           name: e2e-system-wide-logs
           path: test-output/system-wide-log.txt
           retention-days: 14
+
+      - name: Job summary
+        if: always()
+        run: |
+          echo "## 👥 E2E System-Wide Install (Multi-User)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f test-output/system-wide-log.txt ]; then
+            echo "<details><summary>User Initialization</summary>" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            grep -E '✅|❌|Version:' test-output/system-wide-log.txt | head -20 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "</details>" >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Cleanup
         if: always()
