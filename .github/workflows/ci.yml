@@ -479,9 +479,10 @@ jobs:
           echo "│  STAGE 5/5: Markdown internal link check      │"
           echo "└──────────────────────────────────────────────┘"
           echo ""
-          while IFS= read -r file; do
-            grep -oP '\]\((?!http|#|mailto)([^)]+)\)' "$file" 2>/dev/null | \
-              sed 's/\](\(.*\))/\1/' | while read -r link; do
+          find . -name "*.md" -not -path "./.git/*" | while IFS= read -r file; do
+            links=$(grep -oP '\]\((?!http|#|mailto)([^)]+)\)' "$file" 2>/dev/null || true)
+            if [ -n "$links" ]; then
+              echo "$links" | sed 's/\](\(.*\))/\1/' | while read -r link; do
                 link_path="${link%%#*}"
                 if [ -n "$link_path" ]; then
                   dir=$(dirname "$file")
@@ -490,7 +491,8 @@ jobs:
                   fi
                 fi
               done
-          done < <(find . -name "*.md" -not -path "./.git/*")
+            fi
+          done
           echo "✅ Link check complete"
 
       - name: Upload results
