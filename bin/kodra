@@ -68,6 +68,8 @@ show_help() {
     echo "  cleanup [what]    Clear system caches and free space"
     echo "  refresh [what]    Hot-reload theme components without logout"
     echo "  extensions [cmd]  Manage GNOME extensions"
+    echo "  migrate [cmd]     Run version migrations (list, run, status)"
+    echo "  ci-report [opts]  Pull CI logs and generate remediation reports"
     echo "  lock              Lock the screen"
     echo "  suspend           Suspend the system"
     echo "  restart           Restart the system"
