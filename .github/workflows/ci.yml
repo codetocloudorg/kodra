@@ -247,6 +247,9 @@ jobs:
     name: "📦 Container (${{ matrix.ubuntu }})"
     runs-on: ubuntu-24.04
     needs: lint-test-security
+    defaults:
+      run:
+        shell: bash
     strategy:
       fail-fast: false
       matrix:
@@ -380,6 +383,9 @@ jobs:
     name: "🏢 System-Wide & Docs"
     runs-on: ubuntu-24.04
     needs: lint-test-security
+    defaults:
+      run:
+        shell: bash
     container:
       image: ubuntu:24.04
       options: --user root
