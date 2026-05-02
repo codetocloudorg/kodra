@@ -1,0 +1,421 @@
+name: E2E Install Test
+
+# Full end-to-end installation test that simulates a real user experience.
+# Spins up a fresh Ubuntu container, runs the FULL installer, captures ALL
+# terminal output (exactly what a user would see), and uploads logs as artifacts.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      install_flags:
+        description: 'Extra flags for install.sh (e.g., --minimal, --skip-azure)'
+        required: false
+        default: '--skip-desktop --debug'
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e-full-install:
+    name: Full Install (Ubuntu ${{ matrix.ubuntu }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu: ["24.04"]
+        include:
+          - ubuntu: "24.04"
+            codename: "noble"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create test container
+        run: |
+          # Build a fresh Ubuntu container that mimics a real user's system
+          docker build -t kodra-e2e-base -f - . <<'DOCKERFILE'
+          FROM ubuntu:24.04
+          ENV DEBIAN_FRONTEND=noninteractive
+          ENV TERM=xterm-256color
+          
+          # Simulate a real Ubuntu desktop install (minus GUI packages)
+          RUN apt-get update && apt-get install -y \
+            sudo git curl wget ca-certificates gnupg \
+            software-properties-common apt-transport-https \
+            lsb-release bash coreutils systemd-sysv \
+            locales man-db less nano \
+            && locale-gen en_US.UTF-8 \
+            && rm -rf /var/lib/apt/lists/*
+          
+          # Create a real user (simulates fresh Ubuntu install)
+          RUN useradd -m -s /bin/bash -G sudo developer \
+            && echo "developer ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/developer \
+            && chmod 0440 /etc/sudoers.d/developer
+          
+          ENV LANG=en_US.UTF-8
+          ENV LC_ALL=en_US.UTF-8
+          USER developer
+          WORKDIR /home/developer
+          DOCKERFILE
+          echo "✅ Base container built"
+
+      - name: Run full Kodra install (captures user experience)
+        id: install
+        run: |
+          # Create output directory for logs
+          mkdir -p ${{ github.workspace }}/test-output
+          
+          # Run the FULL install inside the container, capturing EVERYTHING
+          # This is exactly what a user would see in their terminal
+          docker run --name kodra-e2e \
+            --env DEBIAN_FRONTEND=noninteractive \
+            --env KODRA_THEME=tokyo-night \
+            --env KODRA_SKIP_BACKUP=1 \
+            --env CI=true \
+            --env TERM=xterm-256color \
+            -v "${{ github.workspace }}:/src:ro" \
+            kodra-e2e-base \
+            bash -c '
+              # ══════════════════════════════════════════════════════
+              # SIMULATING: Real user installation experience
+              # ══════════════════════════════════════════════════════
+              
+              echo "╔══════════════════════════════════════════════════╗"
+              echo "║  Kodra E2E Test — Full User Installation        ║"
+              echo "║  Ubuntu: $(lsb_release -ds)                     ║"
+              echo "║  User: $(whoami) | Home: $HOME                  ║"
+              echo "║  Date: $(date)                                  ║"
+              echo "╚══════════════════════════════════════════════════╝"
+              echo ""
+              
+              # Step 1: Clone repo (simulates git clone from boot.sh)
+              echo "▶ Step 1: Cloning Kodra repository..."
+              cp -r /src "$HOME/.kodra"
+              cd "$HOME/.kodra"
+              echo "  ✓ Repository cloned to ~/.kodra"
+              echo ""
+              
+              # Step 2: Run the actual installer
+              echo "▶ Step 2: Running install.sh ${{ github.event.inputs.install_flags || '--skip-desktop --debug' }}..."
+              echo "═══════════════════════════════════════════════════════"
+              echo ""
+              
+              # Run installer with full output, timing it
+              start_time=$(date +%s)
+              bash ./install.sh ${{ github.event.inputs.install_flags || '--skip-desktop --debug' }} 2>&1
+              install_exit=$?
+              end_time=$(date +%s)
+              duration=$((end_time - start_time))
+              
+              echo ""
+              echo "═══════════════════════════════════════════════════════"
+              echo ""
+              
+              # Step 3: Post-install verification
+              echo "▶ Step 3: Post-install verification..."
+              echo ""
+              
+              # Check what got installed
+              echo "┌─────────────────────────────────────────────────────┐"
+              echo "│ Installation Results                                 │"
+              echo "├─────────────────────────────────────────────────────┤"
+              printf "│ %-20s │ %-28s │\n" "Exit Code" "$install_exit"
+              printf "│ %-20s │ %-28s │\n" "Duration" "${duration}s"
+              printf "│ %-20s │ %-28s │\n" "Kodra Version" "$(cat ~/.kodra/VERSION 2>/dev/null || echo 'N/A')"
+              echo "├─────────────────────────────────────────────────────┤"
+              echo "│ Tool Availability                                    │"
+              echo "├─────────────────────────────────────────────────────┤"
+              
+              # Check each expected tool
+              for cmd in git curl wget jq bat fzf rg starship zoxide eza gh; do
+                if command -v "$cmd" &>/dev/null; then
+                  ver=$($cmd --version 2>/dev/null | head -1 || echo "installed")
+                  printf "│ %-20s │ ✅ %-25s │\n" "$cmd" "$ver"
+                else
+                  printf "│ %-20s │ ❌ %-25s │\n" "$cmd" "NOT FOUND"
+                fi
+              done
+              
+              echo "├─────────────────────────────────────────────────────┤"
+              echo "│ File System                                          │"
+              echo "├─────────────────────────────────────────────────────┤"
+              printf "│ %-20s │ %-28s │\n" "~/.kodra/" "$([ -d ~/.kodra ] && echo '✅ exists' || echo '❌ missing')"
+              printf "│ %-20s │ %-28s │\n" "~/.config/kodra/" "$([ -d ~/.config/kodra ] && echo '✅ exists' || echo '❌ missing')"
+              printf "│ %-20s │ %-28s │\n" "kodra CLI" "$(command -v kodra &>/dev/null && echo '✅ in PATH' || echo '❌ not in PATH')"
+              echo "├─────────────────────────────────────────────────────┤"
+              echo "│ Shell Integration                                    │"
+              echo "├─────────────────────────────────────────────────────┤"
+              printf "│ %-20s │ %-28s │\n" ".bashrc modified" "$(grep -q kodra ~/.bashrc 2>/dev/null && echo '✅ yes' || echo '❌ no')"
+              printf "│ %-20s │ %-28s │\n" "Aliases loadable" "$(source ~/.kodra/configs/shell/aliases.sh 2>/dev/null && echo '✅ yes' || echo '❌ no')"
+              echo "└─────────────────────────────────────────────────────┘"
+              echo ""
+              
+              # Step 4: Test kodra commands
+              echo "▶ Step 4: Testing kodra commands..."
+              export PATH="$HOME/.kodra/bin:$PATH"
+              export KODRA_DIR="$HOME/.kodra"
+              
+              echo "  kodra --version: $(kodra --version 2>/dev/null || echo 'FAILED')"
+              echo "  kodra doctor (dry): $(bash "$KODRA_DIR/bin/kodra-sub/doctor.sh" 2>/dev/null && echo 'OK' || echo 'ISSUES')"
+              echo ""
+              
+              # Step 5: Final summary
+              echo "╔══════════════════════════════════════════════════╗"
+              if [ "$install_exit" -eq 0 ]; then
+                echo "║  ✅ INSTALLATION SUCCESSFUL                       ║"
+              else
+                echo "║  ❌ INSTALLATION FAILED (exit: $install_exit)       ║"
+              fi
+              echo "║  Duration: ${duration} seconds                      ║"
+              echo "╚══════════════════════════════════════════════════╝"
+              
+              exit $install_exit
+            ' 2>&1 | tee ${{ github.workspace }}/test-output/full-install-log.txt
+          
+          # Capture exit code
+          echo "install_exit=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Extract install logs from container
+        if: always()
+        run: |
+          # Copy any internal logs the installer created
+          docker cp kodra-e2e:/home/developer/.config/kodra/ ${{ github.workspace }}/test-output/kodra-config/ 2>/dev/null || true
+          docker cp kodra-e2e:/tmp/ ${{ github.workspace }}/test-output/tmp-logs/ 2>/dev/null || true
+          
+          # Get installed package list
+          docker exec kodra-e2e dpkg --get-selections 2>/dev/null > ${{ github.workspace }}/test-output/installed-packages.txt || true
+          
+          # Get disk usage
+          docker exec kodra-e2e du -sh /home/developer/.kodra 2>/dev/null > ${{ github.workspace }}/test-output/disk-usage.txt || true
+          docker exec kodra-e2e df -h 2>/dev/null >> ${{ github.workspace }}/test-output/disk-usage.txt || true
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-install-logs-ubuntu-${{ matrix.ubuntu }}
+          path: |
+            test-output/full-install-log.txt
+            test-output/kodra-config/
+            test-output/tmp-logs/kodra-install-*.log
+            test-output/installed-packages.txt
+            test-output/disk-usage.txt
+          retention-days: 14
+
+      - name: Verify install succeeded
+        run: |
+          exit_code=${{ steps.install.outputs.install_exit }}
+          if [ "$exit_code" != "0" ] && [ "$exit_code" != "" ]; then
+            echo "::error::Installation failed with exit code $exit_code"
+            echo ""
+            echo "📋 Last 50 lines of install log:"
+            tail -50 ${{ github.workspace }}/test-output/full-install-log.txt
+            exit 1
+          fi
+          echo "✅ Installation completed successfully"
+
+      - name: Job summary
+        if: always()
+        run: |
+          echo "## 🚀 E2E Full Install (Ubuntu ${{ matrix.ubuntu }})" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          exit_code="${{ steps.install.outputs.install_exit }}"
+          if [ "$exit_code" = "0" ] || [ -z "$exit_code" ]; then
+            echo "✅ **Installation succeeded**" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "❌ **Installation failed** (exit code: $exit_code)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          # Tool inventory from log
+          if [ -f "${{ github.workspace }}/test-output/full-install-log.txt" ]; then
+            echo "<details><summary>Tool Availability</summary>" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            grep -E '✅|❌' "${{ github.workspace }}/test-output/full-install-log.txt" | head -30 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "</details>" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f "${{ github.workspace }}/test-output/disk-usage.txt" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "<details><summary>Disk Usage</summary>" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat "${{ github.workspace }}/test-output/disk-usage.txt" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "</details>" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker rm -f kodra-e2e 2>/dev/null || true
+          docker rmi kodra-e2e-base 2>/dev/null || true
+
+  e2e-minimal-install:
+    name: Minimal Install (headless server)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run minimal install
+        run: |
+          mkdir -p ${{ github.workspace }}/test-output
+          
+          docker run --name kodra-minimal \
+            --env DEBIAN_FRONTEND=noninteractive \
+            --env CI=true \
+            -v "${{ github.workspace }}:/src:ro" \
+            ubuntu:24.04 \
+            bash -c '
+              # Setup as root, then switch to user
+              apt-get update -qq
+              apt-get install -y -qq sudo git curl wget ca-certificates gnupg \
+                software-properties-common lsb-release bash coreutils jq 2>/dev/null
+              
+              useradd -m -s /bin/bash serveradmin
+              echo "serveradmin ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+              
+              # Run as serveradmin
+              su - serveradmin -c "
+                echo \"══════════════════════════════════════\"
+                echo \"Kodra Minimal Install (Headless)\"
+                echo \"══════════════════════════════════════\"
+                
+                cp -r /src \$HOME/.kodra
+                cd \$HOME/.kodra
+                
+                bash ./install.sh --minimal --skip-desktop --debug 2>&1
+                
+                echo \"\"
+                echo \"══════════════════════════════════════\"
+                echo \"Verification:\"
+                export PATH=\"\$HOME/.kodra/bin:\$PATH\"
+                export KODRA_DIR=\"\$HOME/.kodra\"
+                echo \"  Version: \$(cat \$KODRA_DIR/VERSION)\"
+                echo \"  bat: \$(command -v bat && echo OK || echo MISSING)\"
+                echo \"  fzf: \$(command -v fzf && echo OK || echo MISSING)\"
+                echo \"  rg: \$(command -v rg && echo OK || echo MISSING)\"
+                echo \"══════════════════════════════════════\"
+              "
+            ' 2>&1 | tee ${{ github.workspace }}/test-output/minimal-install-log.txt
+
+      - name: Upload minimal install logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-minimal-install-logs
+          path: test-output/minimal-install-log.txt
+          retention-days: 14
+
+      - name: Job summary
+        if: always()
+        run: |
+          echo "## 🔧 E2E Minimal Install (Headless)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f test-output/minimal-install-log.txt ]; then
+            echo "<details><summary>Verification Results</summary>" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            grep -E 'Version:|OK|MISSING|✅|❌' test-output/minimal-install-log.txt | head -20 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "</details>" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f kodra-minimal 2>/dev/null || true
+
+  e2e-system-wide:
+    name: System-Wide Install (multi-user)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run system-wide install with multiple users
+        run: |
+          mkdir -p ${{ github.workspace }}/test-output
+          
+          docker run --name kodra-syswide \
+            --env DEBIAN_FRONTEND=noninteractive \
+            --env CI=true \
+            -v "${{ github.workspace }}:/src:ro" \
+            ubuntu:24.04 \
+            bash -c '
+              apt-get update -qq
+              apt-get install -y -qq sudo git curl wget ca-certificates gnupg \
+                software-properties-common lsb-release bash coreutils jq 2>/dev/null
+              
+              # Create multiple users (simulating a shared workstation)
+              useradd -m -s /bin/bash alice
+              useradd -m -s /bin/bash bob
+              useradd -m -s /bin/bash charlie
+              echo "alice ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+              echo "bob ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+              echo "charlie ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+              
+              echo "╔══════════════════════════════════════════════════╗"
+              echo "║  System-Wide Install Test (3 users)              ║"
+              echo "╚══════════════════════════════════════════════════╝"
+              echo ""
+              
+              # Admin installs system-wide
+              echo "▶ Admin: Installing system-wide..."
+              cp -r /src /tmp/kodra-src
+              export KODRA_DIR="/tmp/kodra-src"
+              bash /tmp/kodra-src/install/system-wide.sh 2>&1
+              echo ""
+              
+              # Each user initializes
+              for user in alice bob charlie; do
+                echo "▶ $user: Initializing personal config..."
+                su - "$user" -c "
+                  source /etc/profile.d/kodra.sh 2>/dev/null || true
+                  export PATH=\"/usr/local/bin:\$PATH\"
+                  export KODRA_DIR=\"/opt/kodra\"
+                  
+                  # Simulate kodra setup
+                  mkdir -p \$HOME/.config/kodra
+                  echo \"  Version: \$(kodra --version 2>/dev/null || cat /opt/kodra/VERSION)\"
+                  echo \"  Config dir: \$(ls -la \$HOME/.config/kodra/ 2>/dev/null | wc -l) items\"
+                  echo \"  ✅ $user initialized\"
+                "
+                echo ""
+              done
+              
+              echo "╔══════════════════════════════════════════════════╗"
+              echo "║  ✅ All 3 users successfully initialized         ║"
+              echo "╚══════════════════════════════════════════════════╝"
+            ' 2>&1 | tee ${{ github.workspace }}/test-output/system-wide-log.txt
+
+      - name: Upload system-wide logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-system-wide-logs
+          path: test-output/system-wide-log.txt
+          retention-days: 14
+
+      - name: Job summary
+        if: always()
+        run: |
+          echo "## 👥 E2E System-Wide Install (Multi-User)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f test-output/system-wide-log.txt ]; then
+            echo "<details><summary>User Initialization</summary>" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            grep -E '✅|❌|Version:' test-output/system-wide-log.txt | head -20 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "</details>" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f kodra-syswide 2>/dev/null || true

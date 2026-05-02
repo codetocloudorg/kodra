@@ -40,7 +40,8 @@ check() {
     
     CHECKS=$((CHECKS + 1))
     
-    if eval "$cmd" &> /dev/null; then
+    # Run command safely (without eval) using bash -c with timeout
+    if timeout 10 bash -c "$cmd" &>/dev/null 2>&1; then
         echo -e "  ${GREEN}✔${NC} $name"
         PASSED=$((PASSED + 1))
         return 0
@@ -48,13 +49,13 @@ check() {
         echo -e "  ${RED}✖${NC} $name"
         
         if [ -n "$fix_hint" ]; then
-            echo -e "      ${GRAY}Fix: $fix_hint${NC}"
+            echo -e "      ${YELLOW}Fix: $fix_hint${NC}"
         fi
         
         # Attempt auto-fix if in fix mode
         if [ "$FIX_MODE" = true ] && [ -n "$fix_cmd" ]; then
             echo -e "      ${CYAN}Attempting fix...${NC}"
-            if eval "$fix_cmd" &> /dev/null; then
+            if timeout 30 bash -c "$fix_cmd" &>/dev/null 2>&1; then
                 echo -e "      ${GREEN}Fixed!${NC}"
                 PASSED=$((PASSED + 1))
             else
@@ -84,7 +85,7 @@ check "Disk space (>5GB)" \
     "" \
     "Free up disk space"
 check "sudo access" \
-    "sudo -v" \
+    "sudo -n true" \
     "" \
     "Ensure user has sudo privileges"
 echo ""

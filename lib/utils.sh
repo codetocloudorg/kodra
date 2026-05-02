@@ -193,68 +193,90 @@ run_installer() {
     return 0
 }
 
-# Add directory to PATH in shell configs
+# Add directory to PATH using marker blocks (idempotent)
 add_to_path() {
     local dir="$1"
-    local export_line="export PATH=\"$dir:\$PATH\""
+    local marker_start="# >>> kodra path: $dir >>>"
+    local marker_end="# <<< kodra path: $dir <<<"
+    local block="$marker_start
+export PATH=\"$dir:\$PATH\"
+$marker_end"
     
-    # Add to .bashrc if it exists
-    if [ -f "$HOME/.bashrc" ]; then
-        if ! grep -q "$dir" "$HOME/.bashrc"; then
-            echo "" >> "$HOME/.bashrc"
-            echo "# Kodra" >> "$HOME/.bashrc"
-            echo "$export_line" >> "$HOME/.bashrc"
-        fi
-    fi
-    
-    # Add to .zshrc if it exists
-    if [ -f "$HOME/.zshrc" ]; then
-        if ! grep -q "$dir" "$HOME/.zshrc"; then
-            echo "" >> "$HOME/.zshrc"
-            echo "# Kodra" >> "$HOME/.zshrc"
-            echo "$export_line" >> "$HOME/.zshrc"
-        fi
-    fi
+    for config in "$HOME/.bashrc" "$HOME/.zshrc"; do
+        [ -f "$config" ] && _kodra_update_shell_config "$config" "$marker_start" "$marker_end" "$block"
+    done
 }
 
 # Add shell integration (aliases, completions, MOTD)
+# Uses marker blocks to ensure idempotency on re-runs
 add_shell_integration() {
     local kodra_dir="${KODRA_DIR:-$HOME/.kodra}"
-    local source_line="[ -f \"$kodra_dir/configs/shell/kodra.sh\" ] && source \"$kodra_dir/configs/shell/kodra.sh\""
+    local marker_start="# >>> kodra initialize >>>"
+    local marker_end="# <<< kodra initialize <<<"
     
-    # Add XDG_DATA_DIRS to ~/.profile for GNOME session (so app launcher finds Flatpak apps)
-    # This must be in .profile because GNOME reads it at login before starting the shell
-    if [ -f "$HOME/.profile" ]; then
-        if ! grep -q "flatpak/exports/share" "$HOME/.profile"; then
-            echo "" >> "$HOME/.profile"
-            echo "# Kodra: Include Flatpak paths for GNOME app launcher" >> "$HOME/.profile"
-            echo 'if [[ ! "$XDG_DATA_DIRS" =~ "flatpak" ]]; then' >> "$HOME/.profile"
-            echo '    export XDG_DATA_DIRS="/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"' >> "$HOME/.profile"
-            echo 'fi' >> "$HOME/.profile"
-        fi
-    fi
+    local shell_block
+    shell_block=$(cat <<BLOCK
+$marker_start
+# !! Contents within this block are managed by Kodra. Do not edit. !!
+[ -f "$kodra_dir/configs/shell/kodra.sh" ] && source "$kodra_dir/configs/shell/kodra.sh"
+$marker_end
+BLOCK
+)
     
     # Add to .bashrc
     if [ -f "$HOME/.bashrc" ]; then
-        if ! grep -q "kodra.sh" "$HOME/.bashrc"; then
-            echo "" >> "$HOME/.bashrc"
-            echo "# Kodra shell integration (aliases, completions, tips)" >> "$HOME/.bashrc"
-            echo "$source_line" >> "$HOME/.bashrc"
-        fi
+        _kodra_update_shell_config "$HOME/.bashrc" "$marker_start" "$marker_end" "$shell_block"
     fi
     
-    # Add to .zshrc
-    if [ -f "$HOME/.zshrc" ]; then
-        if ! grep -q "kodra.sh" "$HOME/.zshrc"; then
-            echo "" >> "$HOME/.zshrc"
-            echo "# Kodra shell integration (aliases, completions, tips)" >> "$HOME/.zshrc"
-            echo "$source_line" >> "$HOME/.zshrc"
-        fi
+    # Add to .zshrc (create if zsh is installed but no .zshrc)
+    if command -v zsh &>/dev/null; then
+        touch "$HOME/.zshrc"
+        _kodra_update_shell_config "$HOME/.zshrc" "$marker_start" "$marker_end" "$shell_block"
+    fi
+    
+    # Add XDG_DATA_DIRS to ~/.profile for GNOME session (Flatpak app launcher)
+    if [ -f "$HOME/.profile" ]; then
+        local profile_marker_start="# >>> kodra profile >>>"
+        local profile_marker_end="# <<< kodra profile <<<"
+        local profile_block
+        profile_block=$(cat <<BLOCK
+$profile_marker_start
+# !! Contents within this block are managed by Kodra. Do not edit. !!
+if [ -d "/var/lib/flatpak/exports/share" ]; then
+    export XDG_DATA_DIRS="/var/lib/flatpak/exports/share:\$HOME/.local/share/flatpak/exports/share:\${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+fi
+$profile_marker_end
+BLOCK
+)
+        _kodra_update_shell_config "$HOME/.profile" "$profile_marker_start" "$profile_marker_end" "$profile_block"
     fi
     
     # Create completion directories
     mkdir -p "$HOME/.local/share/bash-completion/completions"
     mkdir -p "$HOME/.config/zsh/completions"
+}
+
+# Helper: update a shell config file with a marker block (idempotent)
+_kodra_update_shell_config() {
+    local file="$1"
+    local marker_start="$2"
+    local marker_end="$3"
+    local block="$4"
+    
+    if grep -q "$marker_start" "$file" 2>/dev/null; then
+        # Block exists — replace it (handles updates)
+        local tmp=$(mktemp)
+        awk -v start="$marker_start" -v end="$marker_end" -v block="$block" '
+            $0 ~ start { skip=1; print block; next }
+            $0 ~ end { skip=0; next }
+            !skip { print }
+        ' "$file" > "$tmp"
+        mv "$tmp" "$file"
+    else
+        # Block doesn't exist — append it
+        echo "" >> "$file"
+        echo "$block" >> "$file"
+    fi
 }
 
 # Check if an app is already installed
@@ -270,7 +292,7 @@ is_flatpak_installed() {
 # Get latest GitHub release version
 get_github_release() {
     local repo="$1"
-    curl -s "https://api.github.com/repos/$repo/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
+    curl -s --max-time 10 "https://api.github.com/repos/$repo/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
 }
 
 # Download and install a .deb file
@@ -278,7 +300,7 @@ install_deb() {
     local url="$1"
     local temp_deb=$(mktemp)
     
-    curl -sL "$url" -o "$temp_deb"
+    curl -sL --max-time 60 "$url" -o "$temp_deb"
     sudo dpkg -i "$temp_deb" || sudo apt-get install -f -y
     rm -f "$temp_deb"
 }

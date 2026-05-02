@@ -11,7 +11,7 @@
 
 **One-command Ubuntu setup for Azure cloud-native developers. GitHub CLI, Docker, Kubernetes, AI-powered workflows. From fresh install to production in minutes.**
 
-[![Version](https://img.shields.io/badge/version-0.4.2-blue?style=flat-square)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.5.0-blue?style=flat-square)](VERSION)
 [![CI](https://img.shields.io/github/actions/workflow/status/codetocloudorg/kodra/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/codetocloudorg/kodra/actions)
 [![Ubuntu 24.04+](https://img.shields.io/badge/Ubuntu-24.04+-E95420?style=flat-square&logo=ubuntu&logoColor=white)](https://releases.ubuntu.com/noble/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
@@ -95,7 +95,7 @@ kodra desktop     # Configure dock, tiling, login screen
 kodra repair      # Re-apply all configs without reinstalling
 kodra dock        # Set dock favorites
 kodra motd        # Set terminal banner (banner, minimal, none)
-kodra setup       # Re-run first-time setup (GitHub, Azure login)
+kodra setup       # Initialize user config (first-time or re-run GitHub, Azure login)
 kodra fetch       # Show system info (beautiful fastfetch)
 kodra doctor      # Check system health
 kodra update      # Update everything
@@ -115,6 +115,18 @@ kodra font        # Change terminal font
 kodra screenshot  # Take screenshots (full/region/window)
 kodra shortcuts   # Display keyboard shortcuts
 kodra menu        # Interactive main menu
+```
+
+### Multi-User / System-Wide
+
+For team environments, Kodra supports system-wide installation:
+
+```bash
+# Install for all users (admin)
+sudo bash install/system-wide.sh
+
+# Each user initializes their config
+kodra setup
 ```
 
 ## Themes

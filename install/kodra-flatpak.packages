@@ -1,0 +1,9 @@
+# Kodra Flatpak Packages (optional)
+# Format: app-id
+# These can be installed via: kodra install <name>
+
+# Available optional apps (not installed by default)
+# com.spotify.Client
+# com.discordapp.Discord
+# com.bitwarden.desktop
+# rest.insomnia.Insomnia

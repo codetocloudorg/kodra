@@ -1,0 +1,18 @@
+# Kodra Homebrew Packages
+# One package per line. Lines starting with # are comments.
+# These are installed via: brew install
+
+# Modern CLI tools
+eza
+zoxide
+btop
+lazygit
+dust
+duf
+procs
+glow
+delta
+
+# Development
+mise
+gh

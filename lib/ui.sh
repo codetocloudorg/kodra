@@ -49,7 +49,7 @@ BOX_WIDTH=60
 # Display the Kodra banner with typing effect
 show_banner() {
     # Get version from VERSION file
-    local version="0.0.1"
+    local version="0.5.0"
     if [ -f "$KODRA_DIR/VERSION" ]; then
         version=$(cat "$KODRA_DIR/VERSION" | tr -d '\n')
     fi

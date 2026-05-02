@@ -45,7 +45,24 @@ cd ~/.kodra
 ./install.sh
 ```
 
-### Method 3: Custom Install
+### Method 3: System-Wide Install (Multi-User)
+
+For shared workstations, labs, or team environments where all users need Kodra:
+
+```bash
+# Clone the repository
+git clone https://github.com/codetocloudorg/kodra.git ~/.kodra
+
+# Install system-wide (requires root)
+sudo bash ~/.kodra/install/system-wide.sh
+
+# Each user then initializes their personal config:
+kodra setup
+```
+
+This installs Kodra to `/opt/kodra` and makes it available to all users via `/etc/profile.d/`.
+
+### Method 4: Custom Install
 
 ```bash
 # Minimal install (skip optional apps)
@@ -102,15 +119,16 @@ Selected during interactive install:
 
 ## Installation Locations
 
-| Component | Location |
-|-----------|----------|
-| **Kodra core** | `~/.kodra/` |
-| **Configs** | `~/.config/kodra/` |
-| **State file** | `~/.config/kodra/state.json` |
-| **Install logs** | `~/.config/kodra/install.log` |
-| **Backups** | `~/.kodra/backups/` |
-| **Themes** | `~/.kodra/themes/` |
-| **Wallpapers** | `~/.kodra/wallpapers/` |
+| Component | Per-User Install | System-Wide Install |
+|-----------|-----------------|---------------------|
+| **Kodra core** | `~/.kodra/` | `/opt/kodra/` |
+| **CLI binary** | `~/.kodra/bin/kodra` | `/usr/local/bin/kodra` |
+| **User config** | `~/.config/kodra/` | `~/.config/kodra/` |
+| **State file** | `~/.config/kodra/state.json` | `~/.config/kodra/state.json` |
+| **Install logs** | `~/.config/kodra/logs/` | `~/.config/kodra/logs/` |
+| **Migrations** | `~/.config/kodra/migrations/` | `~/.config/kodra/migrations/` |
+| **Themes** | `~/.kodra/themes/` | `/opt/kodra/themes/` |
+| **Defaults** | `~/.kodra/defaults/` | `/opt/kodra/defaults/` |
 
 ## Post-Install Setup
 

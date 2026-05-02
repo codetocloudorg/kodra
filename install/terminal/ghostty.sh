@@ -2,78 +2,68 @@
 #
 # Ghostty Terminal Installer
 # https://ghostty.org/
-# Uses pre-built .deb from https://github.com/mkasberg/ghostty-ubuntu
+#
+# Installation methods:
+#   - Ubuntu 26.04+: Official apt repository (ghostty package)
+#   - Ubuntu 24.04:  Community PPA (ppa:mkasberg/ghostty-ubuntu)
+#   - macOS:         Homebrew cask
 #
 
 set -e
 
+KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
+
 echo "👻 Installing Ghostty..."
 
 # Install Ghostty if not present
-if ! command -v ghostty &> /dev/null; then
-    # Check OS
+if ! command -v ghostty &>/dev/null; then
     if [[ "$OSTYPE" == "darwin"* ]]; then
         # macOS - use Homebrew
-        if command -v brew &> /dev/null; then
+        if command -v brew &>/dev/null; then
             brew install --cask ghostty
         else
-            echo "Please install Homebrew first: https://brew.sh"
+            echo "❌ Homebrew required on macOS. Install from https://brew.sh"
             exit 1
         fi
-    elif [[ -f /etc/debian_version ]]; then
-        # Ubuntu/Debian - use pre-built .deb from mkasberg/ghostty-ubuntu
-        echo "Installing Ghostty on Ubuntu via pre-built .deb package..."
+    elif [[ -f /etc/os-release ]]; then
+        . /etc/os-release
+        VERSION_NUM=$(echo "$VERSION_ID" | cut -d. -f1)
         
-        # Get latest release info from mkasberg/ghostty-ubuntu
-        RELEASE_INFO=$(curl -s https://api.github.com/repos/mkasberg/ghostty-ubuntu/releases/latest)
-        
-        # Determine architecture
-        ARCH=$(dpkg --print-architecture)
-        
-        # Determine Ubuntu version
-        if [ -f /etc/os-release ]; then
-            . /etc/os-release
-            UBUNTU_VERSION="${VERSION_ID}"
-        else
-            UBUNTU_VERSION="24.04"
+        if [ "${ID}" != "ubuntu" ] && [ "${ID_LIKE}" != *"ubuntu"* ] && [ "${ID_LIKE}" != *"debian"* ]; then
+            echo "❌ Unsupported distribution: $ID"
+            echo "   Install Ghostty manually from https://ghostty.org/download"
+            exit 1
         fi
         
-        # Map architecture for download URL
-        case "$ARCH" in
-            amd64) DEB_ARCH="amd64" ;;
-            arm64) DEB_ARCH="arm64" ;;
-            *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
-        esac
-        
-        # Find the appropriate .deb URL for Ubuntu 24.04
-        # Format: ghostty_X.X.X-X.ppa1_ARCH_24.04.deb
-        DEB_URL=$(echo "$RELEASE_INFO" | grep -o "https://[^\"]*${DEB_ARCH}_24.04.deb" | head -1)
-        
-        if [ -z "$DEB_URL" ]; then
-            echo "Could not find .deb package for Ubuntu 24.04 ${DEB_ARCH}"
-            echo "Falling back to install script..."
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mkasberg/ghostty-ubuntu/HEAD/install.sh)"
+        if [ "$VERSION_NUM" -ge 26 ]; then
+            # Ubuntu 26.04+ — Ghostty is in the official universe repo
+            echo "Installing from official Ubuntu repository..."
+            sudo apt-get update -qq
+            sudo apt-get install -y ghostty
         else
-            echo "Downloading: $DEB_URL"
-            DEB_FILE="/tmp/ghostty-ubuntu.deb"
-            curl -fsSL -o "$DEB_FILE" "$DEB_URL"
+            # Ubuntu 24.04/25.x — Use community PPA
+            echo "Installing from community PPA (Ubuntu $VERSION_ID)..."
             
-            # Install the .deb package
-            sudo dpkg -i "$DEB_FILE" || sudo apt-get install -f -y
+            if ! grep -q "mkasberg/ghostty" /etc/apt/sources.list.d/*.list 2>/dev/null; then
+                sudo add-apt-repository -y ppa:mkasberg/ghostty-ubuntu
+                sudo apt-get update -qq
+            fi
             
-            # Cleanup
-            rm -f "$DEB_FILE"
-            
-            echo "✅ Ghostty installed from pre-built .deb package"
+            sudo apt-get install -y ghostty
         fi
+    else
+        echo "❌ Cannot detect OS. Install Ghostty manually from https://ghostty.org/download"
+        exit 1
     fi
+    
+    echo "✅ Ghostty installed: $(ghostty --version 2>/dev/null || echo 'unknown version')"
+else
+    echo "✅ Ghostty already installed: $(ghostty --version 2>/dev/null || echo 'unknown version')"
 fi
 
-# Always configure (even if already installed)
-
 # Set Ghostty as the default terminal emulator
-if command -v update-alternatives &> /dev/null && command -v ghostty &> /dev/null; then
-    GHOSTTY_PATH=$(which ghostty)
+if command -v update-alternatives &>/dev/null && command -v ghostty &>/dev/null; then
+    GHOSTTY_PATH=$(command -v ghostty)
     sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator "$GHOSTTY_PATH" 100 2>/dev/null || true
     sudo update-alternatives --set x-terminal-emulator "$GHOSTTY_PATH" 2>/dev/null || true
     echo "✅ Ghostty set as default terminal"
@@ -83,16 +73,18 @@ fi
 mkdir -p "$HOME/.config/ghostty"
 
 # Copy Kodra's Ghostty configuration
-KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
 if [ -f "$KODRA_DIR/configs/ghostty/config" ]; then
     cp "$KODRA_DIR/configs/ghostty/config" "$HOME/.config/ghostty/config"
 fi
 
-# Copy theme
+# Apply current theme
 CURRENT_THEME="${KODRA_THEME:-tokyo-night}"
+if [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/kodra/theme" ]; then
+    CURRENT_THEME=$(cat "${XDG_CONFIG_HOME:-$HOME/.config}/kodra/theme")
+fi
+
 if [ -f "$KODRA_DIR/themes/$CURRENT_THEME/ghostty.conf" ]; then
     cp "$KODRA_DIR/themes/$CURRENT_THEME/ghostty.conf" "$HOME/.config/ghostty/theme"
 fi
 
-echo "✅ Ghostty installed successfully!"
-echo "   Run 'ghostty' to launch"
+echo "✅ Ghostty configured successfully!"

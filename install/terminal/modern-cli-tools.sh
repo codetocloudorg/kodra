@@ -44,8 +44,8 @@ if ! command -v fastfetch &> /dev/null; then
             *) FF_ARCH="" ;;
         esac
         if [ -n "$FF_ARCH" ]; then
-            FF_VERSION=$(curl -s https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | grep -Po '"tag_name": "\K[^"]*' || echo "2.8.10")
-            curl -sL "https://github.com/fastfetch-cli/fastfetch/releases/download/${FF_VERSION}/fastfetch-linux-${FF_ARCH}.deb" -o /tmp/fastfetch.deb
+            FF_VERSION=$(curl -s --max-time 10 https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | grep -Po '"tag_name": "\K[^"]*' || echo "2.8.10")
+            curl -sL --max-time 60 "https://github.com/fastfetch-cli/fastfetch/releases/download/${FF_VERSION}/fastfetch-linux-${FF_ARCH}.deb" -o /tmp/fastfetch.deb
             sudo dpkg -i /tmp/fastfetch.deb 2>/dev/null || sudo apt-get install -f -y
             rm -f /tmp/fastfetch.deb
         fi
@@ -96,14 +96,14 @@ else
             cargo install eza
         else
             # Direct binary download for eza
-            EZA_VERSION=$(curl -s https://api.github.com/repos/eza-community/eza/releases/latest | grep -Po '"tag_name": "\K[^"]*' | tr -d 'v')
+            EZA_VERSION=$(curl -s --max-time 10 https://api.github.com/repos/eza-community/eza/releases/latest | grep -Po '"tag_name": "\K[^"]*' | tr -d 'v')
             if [ -n "$EZA_VERSION" ]; then
                 ARCH=$(uname -m)
                 case $ARCH in
                     x86_64) ARCH="x86_64" ;;
                     aarch64|arm64) ARCH="aarch64" ;;
                 esac
-                curl -sL "https://github.com/eza-community/eza/releases/download/v${EZA_VERSION}/eza_${ARCH}-unknown-linux-gnu.tar.gz" | sudo tar xzf - -C /usr/local/bin eza 2>/dev/null || true
+                curl -sL --max-time 60 "https://github.com/eza-community/eza/releases/download/v${EZA_VERSION}/eza_${ARCH}-unknown-linux-gnu.tar.gz" | sudo tar xzf - -C /usr/local/bin eza 2>/dev/null || true
             fi
         fi
     fi
@@ -111,20 +111,25 @@ else
     # Install zoxide
     if ! command -v zoxide &> /dev/null; then
         echo "Installing zoxide..."
-        curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+        # Safe download: fetch script, then execute
+        local zoxide_installer="/tmp/kodra-zoxide-install.sh"
+        curl -sSf --max-time 30 https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh -o "$zoxide_installer"
+        chmod +x "$zoxide_installer"
+        bash "$zoxide_installer"
+        rm -f "$zoxide_installer"
     fi
     
     # Install lazygit
     if ! command -v lazygit &> /dev/null; then
         echo "Installing lazygit..."
-        LAZYGIT_VERSION=$(curl -s https://api.github.com/repos/jesseduffield/lazygit/releases/latest | grep -Po '"tag_name": "\K[^"]*' | tr -d 'v')
+        LAZYGIT_VERSION=$(curl -s --max-time 10 https://api.github.com/repos/jesseduffield/lazygit/releases/latest | grep -Po '"tag_name": "\K[^"]*' | tr -d 'v')
         if [ -n "$LAZYGIT_VERSION" ]; then
             ARCH=$(uname -m)
             case $ARCH in
                 x86_64) ARCH="x86_64" ;;
                 aarch64|arm64) ARCH="arm64" ;;
             esac
-            curl -sL "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_${ARCH}.tar.gz" | sudo tar xzf - -C /usr/local/bin lazygit
+            curl -sL --max-time 60 "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_${ARCH}.tar.gz" | sudo tar xzf - -C /usr/local/bin lazygit
         fi
     fi
     

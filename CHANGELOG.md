@@ -5,6 +5,40 @@ All notable changes to Kodra will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-05-01
+
+### Added
+- **Migration system** — Timestamped upgrade scripts (`migrations/`) with state tracking; run once per version
+- **Config layering** — Three-layer system (defaults → theme → user) for non-destructive updates
+- **Multi-user deployment** — System-wide install to `/opt/kodra` with per-user initialization
+- **Structured logging** — `lib/logging.sh` with `run_logged()`, timestamped logs, and log retention
+- **Error trap system** — Interactive recovery on install failure (retry, view log, upload for support)
+- **Package manifests** — Declarative `kodra-base.packages`, `kodra-brew.packages`, `kodra-flatpak.packages`
+- **Config library** — `lib/config.sh` with `apply_config()` and `show_config_status()`
+- **System-wide installer** — `install/system-wide.sh` for multi-user environments
+
+### Changed
+- **Ghostty installer** — Updated for post-GitHub era (official apt repo on 26.04+, PPA on 24.04)
+- **Update script** — Replaced dangerous `git reset --hard` with safe `merge --ff-only` + stash
+- **Aliases** — POSIX-overriding aliases now opt-in/out (`KODRA_POSIX_ALIASES`); `find→fd` disabled by default
+- **Shell integration** — Uses marker blocks (`# >>> kodra >>>`) for idempotent .bashrc/.zshrc modifications
+- **Doctor checks** — Replaced `eval` with `timeout bash -c` for safety; sudo check is non-interactive
+- **Network operations** — All curl/wget calls now have `--max-time` timeouts
+- **CLI dispatcher** — Detects system-wide install (`/opt/kodra`) automatically
+
+### Fixed
+- **theme.sh** — OR operator precedence bug in DISPLAY/WAYLAND check
+- **theme.sh** — JSON validation before jq merge (prevents corrupt VS Code settings)
+- **Duplicate bashrc lines** — No longer appends duplicate entries on re-runs
+- **Security** — Eliminated all `curl | bash` patterns (download → verify → execute)
+- **Aliases** — Replaced deprecated `netstat` with `ss`; quoted `$PATH` expansion
+
+### Security
+- Removed `eval` usage in doctor.sh (code injection risk)
+- Added network timeouts to prevent hanging on bad connections
+- Safe download pattern for all external scripts (zoxide, mise)
+- Error handler no longer silently swallows failures
+
 ## [0.4.2] - 2026-02-21
 
 ### Fixed
@@ -120,6 +154,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[0.5.0]: https://github.com/codetocloudorg/kodra/compare/v0.4.2...v0.5.0
+[0.4.2]: https://github.com/codetocloudorg/kodra/compare/v0.4.1...v0.4.2
+[0.4.1]: https://github.com/codetocloudorg/kodra/compare/v0.4.0...v0.4.1
+[0.4.0]: https://github.com/codetocloudorg/kodra/compare/v0.3.2...v0.4.0
 [0.3.2]: https://github.com/codetocloudorg/kodra/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/codetocloudorg/kodra/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/codetocloudorg/kodra/compare/v0.2.0...v0.3.0

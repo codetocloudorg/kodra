@@ -8,13 +8,18 @@
 
 set -e
 
-KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
+# Support both system-wide (/opt/kodra) and per-user (~/.kodra) installs
+if [ -d "/opt/kodra" ]; then
+    KODRA_DIR="${KODRA_DIR:-/opt/kodra}"
+else
+    KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
+fi
 
 # Read version from VERSION file
 if [ -f "$KODRA_DIR/VERSION" ]; then
     VERSION=$(cat "$KODRA_DIR/VERSION" | tr -d '\n')
 else
-    VERSION="0.0.1"
+    VERSION="0.5.0"
 fi
 
 # Colors
@@ -144,6 +149,10 @@ case "${1:-help}" in
         ;;
     setup|first-run)
         shift
+        # System-wide: run per-user init
+        if [ -f "$KODRA_DIR/bin/kodra-user-init" ]; then
+            bash "$KODRA_DIR/bin/kodra-user-init" "$@"
+        fi
         bash "$KODRA_DIR/bin/kodra-sub/first-run.sh" --force "$@"
         ;;
     fetch|info|neofetch)
