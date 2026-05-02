@@ -75,11 +75,12 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
     && apt-get update -qq && apt-get install -y gh \
     && rm -rf /var/lib/apt/lists/*
 
-# Install zoxide
+# Install zoxide (installs to ~/.local/bin by default, move to /usr/local/bin)
 RUN curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh -o /tmp/zoxide-install.sh \
     && chmod +x /tmp/zoxide-install.sh \
-    && /tmp/zoxide-install.sh \
-    && rm /tmp/zoxide-install.sh
+    && HOME=/tmp /tmp/zoxide-install.sh \
+    && mv /tmp/.local/bin/zoxide /usr/local/bin/zoxide \
+    && rm -rf /tmp/zoxide-install.sh /tmp/.local
 
 # Copy Kodra into /opt/kodra (system-wide)
 COPY . /opt/kodra/
