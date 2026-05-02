@@ -115,7 +115,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ubuntu: ["24.04", "24.10"]
+        ubuntu: ["24.04", "25.04"]
     container:
       image: ubuntu:${{ matrix.ubuntu }}
       options: --user root
@@ -291,3 +291,45 @@ jobs:
               done
           done < <(find . -name "*.md" -not -path "./.git/*")
           echo "✅ Link check complete"
+
+  docker-build:
+    name: Docker Image Build
+    runs-on: ubuntu-24.04
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: kodra:${{ github.sha }},kodra:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+
+      - name: Test container starts
+        run: |
+          docker run --rm kodra:latest kodra --version | grep -q "0.5.0"
+          echo "✅ Container runs and reports correct version"
+
+      - name: Test container health
+        run: |
+          # Run container in background
+          cid=$(docker run -d kodra:latest sleep 30)
+          # Test library sourcing inside container
+          docker exec "$cid" bash -c 'source /opt/kodra/lib/utils.sh && echo "✅ Libraries load"'
+          docker exec "$cid" bash -c 'source /opt/kodra/lib/logging.sh && echo "✅ Logging loads"'
+          docker exec "$cid" bash -c 'source /opt/kodra/configs/shell/aliases.sh && echo "✅ Aliases load"'
+          # Test tools are available
+          docker exec "$cid" bash -c 'command -v starship && echo "✅ Starship installed"'
+          docker exec "$cid" bash -c 'command -v gh && echo "✅ GitHub CLI installed"'
+          docker exec "$cid" bash -c 'command -v fzf && echo "✅ fzf installed"'
+          docker exec "$cid" bash -c 'command -v rg && echo "✅ ripgrep installed"'
+          docker exec "$cid" bash -c 'command -v zoxide && echo "✅ zoxide installed"'
+          docker stop "$cid"
+          echo "✅ All container tests passed"
