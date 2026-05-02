@@ -5,6 +5,15 @@ All notable changes to Kodra will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.2] - 2026-05-02
+
+### Added
+- **Microsoft Edge** — Native apt installer with Microsoft GPG key and stable channel
+- **Dock favorites fix** — Run `kodra dock` during first-run wizard when GNOME session is active, ensuring favorites apply reliably
+
+### Fixed
+- **Dock not populating after install** — `gsettings` calls during install fail silently without an active GNOME session; now handled by the first-run wizard
+
 ## [0.5.1] - 2026-05-02
 
 ### Added

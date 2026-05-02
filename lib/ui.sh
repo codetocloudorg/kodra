@@ -52,7 +52,7 @@ BOX_WIDTH=60
 # Display the animated rainbow Kodra logo and tagline
 show_banner() {
     # Get version from VERSION file
-    local version="0.5.1"
+    local version="0.5.2"
     if [ -f "$KODRA_DIR/VERSION" ]; then
         version=$(cat "$KODRA_DIR/VERSION" | tr -d '\n')
     fi
