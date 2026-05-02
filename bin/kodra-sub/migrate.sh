@@ -1,45 +1,109 @@
 #!/usr/bin/env bash
 #
-# Kodra Migration Script
-# Run upgrade migrations
+# Kodra Migration Runner
+# Executes pending migrations in timestamp order
+# Each migration runs exactly once (tracked via state files)
 #
 
 set -e
 
 KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
-KODRA_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/kodra"
 MIGRATIONS_DIR="$KODRA_DIR/migrations"
-MIGRATIONS_FILE="$KODRA_CONFIG_DIR/migrations_run"
+STATE_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/kodra/migrations"
 
 source "$KODRA_DIR/lib/utils.sh"
 
-mkdir -p "$KODRA_CONFIG_DIR"
-touch "$MIGRATIONS_FILE"
+# Ensure state directory exists
+mkdir -p "$STATE_DIR"
 
-# Initialize migrations (mark all as run for fresh installs)
-if [ "$1" = "--init" ]; then
-    for migration in "$MIGRATIONS_DIR"/*.sh; do
-        if [ -f "$migration" ]; then
-            name=$(basename "$migration")
-            echo "$name" >> "$MIGRATIONS_FILE"
-        fi
-    done
-    exit 0
-fi
-
-# Run pending migrations
-for migration in "$MIGRATIONS_DIR"/*.sh; do
-    if [ -f "$migration" ]; then
-        name=$(basename "$migration")
-        
-        # Check if already run
-        if grep -q "^$name$" "$MIGRATIONS_FILE" 2>/dev/null; then
-            continue
-        fi
-        
-        log_info "Running migration: $name"
-        bash "$migration"
-        echo "$name" >> "$MIGRATIONS_FILE"
-        log_success "Migration complete: $name"
+# List pending migrations
+list_pending() {
+    local pending=()
+    if [ -d "$MIGRATIONS_DIR" ] && [ "$(ls -A "$MIGRATIONS_DIR"/*.sh 2>/dev/null)" ]; then
+        for migration in "$MIGRATIONS_DIR"/*.sh; do
+            local name=$(basename "$migration" .sh)
+            if [ ! -f "$STATE_DIR/$name.done" ]; then
+                pending+=("$name")
+            fi
+        done
     fi
-done
+    printf '%s\n' "${pending[@]}" | sort -n
+}
+
+# Run a single migration
+run_migration() {
+    local name="$1"
+    local script="$MIGRATIONS_DIR/${name}.sh"
+    
+    if [ ! -f "$script" ]; then
+        log_error "Migration not found: $name"
+        return 1
+    fi
+    
+    log_info "Running migration: $name"
+    
+    if bash "$script"; then
+        touch "$STATE_DIR/$name.done"
+        log_success "Migration complete: $name"
+        return 0
+    else
+        log_error "Migration failed: $name"
+        return 1
+    fi
+}
+
+# Show status
+show_status() {
+    echo ""
+    echo -e "${BLUE}Migration Status${NC}"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    
+    local total=0
+    local completed=0
+    local pending=0
+    
+    if [ -d "$MIGRATIONS_DIR" ] && [ "$(ls -A "$MIGRATIONS_DIR"/*.sh 2>/dev/null)" ]; then
+        for migration in "$MIGRATIONS_DIR"/*.sh; do
+            local name=$(basename "$migration" .sh)
+            total=$((total + 1))
+            if [ -f "$STATE_DIR/$name.done" ]; then
+                echo -e "  ${GREEN}✔${NC} $name"
+                completed=$((completed + 1))
+            else
+                echo -e "  ${YELLOW}○${NC} $name (pending)"
+                pending=$((pending + 1))
+            fi
+        done
+    fi
+    
+    echo ""
+    echo "Total: $total | Completed: $completed | Pending: $pending"
+    echo ""
+}
+
+# Main
+case "${1:-run}" in
+    run)
+        pending=$(list_pending)
+        if [ -z "$pending" ]; then
+            log_info "No pending migrations"
+            exit 0
+        fi
+        
+        log_info "Running pending migrations..."
+        echo "$pending" | while read -r name; do
+            [ -n "$name" ] && run_migration "$name"
+        done
+        log_success "All migrations complete"
+        ;;
+    status)
+        show_status
+        ;;
+    list)
+        list_pending
+        ;;
+    *)
+        echo "Usage: kodra migrate [run|status|list]"
+        exit 1
+        ;;
+esac
