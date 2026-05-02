@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 #
 # Kodra Shell Integration
-# Beautiful MOTD and shell enhancements
+# Sourced into interactive bash/zsh sessions on every shell start.
+# Provides the MOTD banner, aliases for cloud-native tools, FZF
+# configuration, helper functions, and shell completions.
+#
+# NOTE: set -e is intentionally omitted — this file is sourced into
+# interactive shells where set -e would cause the session to exit on
+# any command failure (e.g., a typo or failed alias).
 #
 
 # Load enhanced readline config (tab-cycle completion)
@@ -176,7 +182,8 @@ alias cp='cp -i'
 # Helper Functions
 # ─────────────────────────────────────────────────────────────
 
-# Create a web app desktop launcher
+# Create a .desktop launcher to open a URL as a standalone web app
+# Arguments: $1 - URL, $2 - app name, $3 - icon name (default: utilities-terminal)
 web2app() {
     local url="$1"
     local name="$2"
@@ -208,7 +215,9 @@ EOF
     echo "  $name is now available in your app launcher!"
 }
 
-# Quick extract - handles most archive types
+# Universal archive extractor — detects format from extension
+# Supports: tar.gz, tar.bz2, tar.xz, zip, gz, bz2, 7z, rar
+# Arguments: $1 - archive file path
 extract() {
     if [ -z "$1" ]; then
         echo "Usage: extract <archive>"
@@ -237,7 +246,8 @@ extract() {
     esac
 }
 
-# Quick compress a folder
+# Create a tar.gz archive of a folder
+# Arguments: $1 - folder, $2 - output filename (default: <folder>.tar.gz)
 compress() {
     if [ -z "$1" ]; then
         echo "Usage: compress <folder> [output.tar.gz]"
@@ -249,7 +259,8 @@ compress() {
     echo "Created: $output"
 }
 
-# Clone and cd into a repo
+# Clone a git repo and cd into the resulting directory
+# Arguments: $1 - repo URL
 gclone() {
     if [ -z "$1" ]; then
         echo "Usage: gclone <repo-url>"
@@ -259,7 +270,8 @@ gclone() {
     git clone "$1" && cd "$(basename "$1" .git)"
 }
 
-# Create a new project from Azure template
+# Scaffold a new project from an Azure Developer CLI template
+# Arguments: $1 - template name, $2 - optional project directory name
 aztemplate() {
     if [ -z "$1" ]; then
         echo "Usage: aztemplate <template-name> [project-name]"
@@ -283,7 +295,8 @@ aztemplate() {
     azd init --template "$template"
 }
 
-# Quick kubectl port-forward with nice output
+# kubectl port-forward with friendly output
+# Arguments: $1 - pod name, $2 - port mapping (default: 8080:8080)
 kpod() {
     local pod="$1"
     local ports="${2:-8080:8080}"
@@ -299,7 +312,8 @@ kpod() {
     kubectl port-forward "$pod" "$ports"
 }
 
-# Search running containers
+# List or search running Docker containers in a compact table
+# Arguments: $1 - optional search filter
 dps() {
     if [ -z "$1" ]; then
         docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | head -20
@@ -370,13 +384,13 @@ fi
 # Handy fzf functions
 # ─────────────────────────────────────────────────────────────
 
-# Fuzzy cd with zoxide
+# Fuzzy directory jump using zoxide history and fzf
 zz() {
     local result
     result=$(zoxide query -l | fzf --no-sort --tac) && cd "$result"
 }
 
-# Fuzzy git branch checkout
+# Fuzzy checkout a git branch (local or remote) via fzf
 fco() {
     local branches branch
     branches=$(git branch --all | grep -v HEAD) &&
@@ -384,7 +398,8 @@ fco() {
     git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
 }
 
-# Fuzzy process kill
+# Fuzzy process kill — select processes via fzf, then send signal
+# Arguments: $1 - signal number (default: 9/SIGKILL)
 fkill() {
     local pid
     pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
@@ -393,21 +408,22 @@ fkill() {
     fi
 }
 
-# Fuzzy docker container shell
+# Fuzzy select a running Docker container and exec into it
+# Arguments: $1 - optional container filter, $2 - shell (default: bash)
 dsh() {
     local cid
     cid=$(docker ps | sed 1d | fzf -1 -q "$1" | awk '{print $1}')
     [ -n "$cid" ] && docker exec -it "$cid" ${2:-bash}
 }
 
-# Fuzzy edit file in current directory
+# Fuzzy find and open a file in the editor
 fe() {
     local file
     file=$(fzf --preview 'bat --style=numbers --color=always --line-range :300 {}')
     [ -n "$file" ] && ${EDITOR:-nvim} "$file"
 }
 
-# Fuzzy git log browser
+# Interactive git log browser with fzf (Ctrl+M to view a commit)
 fgl() {
     git log --graph --color=always \
         --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
@@ -426,7 +442,7 @@ FZF-EOF"
 # Tmux: attach or new session
 alias t='tmux attach 2>/dev/null || tmux new-session'
 
-# Open files/URLs silently in background
+# Open a file or URL with the default system handler (silent, backgrounded)
 open() {
     if [ -z "$1" ]; then
         echo "Usage: open <file|url>"
@@ -435,7 +451,7 @@ open() {
     nohup xdg-open "$@" &>/dev/null &
 }
 
-# Smart nvim - opens directory with file explorer, file directly
+# Smart nvim opener — directories open the file explorer, files open directly
 n() {
     local target="${1:-.}"
     if [ -d "$target" ]; then
@@ -445,7 +461,7 @@ n() {
     fi
 }
 
-# Zoxide with visual feedback (enhanced z)
+# Enhanced directory jump — fzf over zoxide history with tree preview
 zd() {
     local dir
     dir=$(zoxide query -l 2>/dev/null | fzf --height 40% --reverse --preview 'eza --tree --level=1 --icons {}' --preview-window=right:50%)
@@ -458,8 +474,8 @@ zd() {
 # SSH Port Forwarding Helpers
 # ─────────────────────────────────────────────────────────────
 
-# Forward local port to remote
-# Usage: fip <local_port> <remote_host> <remote_port> [ssh_host]
+# Forward a local port to a remote host through an SSH tunnel
+# Arguments: $1 - local port, $2 - remote host, $3 - remote port, $4 - SSH host
 fip() {
     local local_port="${1:-8080}"
     local remote_host="${2:-localhost}"
@@ -477,8 +493,8 @@ fip() {
     ssh -N -L "$local_port:$remote_host:$remote_port" "$ssh_host"
 }
 
-# Dynamic SOCKS proxy
-# Usage: dip [port] <ssh_host>
+# Start a SOCKS5 proxy via SSH (useful for tunneling browser traffic)
+# Arguments: $1 - local port (default: 1080), $2 - SSH host
 dip() {
     local port="${1:-1080}"
     local ssh_host="${2:-}"
@@ -502,7 +518,7 @@ dip() {
     ssh -N -D "$port" "$ssh_host"
 }
 
-# List active port forwards
+# List active SSH tunnels and commonly-forwarded dev ports
 lip() {
     echo "Active SSH tunnels:"
     ps aux | grep 'ssh -[NL]' | grep -v grep | awk '{print $2, $11, $12, $13}'
@@ -515,7 +531,8 @@ lip() {
 # Media Transcoding Helpers
 # ─────────────────────────────────────────────────────────────
 
-# Convert image to JPEG
+# Convert images to JPEG using ImageMagick
+# Arguments: $@ - image files to convert
 img2jpg() {
     if ! command -v convert &>/dev/null; then
         echo "ImageMagick required. Install with: sudo apt install imagemagick"
@@ -527,7 +544,8 @@ img2jpg() {
     done
 }
 
-# Convert image to PNG
+# Convert images to PNG using ImageMagick
+# Arguments: $@ - image files to convert
 img2png() {
     if ! command -v convert &>/dev/null; then
         echo "ImageMagick required. Install with: sudo apt install imagemagick"
@@ -539,7 +557,8 @@ img2png() {
     done
 }
 
-# Convert image to WebP
+# Convert images to WebP format using cwebp
+# Arguments: $@ - image files to convert
 img2webp() {
     if ! command -v cwebp &>/dev/null; then
         echo "WebP tools required. Install with: sudo apt install webp"
@@ -551,7 +570,8 @@ img2webp() {
     done
 }
 
-# Transcode video to 1080p
+# Transcode a video to 1080p H.264 using ffmpeg
+# Arguments: $1 - input file, $2 - output file (default: <input>_1080p.mp4)
 transcode-video-1080p() {
     if ! command -v ffmpeg &>/dev/null; then
         echo "FFmpeg required. Install with: sudo apt install ffmpeg"
@@ -563,7 +583,8 @@ transcode-video-1080p() {
     ffmpeg -i "$input" -vf "scale=-1:1080" -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 128k "$output"
 }
 
-# Transcode video to 720p
+# Transcode a video to 720p H.264 using ffmpeg
+# Arguments: $1 - input file, $2 - output file (default: <input>_720p.mp4)
 transcode-video-720p() {
     if ! command -v ffmpeg &>/dev/null; then
         echo "FFmpeg required. Install with: sudo apt install ffmpeg"
@@ -606,8 +627,8 @@ fi
 # Tmux Dev Layouts (#42)
 # ─────────────────────────────────────────────────────────────
 
-# Tmux layout: web dev (editor + server + shell)
-# Usage: tml web [session-name]
+# Pre-built tmux layouts for common development workflows
+# Arguments: $1 - layout name (web|api|k8s), $2 - session name (default: dev)
 tml() {
     local layout="${1:-web}"
     local session="${2:-dev}"
@@ -659,8 +680,7 @@ tml() {
     esac
 }
 
-# New instance: create/attach with current directory as session name
-# Usage: nic
+# Create or attach to a tmux session named after the current directory
 nic() {
     local session_name=$(basename "$PWD" | tr '.' '-' | tr ' ' '-')
     
@@ -677,8 +697,7 @@ nic() {
     fi
 }
 
-# New instance extended: like nic but with web layout
-# Usage: nicx
+# Like nic but creates a web dev layout if the session is new
 nicx() {
     local session_name=$(basename "$PWD" | tr '.' '-' | tr ' ' '-')
     

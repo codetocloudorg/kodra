@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #
-# Kodra Shortcuts - Display GNOME keybindings
+# Kodra Shortcuts - Display and manage keyboard shortcuts
+# Shows keybindings for GNOME, Ghostty, tmux, shell, and Kodra commands.
+# Supports filtering, export/import of GNOME custom keybindings.
 #
 
 set -e
@@ -18,6 +20,7 @@ WHITE='\033[1;37m'
 NC='\033[0m'
 DIM='\033[2m'
 
+# Print the decorated section title banner
 print_header() {
     echo ""
     echo -e "${PURPLE}═══════════════════════════════════════════════════════════════${NC}"
@@ -26,14 +29,22 @@ print_header() {
     echo ""
 }
 
+# Print a category heading
+# Arguments:
+#   $1 - Section title
 print_section() {
     echo -e "${CYAN}━━━ $1 ━━━${NC}"
 }
 
+# Print a single shortcut entry in aligned columns
+# Arguments:
+#   $1 - Key combination
+#   $2 - Description
 print_shortcut() {
     printf "  ${YELLOW}%-30s${NC} %s\n" "$1" "$2"
 }
 
+# Display core GNOME desktop shortcuts
 show_gnome_shortcuts() {
     print_section "GNOME Desktop"
     print_shortcut "Super" "Open Activities / App Launcher"
@@ -52,6 +63,7 @@ show_gnome_shortcuts() {
     echo ""
 }
 
+# Display GNOME workspace navigation shortcuts
 show_workspace_shortcuts() {
     print_section "Workspaces"
     print_shortcut "Super + Page Up/Down" "Switch Workspace"
@@ -62,6 +74,7 @@ show_workspace_shortcuts() {
     echo ""
 }
 
+# Display screenshot-related key bindings
 show_screenshot_shortcuts() {
     print_section "Screenshots"
     print_shortcut "Print" "Screenshot (Full Screen)"
@@ -72,6 +85,7 @@ show_screenshot_shortcuts() {
     echo ""
 }
 
+# Display Ghostty terminal shortcuts
 show_terminal_shortcuts() {
     print_section "Ghostty Terminal"
     print_shortcut "Ctrl + Shift + C" "Copy"
@@ -86,6 +100,7 @@ show_terminal_shortcuts() {
     echo ""
 }
 
+# Display common kodra CLI commands as quick-reference
 show_kodra_shortcuts() {
     print_section "Kodra Commands"
     print_shortcut "kodra" "Show help"
@@ -100,6 +115,7 @@ show_kodra_shortcuts() {
     echo ""
 }
 
+# Display shell integration shortcuts (FZF, zoxide)
 show_shell_shortcuts() {
     print_section "Shell (FZF + Zoxide)"
     print_shortcut "Ctrl + R" "Search command history"
@@ -114,6 +130,7 @@ show_shell_shortcuts() {
     echo ""
 }
 
+# Display tmux shortcuts (Ctrl+Space prefix)
 show_tmux_shortcuts() {
     print_section "Tmux (prefix: Ctrl+Space)"
     print_shortcut "Ctrl+Space |" "Split vertical"
@@ -128,7 +145,9 @@ show_tmux_shortcuts() {
     echo ""
 }
 
-# Export shortcuts to file (#87)
+# Export GNOME keybindings (custom + standard) to a config file (#87)
+# Arguments:
+#   $1 - Output file path (default: timestamped file in backups dir)
 export_shortcuts() {
     local output_file="${1:-$HOME/.kodra/backups/shortcuts-$(date +%Y%m%d-%H%M%S).conf}"
     local backup_dir=$(dirname "$output_file")
@@ -186,7 +205,9 @@ export_shortcuts() {
     echo -e "${GREEN}✓${NC} Exported to: $output_file"
 }
 
-# Import shortcuts from file (#87)
+# Import GNOME keybindings from a previously exported config file (#87)
+# Arguments:
+#   $1 - Path to the exported shortcuts file
 import_shortcuts() {
     local input_file="$1"
     
@@ -206,11 +227,11 @@ import_shortcuts() {
     local current_section=""
     local custom_path=""
     
+    # Parse INI-style config: [section] headers route key=value pairs
+    # to the correct gsettings schema or dconf path
     while IFS= read -r line || [ -n "$line" ]; do
-        # Skip comments and empty lines
         [[ "$line" =~ ^#.*$ || -z "$line" ]] && continue
         
-        # Section header
         if [[ "$line" =~ ^\[.*\]$ ]]; then
             current_section="${line:1:-1}"
             if [[ "$current_section" == /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/* ]]; then
@@ -244,6 +265,9 @@ import_shortcuts() {
     echo -e "${GREEN}✓${NC} Shortcuts imported"
 }
 
+# Search shortcuts by keyword across all categories
+# Arguments:
+#   $1 - Search query (case-insensitive grep pattern)
 filter_shortcuts() {
     local query="$1"
     
@@ -251,7 +275,7 @@ filter_shortcuts() {
     echo -e "${GREEN}Searching for: ${WHITE}$query${NC}"
     echo ""
     
-    # Create temp file with all shortcuts
+    # Searchable shortcut database: Category_Key_Description (underscore-delimited)
     {
         echo "GNOME_Super_Open Activities / App Launcher"
         echo "GNOME_Super + A_Show Applications"

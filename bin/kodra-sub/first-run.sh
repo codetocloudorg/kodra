@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 #
 # Kodra First-Run Setup
-# Guides user through initial configuration after installation
+# Guides user through initial configuration after installation.
+# Walks the user through Git identity, GitHub/Azure auth, and
+# Copilot CLI setup. Runs once and records completion via a
+# state file so it won't re-trigger on subsequent logins.
 #
 
 set -e
@@ -20,18 +23,19 @@ C_WHITE='\033[38;5;255m'
 C_GRAY='\033[38;5;245m'
 C_RESET='\033[0m'
 
-# Check if first run is needed
+# Check if first run is needed (state file absent means first run)
 is_first_run() {
     [ ! -f "$KODRA_CONFIG_DIR/first_run_complete" ]
 }
 
-# Mark first run as complete
+# Mark first run as complete by writing a timestamp to the state file
 complete_first_run() {
     mkdir -p "$KODRA_CONFIG_DIR"
     date +%s > "$KODRA_CONFIG_DIR/first_run_complete"
 }
 
-# Setup GitHub CLI authentication
+# Interactively authenticate with GitHub CLI (gh).
+# Skips if gh is not installed or already authenticated.
 setup_github() {
     echo ""
     echo -e "${C_PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${C_RESET}"
@@ -74,7 +78,8 @@ setup_github() {
     fi
 }
 
-# Setup Azure CLI authentication
+# Interactively authenticate with Azure CLI (az).
+# Skips if az is not installed or already authenticated.
 setup_azure() {
     echo ""
     echo -e "${C_PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${C_RESET}"
@@ -117,7 +122,8 @@ setup_azure() {
     fi
 }
 
-# Setup Git identity
+# Configure global Git user.name and user.email.
+# Pre-fills defaults from GitHub CLI or system user info when available.
 setup_git_identity() {
     echo ""
     echo -e "${C_PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${C_RESET}"
@@ -203,7 +209,8 @@ setup_git_identity() {
     echo -e "${C_GREEN}✓${C_RESET} Git configured: ${C_WHITE}$final_name${C_RESET} <${C_CYAN}$final_email${C_RESET}>"
 }
 
-# Install GitHub Copilot CLI after auth
+# Install the GitHub Copilot CLI gh extension.
+# Requires gh to be installed and authenticated; silently skips otherwise.
 setup_copilot_cli() {
     if ! command -v gh &> /dev/null; then
         return 0
@@ -230,7 +237,7 @@ setup_copilot_cli() {
     fi
 }
 
-# Show helpful tips
+# Display quick-start tips for Kodra commands and cloud-native workflows
 show_tips() {
     echo ""
     echo -e "${C_GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${C_RESET}"
@@ -252,7 +259,7 @@ show_tips() {
     echo ""
 }
 
-# Main first-run flow
+# Orchestrate the full first-run wizard: identity → auth → tips → done
 run_first_run() {
     echo ""
     echo -e "${C_CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${C_RESET}"
@@ -282,7 +289,9 @@ run_first_run() {
     echo ""
 }
 
-# Parse args
+# --check: print "yes"/"no" for scripted checks
+# --skip:  mark complete without running
+# --force: re-run even if already completed
 case "${1:-}" in
     --check)
         is_first_run && echo "yes" || echo "no"

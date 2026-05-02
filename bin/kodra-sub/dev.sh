@@ -9,7 +9,7 @@ set -e
 KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
 source "$KODRA_DIR/lib/utils.sh"
 
-# Check dependencies
+# Ensure mise runtime manager is available
 check_mise() {
     if ! command -v mise &>/dev/null; then
         log_error "mise is required. Run: kodra repair"
@@ -17,7 +17,10 @@ check_mise() {
     fi
 }
 
-# Install a language runtime
+# Install a language runtime globally via mise
+# Arguments:
+#   $1 - Language/plugin name (e.g., node, python, go)
+#   $2 - Version to install (default: latest)
 install_language() {
     local lang="$1"
     local version="${2:-latest}"
@@ -71,7 +74,7 @@ install_language() {
     esac
 }
 
-# List available runtimes
+# Display all supported runtimes and their install commands
 list_available() {
     echo "Popular runtimes supported by mise:"
     echo ""
@@ -93,7 +96,7 @@ list_available() {
     echo "See all plugins: mise plugins --all"
 }
 
-# Show installed runtimes
+# Show globally and locally configured runtime versions via mise
 show_installed() {
     check_mise
     
@@ -105,7 +108,7 @@ show_installed() {
     mise ls 2>/dev/null || true
 }
 
-# Interactive setup
+# Present a gum multi-select picker for runtime installation
 interactive_setup() {
     if ! command -v gum &>/dev/null; then
         log_error "gum required for interactive mode"
@@ -136,14 +139,13 @@ interactive_setup() {
     echo ""
     
     while IFS= read -r choice; do
-        local lang=$(echo "$choice" | cut -d' ' -f1)
+        local lang=$(echo "$choice" | cut -d' ' -f1)  # Extract runtime name before the description
         install_language "$lang"
     done <<< "$choices"
 }
 
-# Show help
+# Display usage information and examples
 show_help() {
-    echo "Usage: kodra dev <command>"
     echo ""
     echo "Commands:"
     echo "  setup [lang] [version]   Install a language runtime"

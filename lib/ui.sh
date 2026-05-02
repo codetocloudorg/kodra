@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 #
 # Kodra UI Functions
-# Beautiful CLI that makes installation feel premium
+# Premium TUI components for installation and CLI output.
+# Provides progress bars, section headers, interactive selections,
+# status messages, and the post-install summary card.
+# Uses the Tokyo Night color palette throughout.
 #
 
 # Ensure TERM is set (needed for clear, tput, etc.)
@@ -46,7 +49,7 @@ BOX_DOT='·'
 # Box width for consistent alignment (safe for 80-col terminals)
 BOX_WIDTH=60
 
-# Display the Kodra banner with typing effect
+# Display the animated rainbow Kodra logo and tagline
 show_banner() {
     # Get version from VERSION file
     local version="0.5.1"
@@ -88,7 +91,10 @@ show_banner() {
     sleep 0.2
 }
 
-# Display modern progress bar with gradient
+# Display a gradient progress bar with ETA estimate
+# Arguments:
+#   $1 - Current step number
+#   $2 - Total steps
 show_progress() {
     local current=$1
     local total=$2
@@ -130,7 +136,8 @@ show_progress() {
     printf "${C_RESET}${C_DIM}]${C_RESET} ${C_WHITE}%3d%%${C_RESET}${eta_text}\n" "$percent"
 }
 
-# Format elapsed time nicely
+# Format seconds into a human-readable "Xm Ys" or "Xs" string
+# Arguments: $1 - duration in seconds
 format_duration() {
     local seconds=$1
     if [ $seconds -ge 60 ]; then
@@ -140,7 +147,11 @@ format_duration() {
     fi
 }
 
-# Display a section header with modern styling
+# Display a section header with step counter and progress bar
+# Tracks timing for each section to show in the completion summary
+# Arguments:
+#   $1 - Section title
+#   $2 - Emoji icon (default: 🔧)
 section() {
     local title="$1"
     local emoji="${2:-🔧}"
@@ -183,7 +194,8 @@ section() {
     echo ""
 }
 
-# Install gum for interactive CLI
+# Install the gum CLI tool (Charm) for interactive prompts
+# No-ops if gum is already installed
 install_gum() {
     if command -v gum &> /dev/null; then
         return 0
@@ -199,7 +211,8 @@ install_gum() {
     echo -e "    ${C_GREEN}${BOX_CHECK}${C_RESET} ${C_DIM}Interactive CLI ready${C_RESET}"
 }
 
-# Show what's being installed (live status)
+# Print a live status line for a component being installed
+# Arguments: $1 - name, $2 - optional description
 show_installing() {
     local name="$1"
     local desc="${2:-}"
@@ -211,13 +224,15 @@ show_installing() {
     fi
 }
 
-# Show installation success
+# Print a checkmark indicating a component was installed successfully
+# Arguments: $1 - name
 show_installed() {
     local name="$1"
     printf "    ${C_GREEN}${BOX_CHECK}${C_RESET} ${C_DIM}%s${C_RESET}\n" "$name"
 }
 
-# Show a tool group being installed with nice formatting
+# Display a group heading for a set of tools being installed
+# Arguments: $1 - group description (e.g., "Cloud CLI tools")
 show_tools_group() {
     local tools="$1"
     echo ""
@@ -225,7 +240,7 @@ show_tools_group() {
     echo -e "    ${C_DIM}$(printf '%0.s─' $(seq 1 $((BOX_WIDTH - 4))))${C_RESET}"
 }
 
-# Theme selection
+# Interactive theme picker using gum (falls back to "tokyo-night" in non-interactive mode)
 select_theme() {
     # Non-interactive mode or no TTY - use default
     if [ "${NONINTERACTIVE:-0}" = "1" ] || ! command -v gum &> /dev/null || ! ( exec 0</dev/tty ) 2>/dev/null; then
@@ -242,7 +257,8 @@ select_theme() {
     echo "$theme"
 }
 
-# Optional applications selection
+# Interactive app chooser for optional installs (falls back to defaults in non-interactive mode)
+# Returns: comma-separated list of selected app names
 select_optional_apps() {
     # Non-interactive mode or no TTY - use popular defaults
     if [ "${NONINTERACTIVE:-0}" = "1" ] || ! command -v gum &> /dev/null || ! ( exec 0</dev/tty ) 2>/dev/null; then
@@ -270,7 +286,8 @@ select_optional_apps() {
     echo "$apps" | tr '\n' ',' | sed 's/,$//'
 }
 
-# Container runtime selection
+# Interactive container runtime picker (Docker recommended for Dev Containers)
+# Returns: "docker", "podman", or "none"
 select_container_runtime() {
     # Non-interactive mode or no TTY - use Docker (recommended for Azure/Dev Containers)
     if [ "${NONINTERACTIVE:-0}" = "1" ] || ! command -v gum &> /dev/null || ! ( exec 0</dev/tty ) 2>/dev/null; then
@@ -290,7 +307,8 @@ select_container_runtime() {
     echo "$runtime"
 }
 
-# Confirmation before installation - modern card design
+# Show a boxed confirmation card summarizing what will be installed
+# Auto-confirms in non-interactive or headless environments
 confirm_installation() {
     echo ""
     
@@ -372,7 +390,7 @@ confirm_installation() {
     sleep 0.5
 }
 
-# Show elapsed time
+# Print total elapsed time since KODRA_START_TIME
 show_elapsed_time() {
     local end_time=$(date +%s)
     local elapsed=$((end_time - KODRA_START_TIME))
@@ -386,7 +404,8 @@ show_elapsed_time() {
     fi
 }
 
-# Format text with style
+# Apply gum styling to text (falls back to plain echo if gum unavailable)
+# Arguments: $1 - foreground color, $2 - text
 styled() {
     local style="$1"
     local text="$2"
@@ -398,7 +417,8 @@ styled() {
     fi
 }
 
-# Show completion message with premium installation summary
+# Show the premium post-install summary card with stats, available tools,
+# any failed components, and next-step instructions
 show_completion() {
     local end_time=$(date +%s)
     local elapsed=$((end_time - KODRA_START_TIME))
@@ -560,31 +580,35 @@ show_completion() {
     echo ""
 }
 
-# Show error message
+# Show an error message with a cross icon
+# Arguments: $1 - message
 show_error() {
     local message="$1"
     printf "    ${C_RED}${BOX_CROSS}${C_RESET} ${C_RED}%s${C_RESET}\n" "$message"
 }
 
-# Show warning message
+# Show a warning message with an exclamation icon
+# Arguments: $1 - message
 show_warning() {
     local message="$1"
     printf "    ${C_YELLOW}!${C_RESET} ${C_YELLOW}%s${C_RESET}\n" "$message"
 }
 
-# Show success message
+# Show a success message with a checkmark icon
+# Arguments: $1 - message
 show_success() {
     local message="$1"
     printf "    ${C_GREEN}${BOX_CHECK}${C_RESET} ${C_WHITE}%s${C_RESET}\n" "$message"
 }
 
-# Show info message
+# Show a dimmed informational message
+# Arguments: $1 - message
 show_info() {
     local message="$1"
     printf "    ${C_DIM}${BOX_DOT}${C_RESET} ${C_GRAY}%s${C_RESET}\n" "$message"
 }
 
-# Pre-flight check display
+# Open the pre-flight checks box (call show_check for each item, then end_preflight)
 show_preflight() {
     echo ""
     printf "    ${C_DIM}${BOX_TL}"
@@ -596,7 +620,11 @@ show_preflight() {
     printf "${BOX_V}${C_RESET}\n"
 }
 
-# Single preflight check result
+# Display a single pre-flight check result inside the preflight box
+# Arguments:
+#   $1 - Check name
+#   $2 - Status: "ok", "warn", or "fail"
+#   $3 - Optional detail string
 show_check() {
     local name="$1"
     local status="$2"  # "ok", "warn", "fail"
@@ -619,7 +647,7 @@ show_check() {
     fi
 }
 
-# End preflight section
+# Close the pre-flight checks box
 end_preflight() {
     printf "    ${C_DIM}${BOX_BL}"
     printf '%0.s─' $(seq 1 $BOX_WIDTH)
@@ -627,7 +655,8 @@ end_preflight() {
     echo ""
 }
 
-# Show a spinner during an operation
+# Run a command with a spinner animation (uses gum if available, plain fallback otherwise)
+# Arguments: $1 - message, $@ - command to run
 spin() {
     local message="$1"
     shift

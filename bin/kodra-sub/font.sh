@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 #
 # Kodra Font Manager
-# Change terminal and system fonts
+# Change terminal (Ghostty) and system monospace fonts.
+# Supports listing, setting, and interactive Nerd Font selection.
 #
 
 set -e
@@ -23,14 +24,14 @@ NERD_FONTS=(
     "VictorMono Nerd Font"
 )
 
-# List available fonts
+# List available Nerd Fonts and show install status via fc-list
 list_fonts() {
     echo "Available Nerd Fonts:"
     echo ""
     
     local count=1
     for font in "${NERD_FONTS[@]}"; do
-        # Check if installed
+        # Check if installed by matching the first word of the font family name
         if fc-list 2>/dev/null | grep -qi "${font%% *}"; then
             echo "  $count) $font ✓ (installed)"
         else
@@ -44,7 +45,7 @@ list_fonts() {
     fc-list : family 2>/dev/null | grep -i nerd | sort -u | head -10 | sed 's/^/  /'
 }
 
-# Get current font
+# Print the currently active font from Ghostty config
 get_current() {
     local ghostty_config="$HOME/.config/ghostty/config"
     
@@ -56,7 +57,9 @@ get_current() {
     fi
 }
 
-# Set font
+# Apply a font to Ghostty config and GNOME monospace setting
+# Arguments:
+#   $1 - Font family name (e.g. "JetBrainsMono Nerd Font")
 set_font() {
     local font="$1"
     
@@ -77,7 +80,7 @@ set_font() {
     # Update Ghostty config
     local ghostty_config="$HOME/.config/ghostty/config"
     if [ -f "$ghostty_config" ]; then
-        # Replace or add font-family line
+        # Try GNU sed first, fall back to macOS sed (no in-place suffix)
         if grep -q "^font-family" "$ghostty_config"; then
             sed -i "s/^font-family.*/font-family = $font/" "$ghostty_config" 2>/dev/null || \
             sed -i '' "s/^font-family.*/font-family = $font/" "$ghostty_config"
@@ -97,7 +100,7 @@ set_font() {
     echo "Restart Ghostty to apply changes"
 }
 
-# Interactive selection
+# Present an interactive font picker using gum (falls back to read)
 select_interactive() {
     if ! command -v gum &>/dev/null; then
         list_fonts

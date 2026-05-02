@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Kodra Wallpaper Manager
-# Browse and set wallpapers with theme support
+# Browse and set wallpapers with theme support.
+# Wallpapers are resolved from theme-specific dirs first, then the global
+# wallpapers/ dir. Supports GNOME and KDE Plasma desktop environments.
 #
 
 set -e
@@ -12,7 +14,7 @@ STATE_FILE="$KODRA_DIR/.state/wallpaper"
 
 source "$KODRA_DIR/lib/utils.sh"
 
-# Get current theme
+# Read the active theme name from state, defaulting to tokyo-night
 get_current_theme() {
     local state_file="$KODRA_DIR/.state/theme"
     if [ -f "$state_file" ]; then
@@ -22,7 +24,8 @@ get_current_theme() {
     fi
 }
 
-# Get wallpapers for current context (theme-specific or all)
+# Collect all wallpapers: theme-specific first, then global.
+# Returns: Sorted unique list of absolute paths, one per line.
 get_wallpapers() {
     local theme=$(get_current_theme)
     local theme_wp_dir="$WALLPAPER_DIR/$theme"
@@ -48,7 +51,7 @@ get_wallpapers() {
     printf '%s\n' "${wallpapers[@]}" | sort -u
 }
 
-# List all wallpapers
+# Display a numbered list of available wallpapers grouped by source
 list_wallpapers() {
     local theme=$(get_current_theme)
     local theme_wp_dir="$WALLPAPER_DIR/$theme"
@@ -83,7 +86,7 @@ list_wallpapers() {
     shopt -u nullglob
 }
 
-# Get current wallpaper
+# Query GNOME for the currently active wallpaper path
 get_current() {
     if command -v gsettings &> /dev/null; then
         local uri=$(gsettings get org.gnome.desktop.background picture-uri-dark 2>/dev/null || \
@@ -92,19 +95,25 @@ get_current() {
     fi
 }
 
-# Save wallpaper state
+# Persist the current wallpaper path to state file
+# Arguments:
+#   $1 - Absolute path to wallpaper
 save_state() {
     local wallpaper="$1"
     mkdir -p "$(dirname "$STATE_FILE")"
     echo "$wallpaper" > "$STATE_FILE"
 }
 
-# Set wallpaper
+# Set the desktop wallpaper via gsettings (GNOME) or plasma-apply (KDE).
+# Accepts a filename, basename (with or without extension), or absolute path.
+# Resolves relative names by checking theme-specific dir, then global dir.
+# Arguments:
+#   $1 - Wallpaper name or path
 set_wallpaper() {
     local wallpaper="$1"
     local theme=$(get_current_theme)
     
-    # If just a name, look in theme-specific then global wall dir
+    # Resolve relative name: try theme dir first, then global, with extension guessing
     if [[ ! "$wallpaper" = /* ]]; then
         local found=false
         
@@ -164,7 +173,7 @@ set_wallpaper() {
     fi
 }
 
-# Next wallpaper (cycle forward)
+# Cycle to the next wallpaper in the sorted list (wraps around)
 next_wallpaper() {
     local current=$(get_current)
     mapfile -t wallpapers < <(get_wallpapers)
@@ -190,7 +199,7 @@ next_wallpaper() {
     set_wallpaper "${wallpapers[$next_idx]}"
 }
 
-# Previous wallpaper (cycle backward)
+# Cycle to the previous wallpaper in the sorted list (wraps around)
 prev_wallpaper() {
     local current=$(get_current)
     mapfile -t wallpapers < <(get_wallpapers)
@@ -221,7 +230,7 @@ prev_wallpaper() {
     set_wallpaper "${wallpapers[$prev_idx]}"
 }
 
-# Random wallpaper
+# Set a randomly chosen wallpaper from the available pool
 random_wallpaper() {
     mapfile -t wallpapers < <(get_wallpapers)
     local count=${#wallpapers[@]}
@@ -235,7 +244,7 @@ random_wallpaper() {
     set_wallpaper "${wallpapers[$idx]}"
 }
 
-# Interactive selection
+# Present a gum-based interactive picker (or text fallback) for wallpaper selection
 select_interactive() {
     local theme=$(get_current_theme)
     
@@ -258,7 +267,7 @@ select_interactive() {
     fi
 }
 
-# Show help
+# Display usage information
 show_help() {
     echo "Usage: kodra wallpaper [command]"
     echo ""
@@ -277,7 +286,7 @@ show_help() {
     echo "Without arguments, opens interactive picker."
 }
 
-# List theme-specific wallpapers only
+# List only wallpapers from the current theme's directory
 theme_wallpapers() {
     local theme=$(get_current_theme)
     local theme_wp_dir="$WALLPAPER_DIR/$theme"

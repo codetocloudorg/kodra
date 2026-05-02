@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Kodra Refresh - Hot-reload components without logout
-# Part of #48 Theme Hot-Swap
+# Part of #48 Theme Hot-Swap.
+# Sends reload signals or hints to running applications (Ghostty,
+# tmux, VS Code, btop, neovim) after a theme change.
 #
 
 set -e
@@ -9,7 +11,7 @@ set -e
 KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
 source "$KODRA_DIR/lib/utils.sh"
 
-# Refresh terminal (reload Ghostty config)
+# Reload Ghostty terminal config via USR1 signal (Ghostty watches for this)
 refresh_terminal() {
     if command -v ghostty &>/dev/null; then
         # Ghostty watches config files, send signal to reload
@@ -18,7 +20,7 @@ refresh_terminal() {
     fi
 }
 
-# Refresh Starship prompt
+# Notify about Starship prompt reload (it reloads automatically per prompt)
 refresh_starship() {
     # Starship reloads on each prompt, but we can force it
     if [ -n "$STARSHIP_SHELL" ]; then
@@ -28,7 +30,7 @@ refresh_starship() {
     fi
 }
 
-# Refresh tmux
+# Source the tmux config file into any running tmux server
 refresh_tmux() {
     if command -v tmux &>/dev/null && tmux list-sessions &>/dev/null 2>&1; then
         if [ -f "$HOME/.config/tmux/tmux.conf" ]; then
@@ -39,7 +41,7 @@ refresh_tmux() {
     fi
 }
 
-# Refresh VS Code theme
+# Hint the user to reload VS Code window (settings.json is read live)
 refresh_vscode() {
     # VS Code reads settings.json live, but we can trigger Developer: Reload Window
     if pgrep -x "code" &>/dev/null; then
@@ -48,7 +50,7 @@ refresh_vscode() {
     fi
 }
 
-# Refresh btop
+# Hint that btop reads config at startup and needs a restart
 refresh_btop() {
     if pgrep -x "btop" &>/dev/null; then
         # btop reads config on start, needs restart
@@ -56,7 +58,7 @@ refresh_btop() {
     fi
 }
 
-# Refresh neovim
+# Send a remote command to any running neovim instance to reload config
 refresh_nvim() {
     if command -v nvim &>/dev/null; then
         # Check if nvim has a server running
@@ -69,7 +71,7 @@ refresh_nvim() {
     fi
 }
 
-# Refresh GNOME desktop settings
+# GNOME desktop settings are applied immediately via gsettings — just confirm
 refresh_desktop() {
     if command -v gsettings &>/dev/null && [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
         # GNOME settings are applied immediately via gsettings
@@ -77,7 +79,7 @@ refresh_desktop() {
     fi
 }
 
-# Full refresh after theme change
+# Reload all components in sequence after a theme change
 refresh_all() {
     log_info "Refreshing all components..."
     echo ""

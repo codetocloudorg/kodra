@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 #
 # Kodra Config Layering
-# Manages the defaults → theme → user configuration hierarchy
+# Three-tier configuration system: defaults → theme → user overrides.
+# Ensures theme changes don't clobber user customizations.
 #
 
 KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"

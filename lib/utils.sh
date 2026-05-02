@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #
 # Kodra Utility Functions
+# Core helpers used across all Kodra scripts: logging, version checks,
+# sudo management, installer execution, shell integration, and PATH setup.
 #
 
 # Source Homebrew if available (ensures brew is in PATH after fresh install)
@@ -17,19 +19,22 @@ export PURPLE='\033[0;35m'
 export CYAN='\033[0;36m'
 export NC='\033[0m' # No Color
 
-# Logging functions
+# Print an informational message in blue
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
 }
 
+# Print a success message in green
 log_success() {
     echo -e "${GREEN}[OK]${NC} $1"
 }
 
+# Print a warning message in yellow
 log_warning() {
     echo -e "${YELLOW}[WARN]${NC} $1"
 }
 
+# Print an error message in red
 log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
@@ -145,7 +150,13 @@ export KODRA_FAILED_INSTALLS=""
 export KODRA_INSTALL_COUNT=0
 export KODRA_FAIL_COUNT=0
 
-# Run an installer script (always continues on failure, tracks failures for summary)
+# Run an installer script with error tracking
+# Always returns 0 so the main install never halts mid-run.
+# Failures are tracked in KODRA_FAIL_COUNT for the completion summary.
+# Arguments:
+#   $1 - Path to installer script
+#   $@ - Additional arguments passed to the script
+# Returns: 0 always (failures tracked in KODRA_FAIL_COUNT)
 run_installer() {
     local script="$1"
     shift
@@ -193,7 +204,10 @@ run_installer() {
     return 0
 }
 
-# Add directory to PATH using marker blocks (idempotent)
+# Add a directory to PATH in .bashrc and .zshrc using marker blocks
+# Idempotent — safe to call multiple times; existing blocks are updated in place
+# Arguments:
+#   $1 - Directory to add to PATH
 add_to_path() {
     local dir="$1"
     local marker_start="# >>> kodra path: $dir >>>"
@@ -207,8 +221,9 @@ $marker_end"
     done
 }
 
-# Add shell integration (aliases, completions, MOTD)
-# Uses marker blocks to ensure idempotency on re-runs
+# Add Kodra shell integration to .bashrc, .zshrc, and .profile
+# Injects a source line for kodra.sh wrapped in marker blocks so it
+# can be updated or removed cleanly on re-runs
 add_shell_integration() {
     local kodra_dir="${KODRA_DIR:-$HOME/.kodra}"
     local marker_start="# >>> kodra initialize >>>"
@@ -256,7 +271,12 @@ BLOCK
     mkdir -p "$HOME/.config/zsh/completions"
 }
 
-# Helper: update a shell config file with a marker block (idempotent)
+# Replace or append a marker-delimited block in a shell config file
+# Arguments:
+#   $1 - File path (e.g., ~/.bashrc)
+#   $2 - Marker start string
+#   $3 - Marker end string
+#   $4 - Full block content (including markers)
 _kodra_update_shell_config() {
     local file="$1"
     local marker_start="$2"
@@ -279,23 +299,29 @@ _kodra_update_shell_config() {
     fi
 }
 
-# Check if an app is already installed
+# Check if a command is available on PATH
+# Arguments: $1 - command name
 is_installed() {
     command -v "$1" &> /dev/null
 }
 
-# Check if a flatpak app is installed
+# Check if a Flatpak app is installed by searching the app list
+# Arguments: $1 - Flatpak app ID or substring
 is_flatpak_installed() {
     flatpak list --app 2>/dev/null | grep -q "$1"
 }
 
-# Get latest GitHub release version
+# Get the latest release tag from a GitHub repository
+# Arguments: $1 - owner/repo (e.g., "charmbracelet/gum")
+# Returns: tag name string (e.g., "v0.14.0")
 get_github_release() {
     local repo="$1"
     curl -s --max-time 10 "https://api.github.com/repos/$repo/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
 }
 
-# Download and install a .deb file
+# Download and install a .deb package from a URL
+# Falls back to apt-get -f to resolve broken dependencies
+# Arguments: $1 - URL of the .deb file
 install_deb() {
     local url="$1"
     local temp_deb=$(mktemp)
@@ -305,7 +331,8 @@ install_deb() {
     rm -f "$temp_deb"
 }
 
-# Ensure a directory exists
+# Create a directory (and parents) if it doesn't already exist
+# Arguments: $1 - directory path
 ensure_dir() {
     mkdir -p "$1"
 }

@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Kodra Screenshot Tool
-# Take screenshots with various options
+# Take screenshots with various capture modes (full, region, window, delayed).
+# Auto-detects available screenshot backends (gnome-screenshot, scrot, flameshot)
+# and copies results to clipboard when xclip is available.
 #
 
 set -e
@@ -14,13 +16,16 @@ source "$KODRA_DIR/lib/utils.sh"
 # Ensure screenshot directory exists
 mkdir -p "$SCREENSHOT_DIR"
 
-# Generate filename
+# Generate a timestamped filename for the screenshot
+# Arguments:
+#   $1 - Filename prefix (default: "screenshot")
+# Returns: Full path to ~/Pictures/Screenshots/<prefix>_<timestamp>.png
 get_filename() {
     local prefix="${1:-screenshot}"
     echo "$SCREENSHOT_DIR/${prefix}_$(date +%Y-%m-%d_%H-%M-%S).png"
 }
 
-# Full screen screenshot
+# Capture the entire screen using the best available tool
 screenshot_full() {
     local output=$(get_filename "fullscreen")
     
@@ -44,7 +49,7 @@ screenshot_full() {
     fi
 }
 
-# Region selection screenshot
+# Capture a user-selected screen region
 screenshot_region() {
     local output=$(get_filename "region")
     
@@ -70,7 +75,7 @@ screenshot_region() {
     fi
 }
 
-# Active window screenshot
+# Capture the currently focused window
 screenshot_window() {
     local output=$(get_filename "window")
     
@@ -91,7 +96,9 @@ screenshot_window() {
     fi
 }
 
-# Delayed screenshot
+# Take a screenshot after a countdown delay
+# Arguments:
+#   $1 - Delay in seconds (default: 5)
 screenshot_delay() {
     local delay="${1:-5}"
     local output=$(get_filename "delayed")
@@ -111,7 +118,7 @@ screenshot_delay() {
     log_success "Screenshot saved: $output"
 }
 
-# Open screenshot folder
+# Open the screenshot directory in the default file manager
 open_folder() {
     if command -v xdg-open &>/dev/null; then
         xdg-open "$SCREENSHOT_DIR"
@@ -121,7 +128,7 @@ open_folder() {
     fi
 }
 
-# Interactive mode
+# Present an interactive gum-based menu for screenshot mode selection
 interactive_mode() {
     if ! command -v gum &>/dev/null; then
         show_help
@@ -154,7 +161,7 @@ interactive_mode() {
     esac
 }
 
-# Show help
+# Display usage information
 show_help() {
     echo "Usage: kodra screenshot [command]"
     echo ""

@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Kodra Power - Power profile management
-# Uses powerprofilesctl for GNOME power management
+# Uses powerprofilesctl for GNOME power management.
+# Supports performance, balanced, and power-saver profiles
+# with friendly aliases (e.g. "perf", "battery").
 #
 
 set -e
@@ -39,6 +41,7 @@ show_help() {
     echo "  kodra power power-saver  # Switch to power saver"
 }
 
+# Abort early if powerprofilesctl is not installed
 check_powerprofilesctl() {
     if ! command -v powerprofilesctl &>/dev/null; then
         echo -e "${RED}Error:${NC} powerprofilesctl not found."
@@ -49,10 +52,12 @@ check_powerprofilesctl() {
     fi
 }
 
+# Query the active power profile from the daemon
 get_current_profile() {
     powerprofilesctl get 2>/dev/null || echo "unknown"
 }
 
+# Display the current profile and all available profiles with indicators
 show_current() {
     local current=$(get_current_profile)
     local icon=""
@@ -114,10 +119,13 @@ show_current() {
     echo -e "${WHITE}Usage:${NC} kodra power <profile>"
 }
 
+# Switch to a power profile, accepting canonical names and aliases
+# Arguments:
+#   $1 - Profile name or alias (e.g. "performance", "perf", "battery")
 set_profile() {
     local profile="$1"
     
-    # Validate profile
+    # Normalize friendly aliases to canonical profile names
     case "$profile" in
         performance|balanced|power-saver)
             ;;

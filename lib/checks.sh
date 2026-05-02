@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Kodra Pre-flight Checks
-# System validation before installation
+# Validates the system environment before installation: OS version,
+# architecture, disk space, network, sudo access, and runtime
+# (graphical vs. WSL vs. container).
 #
 
 KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"

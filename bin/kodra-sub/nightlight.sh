@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Kodra Night Light - Control GNOME Night Light
-# Reduces blue light for better sleep
+# Reduces blue light for better sleep.
+# Wraps gsettings for the org.gnome.settings-daemon.plugins.color schema
+# to toggle, set temperature, and manage scheduling.
 #
 
 set -e
@@ -45,6 +47,7 @@ show_help() {
     echo "  kodra nightlight temp 6500 # Cooler (neutral)"
 }
 
+# Abort early if gsettings (GNOME) is unavailable
 check_gsettings() {
     if ! command -v gsettings &>/dev/null; then
         echo -e "${RED}Error:${NC} gsettings not found. GNOME is required."
@@ -52,10 +55,13 @@ check_gsettings() {
     fi
 }
 
+# Query whether night light is currently enabled
+# Returns: "true" or "false"
 get_enabled() {
     gsettings get "$SCHEMA" night-light-enabled 2>/dev/null | grep -q "true" && echo "true" || echo "false"
 }
 
+# Get current color temperature in Kelvin
 get_temperature() {
     # Temperature is stored as a uint32 value representing Kelvin
     local temp=$(gsettings get "$SCHEMA" night-light-temperature 2>/dev/null)
@@ -63,10 +69,12 @@ get_temperature() {
     echo "${temp#uint32 }"
 }
 
+# Check if automatic sunset-to-sunrise scheduling is active
 get_schedule_enabled() {
     gsettings get "$SCHEMA" night-light-schedule-automatic 2>/dev/null | grep -q "true" && echo "true" || echo "false"
 }
 
+# Display a formatted summary of night light state, temperature, and schedule
 show_status() {
     local enabled=$(get_enabled)
     local temp=$(get_temperature)
@@ -98,6 +106,9 @@ show_status() {
     echo -e "  ${WHITE}6500K+${NC}      Cool (blue sky)"
 }
 
+# Enable or disable night light
+# Arguments:
+#   $1 - "true" to enable, "false" to disable
 set_enabled() {
     local state="$1"
     local icon=""
@@ -118,6 +129,7 @@ set_enabled() {
     echo -e "${color}$icon Night light ${word}${NC}"
 }
 
+# Toggle night light between enabled and disabled
 toggle() {
     local current=$(get_enabled)
     if [ "$current" = "true" ]; then
@@ -127,10 +139,13 @@ toggle() {
     fi
 }
 
+# Set the color temperature in Kelvin (1000–10000)
+# Arguments:
+#   $1 - Temperature value in Kelvin
 set_temperature() {
     local temp="$1"
     
-    # Validate temperature
+    # Validate: must be a positive integer
     if ! [[ "$temp" =~ ^[0-9]+$ ]]; then
         echo -e "${RED}Error:${NC} Temperature must be a number (in Kelvin)"
         exit 1
@@ -163,6 +178,9 @@ set_temperature() {
     fi
 }
 
+# Enable or disable automatic sunset-to-sunrise scheduling
+# Arguments:
+#   $1 - "true" for automatic, "false" for manual
 set_schedule() {
     local auto="$1"
     
@@ -212,7 +230,7 @@ case "${1:-}" in
         toggle
         ;;
     *)
-        # Check if argument looks like a temperature
+        # Bare number argument treated as a temperature shorthand
         if [[ "$1" =~ ^[0-9]+$ ]]; then
             set_temperature "$1"
         else

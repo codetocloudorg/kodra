@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 #
 # Kodra Migration Runner
-# Executes pending migrations in timestamp order
-# Each migration runs exactly once (tracked via state files)
+# Executes pending migrations in timestamp order.
+# Each migration runs exactly once, tracked via .done state files
+# in $XDG_CONFIG_HOME/kodra/migrations/. On fresh installs, use
+# "init" to mark all existing migrations as complete.
 #
 
 set -e
@@ -16,7 +18,8 @@ source "$KODRA_DIR/lib/utils.sh"
 # Ensure state directory exists
 mkdir -p "$STATE_DIR"
 
-# List pending migrations
+# List migrations that have not yet been marked as complete
+# Returns: newline-separated migration names, sorted numerically
 list_pending() {
     local pending=()
     if [ -d "$MIGRATIONS_DIR" ] && [ "$(ls -A "$MIGRATIONS_DIR"/*.sh 2>/dev/null)" ]; then
@@ -30,7 +33,10 @@ list_pending() {
     printf '%s\n' "${pending[@]}" | sort -n
 }
 
-# Run a single migration
+# Execute a single migration script and record completion
+# Arguments:
+#   $1 - Migration name (filename without .sh)
+# Returns: 0 on success, 1 on failure
 run_migration() {
     local name="$1"
     local script="$MIGRATIONS_DIR/${name}.sh"
@@ -43,7 +49,7 @@ run_migration() {
     log_info "Running migration: $name"
     
     if bash "$script"; then
-        touch "$STATE_DIR/$name.done"
+        touch "$STATE_DIR/$name.done"  # Record successful completion
         log_success "Migration complete: $name"
         return 0
     else
@@ -52,7 +58,7 @@ run_migration() {
     fi
 }
 
-# Show status
+# Display status of all migrations (completed vs pending)
 show_status() {
     echo ""
     echo -e "${BLUE}Migration Status${NC}"

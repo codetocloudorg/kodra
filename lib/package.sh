@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 #
 # Kodra Package Management Helpers
-# DRY utilities for apt, snap, deb, and flatpak installations
+# Abstraction layer over apt, snap, flatpak, and .deb installers.
+# All functions are idempotent — safe to call repeatedly.
 #
 
 KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"

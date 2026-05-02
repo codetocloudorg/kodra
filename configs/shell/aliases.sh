@@ -1,5 +1,17 @@
+#!/usr/bin/env bash
+#
 # Kodra Shell Aliases
 # A Code To Cloud Project ☁️
+#
+# Organized into categories:
+#   - Modern CLI replacements (bat, eza, fd — opt-in via KODRA_POSIX_ALIASES)
+#   - Git shortcuts (g, gs, gp, etc.)
+#   - Docker shortcuts (d, dc, dps, etc.)
+#   - Azure & azd shortcuts
+#   - GitHub Copilot CLI shortcuts
+#   - Terraform / OpenTofu shortcuts
+#   - Utility shortcuts (navigation, editors, quick info)
+#   - Kodra command aliases
 #
 # Source this file in your .bashrc or .zshrc:
 #   source ~/.kodra/configs/shell/aliases.sh
@@ -139,7 +151,8 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 
-# Make directory and cd into it
+# Make a directory and cd into it in one step
+# Usage: mkcd <directory>
 mkcd() {
     [ -z "$1" ] && { echo "Usage: mkcd <directory>"; return 1; }
     mkdir -p "$1" && cd "$1"

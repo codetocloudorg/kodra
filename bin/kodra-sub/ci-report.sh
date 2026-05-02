@@ -30,6 +30,7 @@ NC='\033[0m'
 
 # ── Functions ──
 
+# Display usage information and available CLI options
 show_help() {
     echo "Usage: kodra ci-report [OPTIONS]"
     echo ""
@@ -47,6 +48,7 @@ show_help() {
     echo "Reports are saved to: $REPORT_DIR/"
 }
 
+# Verify gh CLI is installed and authenticated
 check_deps() {
     if ! command -v gh &>/dev/null; then
         echo -e "${RED}Error: gh CLI not found. Install: https://cli.github.com${NC}" >&2
@@ -58,6 +60,9 @@ check_deps() {
     fi
 }
 
+# Get the most recent workflow run ID from the repository
+# Arguments:
+#   $1 - Optional status filter (e.g., "in_progress")
 get_latest_run() {
     local status="${1:-}"
     local filter=""
@@ -68,11 +73,13 @@ get_latest_run() {
         --jq '.[0].databaseId'
 }
 
+# Get the most recent failed run ID from the last 10 runs
 get_latest_failed_run() {
     gh run list --repo "$REPO" --limit 10 --json databaseId,status,conclusion \
         --jq '[.[] | select(.conclusion=="failure")][0].databaseId'
 }
 
+# Block until an in-progress run completes, then generate its report
 watch_run() {
     local run_id
     run_id=$(gh run list --repo "$REPO" --limit 1 \
@@ -89,6 +96,11 @@ watch_run() {
     analyze_run "$run_id"
 }
 
+# Fetch run metadata, pull logs for failed jobs, and write a markdown report
+# Arguments:
+#   $1 - Workflow run ID
+#   $2 - Include all logs, not just failures ("true"/"false")
+#   $3 - Output as JSON instead of markdown ("true"/"false")
 analyze_run() {
     local run_id="$1"
     local all_logs="${2:-false}"
@@ -165,7 +177,7 @@ analyze_run() {
             local log_content
             log_content=$(gh api "repos/${REPO}/actions/jobs/${job_id}/logs" 2>/dev/null | tail -"$MAX_LOG_LINES" || echo "Could not retrieve logs")
 
-            # Extract errors
+            # Extract error lines using common CI failure patterns
             local errors
             errors=$(echo "$log_content" | grep -i "error\|::error\|FAILED\|not ok\|exit code [1-9]" | head -30 || true)
 
@@ -237,6 +249,10 @@ analyze_run() {
     fi
 }
 
+# Map error patterns to actionable remediation checklist items
+# Arguments:
+#   $1 - Error log text to scan for known failure patterns
+#   $2 - Job name (used in fallback message)
 generate_remediation() {
     local errors="$1"
     local job_name="$2"
@@ -290,6 +306,9 @@ generate_remediation() {
     echo -e "$items"
 }
 
+# Display a tabular summary of the last N workflow runs
+# Arguments:
+#   $1 - Number of runs to show (default: 10)
 show_history() {
     local count="${1:-10}"
     echo -e "${BLUE}━━━ Last ${count} CI Runs ━━━${NC}"
@@ -310,6 +329,8 @@ show_history() {
 }
 
 # ── Main ──
+
+# Parse CLI flags and dispatch to the appropriate action
 main() {
     check_deps
 

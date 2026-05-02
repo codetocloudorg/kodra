@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 #
 # Kodra Menu - Interactive main menu
-# Uses gum for beautiful TUI
+# Uses gum for a beautiful TUI that dispatches to other kodra subcommands.
+# Requires gum to be installed.
 #
 
 set -e
@@ -25,6 +26,7 @@ if ! command -v gum &>/dev/null; then
     exit 1
 fi
 
+# Display the top-level menu with ASCII banner and dispatch selection
 show_main_menu() {
     clear
     echo ""
@@ -104,6 +106,7 @@ show_main_menu() {
     esac
 }
 
+# Show theme selection submenu, populated from themes/ directory
 show_theme_menu() {
     clear
     echo -e "${PURPLE}🎨 Theme Selection${NC}"
@@ -112,6 +115,7 @@ show_theme_menu() {
     # List available themes
     THEMES_DIR="$KODRA_DIR/themes"
     THEMES=()
+    # Collect theme directories (null-delimited for safe handling of special chars)
     while IFS= read -r -d '' theme; do
         name=$(basename "$theme")
         THEMES+=("$name")
@@ -140,6 +144,7 @@ show_theme_menu() {
     fi
 }
 
+# Show desktop configuration submenu (refresh, setup, dock, extensions)
 show_desktop_menu() {
     clear
     echo -e "${PURPLE}🖥️ Desktop Configuration${NC}"
@@ -178,6 +183,7 @@ show_desktop_menu() {
     show_desktop_menu
 }
 
+# Show application installer submenu, populated from applications/ directory
 show_install_menu() {
     clear
     echo -e "${PURPLE}📦 Install Applications${NC}"

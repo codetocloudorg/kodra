@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Kodra Backup System
-# Backs up dotfiles before modification for safe recovery
+# Creates timestamped snapshots of dotfiles before modifications,
+# enabling safe recovery via restore. Also supports full dconf
+# backup/restore and portable tarball export/import of dotfiles.
 #
 
 KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"

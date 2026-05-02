@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 #
 # Kodra First-Run Welcome
-# Beautiful post-install experience
+# Animated post-install welcome screen showing what was installed,
+# quick-start commands, and keyboard shortcuts. Uses ANSI escape codes
+# for color and a typewriter effect for key messages.
 #
 
 clear
 
-# Animated typing effect
+# Print text one character at a time for a typewriter effect
+# Arguments:
+#   $1 - Text to display
+#   $2 - Delay between characters in seconds (default: 0.03)
 type_text() {
     local text="$1"
     local delay="${2:-0.03}"
@@ -17,7 +22,7 @@ type_text() {
     echo ""
 }
 
-# Colors
+# ANSI color codes (short names to keep banner lines readable)
 R='\033[0;31m'
 G='\033[0;32m'
 Y='\033[0;33m'
@@ -27,7 +32,7 @@ C='\033[0;36m'
 NC='\033[0m'
 BOLD='\033[1m'
 
-# Rainbow banner with animation
+# Rainbow ASCII banner — each line uses 256-color escapes for a gradient effect
 echo ""
 sleep 0.1
 echo -e "\033[38;5;196m    ██╗  ██╗\033[38;5;208m ██████╗ \033[38;5;226m██████╗ \033[38;5;46m██████╗ \033[38;5;51m █████╗ \033[0m"

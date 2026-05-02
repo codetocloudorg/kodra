@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Kodra Update Script
-# Safely updates Kodra and system packages
+# Safely updates the Kodra repository (git pull with stash protection),
+# runs migrations, then updates system packages (apt, brew, flatpak),
+# mise runtimes, VS Code extensions, and desktop settings.
 #
 
 set -e
@@ -9,7 +11,7 @@ set -e
 KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
 source "$KODRA_DIR/lib/utils.sh"
 
-# Pre-flight checks
+# Verify internet connectivity before attempting updates
 check_network() {
     if ! curl -s --max-time 5 https://github.com &>/dev/null; then
         if ! ping -c 1 -W 3 github.com &>/dev/null; then
@@ -19,7 +21,8 @@ check_network() {
     fi
 }
 
-# Cache sudo credentials upfront (single prompt)
+# Prompt for sudo once and keep credentials alive in the background.
+# Spawns a keep-alive loop that refreshes the sudo timestamp every 50s.
 cache_sudo() {
     if ! sudo -n true 2>/dev/null; then
         log_info "Sudo access needed for system updates..."
@@ -43,7 +46,7 @@ check_network
 log_info "Updating Kodra repository..."
 cd "$KODRA_DIR"
 
-# Check for local modifications
+# Stash any local modifications so the fast-forward merge can succeed
 if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
     log_warning "Local modifications detected in $KODRA_DIR"
     log_warning "Stashing changes before update..."
@@ -51,7 +54,7 @@ if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; th
     STASHED=true
 fi
 
-# Fetch and merge (fast-forward only — no force)
+# Fetch and merge: prefer fast-forward, fall back to rebase, abort on conflict
 git fetch origin --quiet
 CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo "main")
 UPSTREAM="origin/${KODRA_UPDATE_BRANCH:-main}"

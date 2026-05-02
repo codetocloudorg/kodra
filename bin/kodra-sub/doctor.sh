@@ -32,6 +32,12 @@ CHECKS=0
 PASSED=0
 FIXES=()
 
+# Run a single health check with optional auto-fix support
+# Arguments:
+#   $1 - Check display name
+#   $2 - Shell command to evaluate (runs in bash -c with a 10s timeout)
+#   $3 - Optional auto-fix command (runs if --fix mode and check fails)
+#   $4 - Optional human-readable fix hint shown on failure
 check() {
     local name="$1"
     local cmd="$2"
@@ -229,6 +235,7 @@ echo ""
 echo -e "  ${WHITE}Results: ${PASSED}/${CHECKS} checks passed${NC}"
 echo ""
 
+# Determine health tier: all passed, ≥75% passed, or critical issues
 if [ $PASSED -eq $CHECKS ]; then
     echo -e "  ${GREEN}✅ All systems go! Kodra is healthy.${NC}"
 elif [ $PASSED -ge $((CHECKS * 3 / 4)) ]; then

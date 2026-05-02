@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Kodra Repair Command
-# Re-apply all configurations without reinstalling apps
+# Re-apply all configurations without reinstalling apps.
+# Covers shell integration, desktop files, terminal configs,
+# VS Code settings, GNOME extensions/dock, and login screen.
 #
 
 set -e
@@ -36,13 +38,15 @@ show_help() {
     echo "  kodra repair --login   # Sync login screen with desktop wallpaper"
 }
 
+# Ensure Kodra source line is present in .bashrc/.zshrc and configure
+# shell environment (Flatpak XDG paths, EDITOR, completions).
 repair_shell_integration() {
     echo -e "${CYAN}━━━ Shell Integration ━━━${NC}"
     
     local kodra_dir="${KODRA_DIR:-$HOME/.kodra}"
     local source_line="[ -f \"$kodra_dir/configs/shell/kodra.sh\" ] && source \"$kodra_dir/configs/shell/kodra.sh\""
     
-    # Add XDG_DATA_DIRS to ~/.profile for GNOME session
+    # Flatpak exports need to be in XDG_DATA_DIRS for GNOME app launcher
     if [ -f "$HOME/.profile" ]; then
         if ! grep -q "flatpak/exports/share" "$HOME/.profile"; then
             echo "" >> "$HOME/.profile"
@@ -96,7 +100,7 @@ repair_shell_integration() {
     echo ""
 }
 
-# Install shell completions for kodra
+# Install bash and zsh tab-completions for the kodra command
 install_completions() {
     local kodra_dir="${KODRA_DIR:-$HOME/.kodra}"
     
@@ -127,6 +131,7 @@ install_completions() {
     fi
 }
 
+# Create .desktop files for TUI apps so they appear in GNOME launcher
 repair_app_desktop_files() {
     echo -e "${CYAN}━━━ Application Desktop Files ━━━${NC}"
     
@@ -226,6 +231,7 @@ EOF
     echo ""
 }
 
+# Merge Kodra theme settings into VS Code's settings.json
 repair_vscode_settings() {
     echo -e "${CYAN}━━━ VS Code Settings ━━━${NC}"
     
@@ -248,6 +254,7 @@ repair_vscode_settings() {
     if [ -f "$kodra_theme_settings" ]; then
         if [ -f "$vscode_settings_file" ]; then
             if command -v jq &>/dev/null; then
+                # Deep-merge existing user settings with theme settings
                 jq -s '.[0] * .[1]' "$vscode_settings_file" "$kodra_theme_settings" > "${vscode_settings_file}.tmp" 2>/dev/null && \
                     mv "${vscode_settings_file}.tmp" "$vscode_settings_file" && \
                     echo "  ✓ Applied $current_theme theme (merged)"
@@ -265,6 +272,7 @@ repair_vscode_settings() {
     echo ""
 }
 
+# Copy theme-specific and base configs for Ghostty, Starship, btop, nvim, etc.
 repair_terminal_configs() {
     echo -e "${CYAN}━━━ Terminal Configurations ━━━${NC}"
     
@@ -377,6 +385,7 @@ repair_terminal_configs() {
     echo ""
 }
 
+# Enable GNOME extensions, disable conflicting Ubuntu defaults, and set dock favorites
 repair_desktop() {
     echo -e "${CYAN}━━━ Desktop Environment ━━━${NC}"
     
@@ -410,6 +419,9 @@ repair_desktop() {
         "/usr/local/share/applications"
     )
     
+    # Search multiple directories for a .desktop file, trying variant names
+    # Arguments: one or more .desktop filenames to try
+    # Returns: first match found, or 1 if none
     find_app() {
         local variants=("$@")
         for variant in "${variants[@]}"; do
@@ -434,6 +446,7 @@ repair_desktop() {
     app=$(find_app "org.gnome.Settings.desktop" "gnome-control-center.desktop") && INSTALLED_APPS+=("$app")
     
     if [ ${#INSTALLED_APPS[@]} -gt 0 ]; then
+        # Build a gsettings-compatible list: ['app1.desktop','app2.desktop']
         FAVORITES_LIST=$(printf "'%s'," "${INSTALLED_APPS[@]}")
         FAVORITES_LIST="[${FAVORITES_LIST%,}]"
         gsettings set org.gnome.shell favorite-apps "$FAVORITES_LIST" 2>/dev/null || true
@@ -443,6 +456,8 @@ repair_desktop() {
     echo ""
 }
 
+# Configure GDM login screen: dark theme, Kodra wallpaper, dconf settings.
+# Requires sudo for writing to /usr/share/backgrounds and /etc/dconf/.
 repair_login_screen() {
     echo -e "${CYAN}━━━ Login Screen ━━━${NC}"
     
@@ -508,6 +523,7 @@ DCONFTHEME
     echo ""
 }
 
+# Run all repair steps in sequence with a formatted banner
 repair_all() {
     echo ""
     echo -e "\033[38;5;51m╔════════════════════════════════════════════════════════════╗\033[0m"

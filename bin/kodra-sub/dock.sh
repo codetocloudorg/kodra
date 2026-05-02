@@ -7,12 +7,12 @@
 set -e
 
 # Colors
-C='\033[0;36m'
-G='\033[0;32m'
-Y='\033[0;33m'
-R='\033[0;31m'
-W='\033[0;37m'
-NC='\033[0m'
+C='\033[0;36m'   # Cyan - headings
+G='\033[0;32m'   # Green - success
+Y='\033[0;33m'   # Yellow - warnings
+R='\033[0;31m'   # Red - errors
+W='\033[0;37m'   # White - body text
+NC='\033[0m'     # Reset
 
 echo ""
 echo -e "${C}📌 Kodra Dock Configuration${NC}"
@@ -24,7 +24,8 @@ if ! command -v gnome-shell &> /dev/null; then
     exit 1
 fi
 
-# Desktop file locations (order matters - prefer flatpak)
+# Desktop file locations — Flatpak paths are checked first so Flatpak
+# versions are preferred over native .deb installs
 DESKTOP_DIRS=(
     "/var/lib/flatpak/exports/share/applications"
     "$HOME/.local/share/applications"
@@ -32,7 +33,10 @@ DESKTOP_DIRS=(
     "/usr/local/share/applications"
 )
 
-# Helper: find first existing desktop file from variants
+# Find the first existing .desktop file from a list of variant names
+# Arguments:
+#   $@ - One or more .desktop filename variants to search for
+# Returns: Prints the first match; exits 1 if none found
 find_app() {
     local variants=("$@")
     for variant in "${variants[@]}"; do
@@ -46,7 +50,10 @@ find_app() {
     return 1
 }
 
-# Helper: add app if found and report
+# Look up an app by name, add to INSTALLED_APPS if found, and log the result
+# Arguments:
+#   $1 - Human-readable app name (for display)
+#   $@ - Remaining args are .desktop filename variants
 add_app() {
     local name="$1"
     shift
@@ -83,11 +90,11 @@ if [ ${#INSTALLED_APPS[@]} -eq 0 ]; then
     exit 0
 fi
 
-# Build favorites list
+# Build a gsettings-compatible array string from the matched apps
 FAVORITES_LIST=$(printf "'%s'," "${INSTALLED_APPS[@]}")
-FAVORITES_LIST="[${FAVORITES_LIST%,}]"
+FAVORITES_LIST="[${FAVORITES_LIST%,}]"  # Strip trailing comma and wrap
 
-# Apply
+# Apply the favorites list to GNOME Shell
 gsettings set org.gnome.shell favorite-apps "$FAVORITES_LIST"
 
 echo -e "${G}✓ Dock updated with ${#INSTALLED_APPS[@]} apps${NC}"

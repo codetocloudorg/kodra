@@ -11,8 +11,8 @@ KODRA_DATA_DIR="$HOME/.local/share/kodra"
 
 source "$KODRA_DIR/lib/utils.sh"
 
+# Display usage information and available desktop commands
 show_help() {
-    echo "Usage: kodra desktop [command]"
     echo ""
     echo "Configure your desktop for the best developer experience"
     echo ""
@@ -32,11 +32,14 @@ show_help() {
     echo "  kodra desktop tiling      # Configure window tiling"
 }
 
+# Run the full first-time GNOME desktop setup via the installer script
 setup_desktop() {
     log_info "Running full desktop setup..."
     bash "$KODRA_DIR/install/desktop/gnome-setup.sh"
 }
 
+# Re-apply all desktop settings without a full reinstall:
+# refreshes desktop DB, enables extensions, configures dock, and sets favorites
 refresh_desktop() {
     echo ""
     echo -e "\033[38;5;51m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
@@ -46,6 +49,7 @@ refresh_desktop() {
     
     # 1. Refresh desktop database for Flatpak apps
     log_info "Refreshing desktop database..."
+    # Ensure Flatpak app directories are in XDG_DATA_DIRS so desktop files are discoverable
     export XDG_DATA_DIRS="/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
     if command -v update-desktop-database &>/dev/null; then
         sudo update-desktop-database /var/lib/flatpak/exports/share/applications 2>/dev/null || true
@@ -71,7 +75,7 @@ refresh_desktop() {
         fi
     done
     
-    # Disable conflicting Ubuntu defaults
+    # Disable Ubuntu's built-in dock and desktop icons to avoid conflicts with Dash to Dock
     gnome-extensions disable ubuntu-dock@ubuntu.com 2>/dev/null || true
     gnome-extensions disable ding@rastersoft.com 2>/dev/null || true
     log_success "Extensions configured"
@@ -92,6 +96,7 @@ refresh_desktop() {
         "/usr/local/share/applications"
     )
     
+    # Search standard .desktop file locations in priority order (Flatpak first)
     find_app() {
         local variants=("$@")
         for variant in "${variants[@]}"; do
@@ -115,9 +120,10 @@ refresh_desktop() {
     app=$(find_app "com.discordapp.Discord.desktop" "discord.desktop") && INSTALLED_APPS+=("$app")
     app=$(find_app "org.gnome.Settings.desktop" "gnome-control-center.desktop") && INSTALLED_APPS+=("$app")
     
+    # Build gsettings-compatible favorites array from matched desktop files
     if [ ${#INSTALLED_APPS[@]} -gt 0 ]; then
         FAVORITES_LIST=$(printf "'%s'," "${INSTALLED_APPS[@]}")
-        FAVORITES_LIST="[${FAVORITES_LIST%,}]"
+        FAVORITES_LIST="[${FAVORITES_LIST%,}]"  # Strip trailing comma and wrap
         gsettings set org.gnome.shell favorite-apps "$FAVORITES_LIST" 2>/dev/null || true
         log_success "Dock favorites set (${#INSTALLED_APPS[@]} apps)"
     fi
@@ -143,6 +149,7 @@ refresh_desktop() {
     echo ""
 }
 
+# Run the dock configuration script from the data directory
 configure_dock() {
     if [ -f "$KODRA_DATA_DIR/configure-dock.sh" ]; then
         bash "$KODRA_DATA_DIR/configure-dock.sh"
@@ -153,6 +160,7 @@ configure_dock() {
     fi
 }
 
+# Install and enable recommended GNOME Shell extensions
 setup_extensions() {
     if [ -f "$KODRA_DATA_DIR/setup-extensions.sh" ]; then
         bash "$KODRA_DATA_DIR/setup-extensions.sh"
@@ -163,6 +171,7 @@ setup_extensions() {
     fi
 }
 
+# Apply dark theme and wallpaper to the GDM login screen
 customize_login_screen() {
     log_info "Customizing login screen..."
     if [ -f "$KODRA_DIR/install/desktop/login-screen.sh" ]; then
@@ -173,6 +182,7 @@ customize_login_screen() {
     fi
 }
 
+# Reset GNOME desktop to upstream defaults (prompts for confirmation)
 reset_desktop() {
     log_warning "This will reset GNOME to default settings"
     read -p "Continue? (y/N) " -n 1 -r
@@ -193,6 +203,7 @@ reset_desktop() {
     fi
 }
 
+# Configure or display window tiling shortcuts (uses Tactile extension)
 configure_tiling() {
     if [ -f "$KODRA_DATA_DIR/configure-tiling.sh" ]; then
         bash "$KODRA_DATA_DIR/configure-tiling.sh"

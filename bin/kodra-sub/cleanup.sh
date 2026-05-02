@@ -12,9 +12,12 @@ source "$KODRA_DIR/lib/utils.sh"
 # Track total space freed
 TOTAL_FREED=0
 
-# Format bytes to human readable
+# Convert byte count to human-readable format (KB/MB/GB)
+# Arguments:
+#   $1 - Size in bytes
 format_bytes() {
     local bytes=$1
+    # Thresholds: 1 GB, 1 MB, 1 KB
     if [ "$bytes" -gt 1073741824 ]; then
         echo "$(echo "scale=2; $bytes/1073741824" | bc) GB"
     elif [ "$bytes" -gt 1048576 ]; then
@@ -26,12 +29,14 @@ format_bytes() {
     fi
 }
 
-# Get directory size
+# Get directory size in bytes, returns 0 if path is inaccessible
+# Arguments:
+#   $1 - Directory path
 get_size() {
     du -sb "$1" 2>/dev/null | cut -f1 || echo 0
 }
 
-# Clean apt cache
+# Clean apt package cache and remove orphaned packages
 clean_apt() {
     echo "Cleaning apt cache..."
     
@@ -55,7 +60,7 @@ clean_apt() {
     fi
 }
 
-# Clean snap cache
+# Remove disabled snap revisions to reclaim space
 clean_snap() {
     echo "Cleaning snap cache..."
     
@@ -76,7 +81,7 @@ clean_snap() {
     fi
 }
 
-# Clean flatpak cache
+# Remove unused flatpak runtimes
 clean_flatpak() {
     echo "Cleaning flatpak..."
     
@@ -88,7 +93,7 @@ clean_flatpak() {
     fi
 }
 
-# Clean journal logs
+# Vacuum systemd journal logs older than 7 days
 clean_journal() {
     echo "Cleaning system logs..."
     
@@ -104,7 +109,7 @@ clean_journal() {
     fi
 }
 
-# Clean temp files
+# Clean safe user cache directories and stale temp files
 clean_temp() {
     echo "Cleaning temp files..."
     
@@ -136,7 +141,7 @@ clean_temp() {
     fi
 }
 
-# Clean Docker
+# Prune unused Docker images, containers, and networks
 clean_docker() {
     echo "Cleaning Docker..."
     
@@ -148,7 +153,7 @@ clean_docker() {
     fi
 }
 
-# Clean homebrew
+# Remove Homebrew downloads older than 7 days
 clean_brew() {
     echo "Cleaning Homebrew..."
     
@@ -160,7 +165,7 @@ clean_brew() {
     fi
 }
 
-# Show disk usage
+# Display root partition usage and largest directories in $HOME
 show_usage() {
     echo "Disk usage:"
     echo ""
@@ -171,7 +176,7 @@ show_usage() {
     du -sh "$HOME"/* 2>/dev/null | sort -rh | head -10 | sed 's/^/  /'
 }
 
-# Clean all
+# Run all cleanup tasks sequentially and report total freed space
 clean_all() {
     echo ""
     echo "━━━ Kodra Cleanup ━━━"
@@ -198,7 +203,7 @@ clean_all() {
     show_usage
 }
 
-# Interactive mode
+# Present a gum multi-select picker; falls back to clean_all without gum
 interactive_mode() {
     if ! command -v gum &>/dev/null; then
         clean_all
@@ -242,7 +247,7 @@ interactive_mode() {
     fi
 }
 
-# Show help
+# Display usage information and available subcommands
 show_help() {
     echo "Usage: kodra cleanup [command]"
     echo ""

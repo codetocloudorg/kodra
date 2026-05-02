@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Kodra Uninstall Script
-# Remove applications
+# Remove applications installed by Kodra. Runs per-app uninstall scripts
+# from the uninstall/ directory, with interactive multi-select and
+# category-based batch removal.
 #
 
 set -e
@@ -9,7 +11,7 @@ set -e
 KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
 source "$KODRA_DIR/lib/utils.sh"
 
-# List available uninstall scripts
+# List all applications that have an uninstall script
 list_uninstalls() {
     echo "Applications with uninstall scripts:"
     echo ""
@@ -21,7 +23,7 @@ list_uninstalls() {
     done
 }
 
-# Interactive uninstall menu
+# Present a gum multi-select menu to choose applications to uninstall
 interactive_uninstall() {
     if ! command -v gum &>/dev/null; then
         list_uninstalls
@@ -69,7 +71,9 @@ interactive_uninstall() {
     fi
 }
 
-# Uninstall by category
+# Batch-uninstall all apps in a named category (azure, docker)
+# Arguments:
+#   $1 - Category name
 uninstall_category() {
     local category="$1"
     
@@ -98,6 +102,7 @@ uninstall_category() {
     esac
 }
 
+# Display usage information
 show_help() {
     echo "Usage: kodra uninstall [app|options]"
     echo ""

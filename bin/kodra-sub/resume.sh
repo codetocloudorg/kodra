@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Kodra Resume Command
-# Resume incomplete installations or retry failed components
+# Resume incomplete installations or retry failed components.
+# Tracks installation state via lib/state.sh and maps component names
+# to their installer scripts for targeted retries.
 #
 
 set -e
@@ -11,6 +13,7 @@ KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
 source "$KODRA_DIR/lib/utils.sh"
 source "$KODRA_DIR/lib/state.sh"
 
+# Display usage information and examples
 show_help() {
     echo "Usage: kodra resume [command]"
     echo ""
@@ -27,6 +30,9 @@ show_help() {
     echo ""
 }
 
+# Retry all components marked as failed in installation state.
+# Maps component names to known install scripts, prompts for
+# confirmation, then re-runs each installer.
 retry_failed() {
     local failed=$(get_failed_components)
     
@@ -60,7 +66,8 @@ retry_failed() {
     log_info "Retrying failed components..."
     echo ""
     
-    # Map component names to install scripts
+    # Map component names to install scripts via known paths;
+    # fall back to a fuzzy find for unknown components
     echo "$failed" | while read comp; do
         local script=""
         
@@ -102,6 +109,7 @@ retry_failed() {
     show_install_status
 }
 
+# Show installation status and offer interactive recovery options
 interactive_resume() {
     show_install_status
     

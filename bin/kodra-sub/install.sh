@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 #
 # Kodra Install Script
-# Install additional applications
+# Install additional applications from the applications/ directory.
+# Each application has a self-contained installer script.
 #
 
 set -e
@@ -9,6 +10,7 @@ set -e
 KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
 source "$KODRA_DIR/lib/utils.sh"
 
+# No app specified — show usage and enumerate available installer scripts
 if [ -z "$1" ]; then
     echo "Usage: kodra install <app>"
     echo ""

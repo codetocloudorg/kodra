@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Kodra State Management
-# Track installation progress for resume capability
+# JSON-based installation state tracking with jq (falls back to grep/sed).
+# Enables resume capability so interrupted installs can pick up where
+# they left off. State file lives at ~/.config/kodra/state.json.
 #
 
 KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"

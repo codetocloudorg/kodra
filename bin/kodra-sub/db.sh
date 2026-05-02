@@ -16,7 +16,7 @@ DEFAULT_REDIS_VERSION="7"
 DEFAULT_MONGO_VERSION="7"
 DEFAULT_NETWORK="kodra-db-net"
 
-# Check docker
+# Verify Docker is installed and the daemon is responsive
 check_docker() {
     if ! command -v docker &>/dev/null; then
         log_error "Docker is required. Install with: kodra install docker-ce"
@@ -29,7 +29,7 @@ check_docker() {
     fi
 }
 
-# Create network if not exists
+# Create the shared Docker bridge network if it doesn't exist yet
 ensure_network() {
     if ! docker network inspect "$DEFAULT_NETWORK" &>/dev/null; then
         docker network create "$DEFAULT_NETWORK" &>/dev/null
@@ -40,6 +40,12 @@ ensure_network() {
 # PostgreSQL
 # ─────────────────────────────────────────────────────────────
 
+# Start or resume a PostgreSQL container with a persistent volume
+# Arguments:
+#   $1 - Container name (default: kodra-postgres)
+#   $2 - PostgreSQL version (default: 16)
+#   $3 - Host port (default: 5432)
+#   $4 - Superuser password (default: postgres)
 start_postgres() {
     local name="${1:-kodra-postgres}"
     local version="${2:-$DEFAULT_POSTGRES_VERSION}"
@@ -78,6 +84,9 @@ start_postgres() {
     echo "  GUI:        pgAdmin, DBeaver, or TablePlus"
 }
 
+# Stop a running PostgreSQL container
+# Arguments:
+#   $1 - Container name (default: kodra-postgres)
 stop_postgres() {
     local name="${1:-kodra-postgres}"
     docker stop "$name" &>/dev/null && log_success "PostgreSQL stopped"
@@ -87,6 +96,12 @@ stop_postgres() {
 # MySQL
 # ─────────────────────────────────────────────────────────────
 
+# Start or resume a MySQL container with a persistent volume
+# Arguments:
+#   $1 - Container name (default: kodra-mysql)
+#   $2 - MySQL version (default: 8)
+#   $3 - Host port (default: 3306)
+#   $4 - Root password (default: mysql)
 start_mysql() {
     local name="${1:-kodra-mysql}"
     local version="${2:-$DEFAULT_MYSQL_VERSION}"
@@ -123,6 +138,9 @@ start_mysql() {
     echo "  Connect:    mysql -h 127.0.0.1 -P $port -u root -p"
 }
 
+# Stop a running MySQL container
+# Arguments:
+#   $1 - Container name (default: kodra-mysql)
 stop_mysql() {
     local name="${1:-kodra-mysql}"
     docker stop "$name" &>/dev/null && log_success "MySQL stopped"
@@ -132,6 +150,11 @@ stop_mysql() {
 # Redis
 # ─────────────────────────────────────────────────────────────
 
+# Start or resume a Redis container with a persistent volume
+# Arguments:
+#   $1 - Container name (default: kodra-redis)
+#   $2 - Redis version (default: 7)
+#   $3 - Host port (default: 6379)
 start_redis() {
     local name="${1:-kodra-redis}"
     local version="${2:-$DEFAULT_REDIS_VERSION}"
@@ -162,6 +185,9 @@ start_redis() {
     echo "  Connect:    redis-cli -h localhost -p $port"
 }
 
+# Stop a running Redis container
+# Arguments:
+#   $1 - Container name (default: kodra-redis)
 stop_redis() {
     local name="${1:-kodra-redis}"
     docker stop "$name" &>/dev/null && log_success "Redis stopped"
@@ -171,6 +197,11 @@ stop_redis() {
 # MongoDB
 # ─────────────────────────────────────────────────────────────
 
+# Start or resume a MongoDB container with a persistent volume
+# Arguments:
+#   $1 - Container name (default: kodra-mongo)
+#   $2 - MongoDB version (default: 7)
+#   $3 - Host port (default: 27017)
 start_mongo() {
     local name="${1:-kodra-mongo}"
     local version="${2:-$DEFAULT_MONGO_VERSION}"
@@ -201,6 +232,9 @@ start_mongo() {
     echo "  Connect:    mongosh mongodb://localhost:$port"
 }
 
+# Stop a running MongoDB container
+# Arguments:
+#   $1 - Container name (default: kodra-mongo)
 stop_mongo() {
     local name="${1:-kodra-mongo}"
     docker stop "$name" &>/dev/null && log_success "MongoDB stopped"
@@ -210,6 +244,7 @@ stop_mongo() {
 # Status & Management
 # ─────────────────────────────────────────────────────────────
 
+# Show all running kodra database containers with their ports
 list_databases() {
     check_docker
     
@@ -231,6 +266,7 @@ list_databases() {
     fi
 }
 
+# Stop all running kodra database containers
 stop_all() {
     check_docker
     
@@ -239,6 +275,7 @@ stop_all() {
     log_success "All database containers stopped"
 }
 
+# Remove all kodra database containers and their persistent volumes (destructive)
 clean_all() {
     check_docker
     
@@ -271,6 +308,7 @@ clean_all() {
 # Help
 # ─────────────────────────────────────────────────────────────
 
+# Display usage information and supported database engines
 show_help() {
     echo "Usage: kodra db <database> [command] [options]"
     echo ""

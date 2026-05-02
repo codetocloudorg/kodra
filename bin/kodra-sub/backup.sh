@@ -10,6 +10,7 @@ KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
 
 source "$KODRA_DIR/lib/backup.sh"
 
+# Display usage information and available subcommands
 show_help() {
     echo "Usage: kodra backup [command] [options]"
     echo ""
@@ -32,6 +33,7 @@ show_help() {
     echo ""
 }
 
+# Dispatch subcommand; defaults to help if no argument given
 case "${1:-help}" in
     create|new)
         backup_dotfiles
@@ -52,6 +54,7 @@ case "${1:-help}" in
         restore_dconf "${2:-}"
         ;;
     cleanup|clean)
+        # Default to 30 days if no retention period specified
         cleanup_old_backups "${2:-30}"
         ;;
     help|--help|-h)

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #
 # Kodra Theme Switcher
+# Apply a unified theme across Ghostty, Starship, VS Code, tmux, btop,
+# Neovim, GNOME wallpaper, and accent color. Themes live in themes/<name>/.
 #
 
 set -e
@@ -11,7 +13,10 @@ THEMES_DIR="$KODRA_DIR/themes"
 
 source "$KODRA_DIR/lib/utils.sh"
 
-# Map Kodra themes to nvim colorschemes (#52)
+# Map a Kodra theme name to its corresponding nvim colorscheme (#52)
+# Arguments:
+#   $1 - Kodra theme name
+# Returns: Matching nvim colorscheme name on stdout
 get_nvim_colorscheme() {
     local theme="$1"
     case "$theme" in
@@ -25,7 +30,10 @@ get_nvim_colorscheme() {
     esac
 }
 
-# Sync nvim colorscheme with current theme (#52)
+# Generate a Lua module in nvim config that exposes the current colorscheme (#52).
+# Nvim init can require("kodra-theme").apply() to stay in sync.
+# Arguments:
+#   $1 - Kodra theme name
 sync_nvim_colorscheme() {
     local theme="$1"
     local nvim_config="$HOME/.config/nvim"
@@ -64,7 +72,7 @@ EOF
     log_success "Neovim colorscheme synced: $colorscheme"
 }
 
-# Get current theme
+# Read the active theme name from state file, defaulting to tokyo-night
 get_current_theme() {
     if [ -f "$KODRA_CONFIG_DIR/theme" ]; then
         cat "$KODRA_CONFIG_DIR/theme"
@@ -73,7 +81,7 @@ get_current_theme() {
     fi
 }
 
-# List available themes
+# List all available themes, marking the currently active one
 list_themes() {
     echo "Available themes:"
     echo ""
@@ -87,7 +95,9 @@ list_themes() {
     done
 }
 
-# Apply a theme
+# Apply a theme across all supported applications
+# Arguments:
+#   $1 - Theme name (must match a directory under themes/)
 apply_theme() {
     local theme="$1"
     local theme_dir="$THEMES_DIR/$theme"
@@ -114,7 +124,7 @@ apply_theme() {
         log_success "Starship theme applied"
     fi
     
-    # VS Code (if settings exist)
+    # VS Code: merge theme settings into existing settings.json using jq
     if [ -f "$theme_dir/vscode-settings.json" ]; then
         VSCODE_DIR="$HOME/.config/Code/User"
         # Create VS Code settings directory if it doesn't exist
@@ -225,7 +235,7 @@ apply_theme() {
     fi
 }
 
-# Interactive theme selection
+# Present an interactive picker (gum or text fallback) for theme selection
 select_theme_interactive() {
     if command -v gum &> /dev/null; then
         local themes=$(ls -1 "$THEMES_DIR")

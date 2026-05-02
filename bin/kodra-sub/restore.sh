@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Kodra Restore Command
-# Restore backed up dotfiles
+# Restore backed up dotfiles from timestamped snapshots.
+# Provides interactive, timestamp-based, and "last" restore modes,
+# plus cleanup of old backups. Delegates to lib/backup.sh for core logic.
 #
 
 set -e
@@ -10,6 +12,7 @@ KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
 
 source "$KODRA_DIR/lib/backup.sh"
 
+# Display usage information and examples
 show_help() {
     echo "Usage: kodra restore [command]"
     echo ""

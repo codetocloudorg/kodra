@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #
 # Kodra ASCII Art Banners
+# Collection of themed ASCII art banners for the MOTD and CLI.
+# Each style uses a different color palette and character set.
 # A Code To Cloud Project ☁️
 #
 

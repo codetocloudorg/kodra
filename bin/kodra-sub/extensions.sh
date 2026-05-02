@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
 # Kodra GNOME Extensions Manager
+# Install, enable, disable, and remove GNOME Shell extensions
 # Part of #81 Extension Management
 #
 
@@ -9,7 +10,7 @@ set -e
 KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
 source "$KODRA_DIR/lib/utils.sh"
 
-# Check if GNOME Shell is running
+# Verify gnome-extensions CLI exists and a graphical session is active
 check_gnome() {
     if ! command -v gnome-extensions &>/dev/null; then
         log_error "gnome-extensions command not found"
@@ -23,7 +24,7 @@ check_gnome() {
     fi
 }
 
-# List all extensions
+# List user and system extensions with their enabled/disabled state
 list_extensions() {
     check_gnome
     
@@ -52,7 +53,9 @@ list_extensions() {
     done
 }
 
-# Enable an extension
+# Enable a GNOME Shell extension by UUID
+# Arguments:
+#   $1 - Extension UUID (e.g., dash-to-dock@micxgx.gmail.com)
 enable_extension() {
     check_gnome
     local ext="$1"
@@ -73,7 +76,9 @@ enable_extension() {
     fi
 }
 
-# Disable an extension
+# Disable a GNOME Shell extension by UUID
+# Arguments:
+#   $1 - Extension UUID
 disable_extension() {
     check_gnome
     local ext="$1"
@@ -91,7 +96,9 @@ disable_extension() {
     fi
 }
 
-# Install extension from extensions.gnome.org
+# Install an extension from extensions.gnome.org (via gext CLI or browser)
+# Arguments:
+#   $1 - Extension UUID
 install_extension() {
     local ext="$1"
     
@@ -122,7 +129,9 @@ install_extension() {
     fi
 }
 
-# Uninstall extension
+# Remove an installed extension by UUID
+# Arguments:
+#   $1 - Extension UUID
 uninstall_extension() {
     check_gnome
     local ext="$1"
@@ -140,7 +149,9 @@ uninstall_extension() {
     fi
 }
 
-# Show extension info
+# Display detailed metadata for a specific extension
+# Arguments:
+#   $1 - Extension UUID
 info_extension() {
     check_gnome
     local ext="$1"
@@ -153,7 +164,7 @@ info_extension() {
     gnome-extensions info "$ext"
 }
 
-# Enable all installed extensions
+# Enable every installed user and system extension
 enable_all() {
     check_gnome
     log_info "Enabling all installed extensions..."
@@ -167,7 +178,7 @@ enable_all() {
     log_success "Done"
 }
 
-# Interactive extension picker
+# Present a gum-based interactive menu; falls back to list if gum is absent
 interactive_menu() {
     check_gnome
     
@@ -228,7 +239,7 @@ interactive_menu() {
     esac
 }
 
-# Show help
+# Display usage information and examples
 show_help() {
     echo "Usage: kodra extensions <command> [args]"
     echo ""

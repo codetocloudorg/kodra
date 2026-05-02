@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Kodra Structured Logging
-# Provides timestamped logging and script execution tracking
+# Provides timestamped install logging with automatic archival.
+# Logs are written to a temp file during install and archived to
+# ~/.config/kodra/logs/ on completion (last 10 kept).
 #
 
 KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
@@ -14,6 +16,8 @@ if [ -f "$KODRA_DIR/lib/utils.sh" ]; then
     source "$KODRA_DIR/lib/utils.sh"
 fi
 
+# Initialize the install log — creates a timestamped permanent log file
+# and resets the temp log. Call once at the start of an install session.
 start_install_log() {
     mkdir -p "$KODRA_LOG_DIR"
 
@@ -31,6 +35,8 @@ start_install_log() {
     log_to_file "User: ${USER:-$(whoami)}"
 }
 
+# Finalize the install log — records duration, copies to permanent archive,
+# and prunes old logs (keeps the 10 most recent)
 stop_install_log() {
     local end_time=$(date +%s)
     local duration=$((end_time - ${KODRA_START_TIME:-$end_time}))
@@ -55,14 +61,17 @@ stop_install_log() {
     log_info "Log saved: $KODRA_PERMANENT_LOG"
 }
 
+# Append a timestamped message to the install log file
+# Arguments: $1 - message string
 log_to_file() {
     local message="$1"
     local timestamp="[$(date '+%Y-%m-%d %H:%M:%S')]"
     echo "$timestamp $message" >> "$KODRA_INSTALL_LOG_FILE" 2>/dev/null || true
 }
 
-# Run a script with logging - captures output and tracks success/failure
-# Usage: run_logged "script_path" [args...]
+# Run a script with output capture — logs START/OK/FAIL to the install log
+# On failure, appends the script's full output for debugging
+# Arguments: $1 - script path, $@ - arguments to pass
 run_logged() {
     local script="$1"
     shift
@@ -101,7 +110,8 @@ run_logged() {
     fi
 }
 
-# Show last N lines of install log (for error display)
+# Display the last N lines of the install log (useful for error context)
+# Arguments: $1 - number of lines (default: 20)
 show_log_tail() {
     local lines="${1:-20}"
     if [ -f "$KODRA_INSTALL_LOG_FILE" ]; then
