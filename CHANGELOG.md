@@ -5,6 +5,28 @@ All notable changes to Kodra will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2026-05-02
+
+### Added
+- **BATS testing framework** — 43 tests across unit, integration, and security suites with JUnit XML reports
+- **Security scanning** — Supply chain validation, secret detection, permission audits, Dockerfile hardening
+- **CI/CD pipeline** — 4-job pipeline with ShellCheck, Hadolint, BATS, Docker build; optimized for free runners (~2.5 min)
+- **`kodra ci-report`** — Pull GitHub Actions logs and generate markdown remediation reports with pattern matching
+- **`kodra migrate --init`** — Mark all migrations complete on fresh installs (prevents stale migrations running)
+- **Code To Cloud branding** — ASCII banners and stage markers in CI terminal output
+
+### Fixed
+- **Ghostty installer** — Restored GitHub `.deb` release fallback when PPA is unavailable
+- **Azure Storage Explorer** — Gracefully skips when snapd is unavailable (container/CI environments)
+- **Migration runner** — Added missing `--init` flag (was causing E2E minimal install failures)
+- **CI container jobs** — Set `shell: bash` default (was falling back to `sh`, breaking process substitution)
+- **CI job summary** — Fixed `grep -c` multiline arithmetic and `${var^}` bash-only expansion
+
+### Security
+- ShellCheck static analysis on all shell scripts in CI
+- Hadolint Dockerfile linting in CI
+- BATS security tests: world-writable files, setuid binaries, eval safety, HTTPS enforcement, GPG verification
+
 ## [0.5.0] - 2026-05-01
 
 ### Added

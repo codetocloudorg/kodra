@@ -218,6 +218,34 @@ Quick reference for all aliases, keyboard shortcuts, and keybindings included wi
 ### Maintenance
 `kodra update/repair/cleanup/doctor/install/uninstall`
 
+### CI/CD & Quality
+
+```bash
+kodra ci-report              # Latest CI run remediation report
+kodra ci-report --run 123    # Specific run ID
+kodra ci-report --watch      # Watch for failures and report
+kodra ci-report --history 5  # Last 5 runs summary
+kodra ci-report --json       # JSON output for automation
+kodra migrate                # Run pending version migrations
+kodra migrate --init         # Mark all migrations complete (fresh install)
+kodra migrate list           # Show pending migrations
+kodra migrate status         # Show migration status
+```
+
+### Testing
+
+```bash
+# Run all BATS tests locally
+bats tests/unit/ tests/integration/ tests/security/
+
+# Run specific suite
+bats tests/unit/           # 22 unit tests
+bats tests/integration/    # 9 integration tests
+bats tests/security/       # 12 security tests
+
+# CI runs automatically: ShellCheck → Hadolint → BATS → Docker build
+```
+
 ---
 
 ## 🎨 Themes

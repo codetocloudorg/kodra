@@ -50,7 +50,7 @@
         "description": "Kodra: One-command Ubuntu setup for Azure cloud-native developers. GitHub CLI, Docker, Kubernetes, AI-powered workflows. From fresh install to production in minutes.",
         "url": "https://kodra.codetocloud.io",
         "downloadUrl": "https://kodra.codetocloud.io/boot.sh",
-        "softwareVersion": "0.5.0",
+        "softwareVersion": "0.5.1",
         "creator": {
             "@type": "Organization",
             "name": "Code To Cloud",
@@ -63,7 +63,9 @@
             "Container tools (Docker CE, lazydocker)",
             "Infrastructure as Code (Terraform, Bicep, OpenTofu)",
             "Modern terminal (Ghostty, Starship, Nerd Fonts)",
-            "VS Code with cloud-native extensions"
+            "VS Code with cloud-native extensions",
+            "Enterprise CI/CD with BATS testing (43 tests)",
+            "Security scanning and automated remediation"
         ],
         "screenshot": "https://kodra.codetocloud.io/assets/kodra-desktop.png"
     }
@@ -1087,7 +1089,7 @@
     <section class="hero">
         <div class="hero-badge">
             <span class="hero-badge-dot"></span>
-            v0.5.0 &mdash; Multi-user deployment, migration system, config layering, security hardening
+            v0.5.1 &mdash; Enterprise CI/CD testing, security scanning, automated remediation
         </div>
         
         <pre class="ascii-art">
@@ -1348,6 +1350,16 @@
                 <h3 class="feature-title">Themed Desktop</h3>
                 <p class="feature-description">ULauncher, window tiling, system monitor, blur effects, and clean dock.</p>
             </div>
+            <div class="feature-card">
+                <div class="feature-icon">🧪</div>
+                <h3 class="feature-title">Enterprise CI/CD</h3>
+                <p class="feature-description">43 BATS tests across unit, integration, and security suites. JUnit XML reports with automated remediation.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3 class="feature-title">Security Scanning</h3>
+                <p class="feature-description">Supply chain validation, secret detection, permission audits, and Dockerfile hardening checks&mdash;built into CI.</p>
+            </div>
         </div>
     </section>
 
@@ -1483,6 +1495,14 @@
             <div class="command-item">
                 <code class="command-code">kodra fetch</code>
                 <span class="command-desc">Show system info</span>
+            </div>
+            <div class="command-item">
+                <code class="command-code">kodra ci-report</code>
+                <span class="command-desc">Pull CI logs &amp; generate remediation</span>
+            </div>
+            <div class="command-item">
+                <code class="command-code">kodra migrate</code>
+                <span class="command-desc">Run version migrations</span>
             </div>
         </div>
     </section>
