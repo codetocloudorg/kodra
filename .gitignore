@@ -34,6 +34,7 @@ coverage/tests/results/
 .azure-test-config
 *.pem
 # Test dependencies (installed at runtime)
+tests/lib/bats-core/
 tests/lib/bats-support/
 tests/lib/bats-assert/
 test-results/
