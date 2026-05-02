@@ -95,6 +95,14 @@ kodra_error_handler() {
     local exit_code=$?
     local line_no=$1
     
+    # In debug/resilient mode, log but don't halt — individual failures
+    # are already tracked by run_installer in KODRA_FAIL_COUNT
+    if [ "${KODRA_DEBUG:-false}" = "true" ]; then
+        echo "[WARN] Command failed at line $line_no (exit code: $exit_code)" >> "${KODRA_LOG_FILE:-/dev/stderr}" 2>/dev/null
+        echo "  [DEBUG] Non-fatal error at line $line_no (exit $exit_code) — continuing in resilient mode"
+        return 0
+    fi
+    
     # Prevent recursive error handling
     [ "${KODRA_ERROR_HANDLING:-false}" = "true" ] && return
     export KODRA_ERROR_HANDLING=true
@@ -557,9 +565,10 @@ if [ "$KODRA_DEBUG" = "true" ] && [ -n "$KODRA_FAILED_INSTALLS" ]; then
     printf "    ${C_YELLOW}${BOX_V}${C_RESET}  Attempted: %-*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$((BOX_WIDTH - 14))" "$KODRA_INSTALL_COUNT installers"
     printf "    ${C_YELLOW}${BOX_V}${C_RESET}  Failed:    %-*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$((BOX_WIDTH - 14))" "$KODRA_FAIL_COUNT installers"
     printf "    ${C_YELLOW}${BOX_V}${C_RESET}%*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$BOX_WIDTH" ""
-    echo -e "$KODRA_FAILED_INSTALLS" | while read -r line; do
+    # Use here-string to avoid pipeline exit code triggering ERR trap
+    while read -r line; do
         [ -n "$line" ] && printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_RED}${BOX_CROSS}${C_RESET} %-*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$((BOX_WIDTH - 6))" "$line"
-    done
+    done <<< "$KODRA_FAILED_INSTALLS" || true
     printf "    ${C_YELLOW}${BOX_V}${C_RESET}%*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$BOX_WIDTH" ""
     printf "    ${C_YELLOW}${BOX_V}${C_RESET}  ${C_DIM}Logs: /tmp/kodra-install-*.log${C_RESET}%*s${C_YELLOW}${BOX_V}${C_RESET}\n" "$((BOX_WIDTH - 31))" ""
     printf "    ${C_YELLOW}${BOX_BL}"
