@@ -96,6 +96,19 @@ case "${1:-run}" in
         done
         log_success "All migrations complete"
         ;;
+    --init|init)
+        # Mark all existing migrations as complete (fresh install)
+        # This prevents old migrations from running on a new install
+        if [ -d "$MIGRATIONS_DIR" ] && [ "$(ls -A "$MIGRATIONS_DIR"/*.sh 2>/dev/null)" ]; then
+            for migration in "$MIGRATIONS_DIR"/*.sh; do
+                local_name=$(basename "$migration" .sh)
+                touch "$STATE_DIR/$local_name.done"
+            done
+            log_info "Marked all migrations as complete (fresh install)"
+        else
+            log_info "No migrations to initialize"
+        fi
+        ;;
     status)
         show_status
         ;;
@@ -103,7 +116,7 @@ case "${1:-run}" in
         list_pending
         ;;
     *)
-        echo "Usage: kodra migrate [run|status|list]"
+        echo "Usage: kodra migrate [run|init|status|list]"
         exit 1
         ;;
 esac
