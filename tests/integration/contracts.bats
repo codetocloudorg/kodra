@@ -116,6 +116,21 @@ load '../helpers/setup'
     [ "$found_unguarded" -eq 0 ] || fail "Found snap install without timeout/skip guard"
 }
 
+@test "contract: scripts using systemctl enable/start have container detection" {
+    # Docker CE and similar scripts that rely on systemd to start daemons
+    # must detect container environments and skip gracefully
+    local found_unguarded=0
+
+    while IFS= read -r script; do
+        if ! grep -q "dockerenv\|container\|/proc/1/cgroup\|is-system-running" "$script"; then
+            found_unguarded=1
+            echo "Missing container detection: $script"
+        fi
+    done < <(grep -rl "systemctl enable\|systemctl start" "$KODRA_DIR/applications/" "$KODRA_DIR/install/" 2>/dev/null || true)
+
+    [ "$found_unguarded" -eq 0 ] || fail "Found systemctl enable/start without container detection"
+}
+
 @test "contract: CI workflows do not hardcode version numbers" {
     # Version checks in CI should use patterns (grep -qE '[0-9]+\.[0-9]+')
     # not hardcoded strings (grep -q '0.5.0') which break on bumps

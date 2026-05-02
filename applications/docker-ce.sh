@@ -12,6 +12,23 @@ if command -v docker &> /dev/null; then
     exit 0
 fi
 
+# Docker CE requires systemd to manage the Docker daemon.
+# In containers (Docker-in-Docker), systemd is unavailable and the daemon
+# cannot start. Detect this and skip gracefully.
+if [ -f /.dockerenv ] || grep -qsE '(docker|lxc|containerd)' /proc/1/cgroup 2>/dev/null; then
+    echo "[WARN] Container environment detected — skipping Docker CE"
+    echo "Docker cannot run its daemon inside a container without special privileges."
+    echo "Install manually on a full system: https://docs.docker.com/engine/install/ubuntu/"
+    exit 0
+fi
+
+if ! command -v systemctl &>/dev/null || ! systemctl is-system-running &>/dev/null; then
+    echo "[WARN] systemd not available — skipping Docker CE"
+    echo "Docker CE requires systemd to manage the daemon."
+    echo "Install manually: https://docs.docker.com/engine/install/ubuntu/"
+    exit 0
+fi
+
 # Remove any old versions
 for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
     sudo apt-get remove -y $pkg 2>/dev/null || true
