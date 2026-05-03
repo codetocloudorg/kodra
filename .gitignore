@@ -40,3 +40,5 @@ tests/lib/bats-assert/
 test-results/
 node_modules/
 ci-reports/
+playwright-report/
+playwright/.cache/
