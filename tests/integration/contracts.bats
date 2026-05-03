@@ -80,7 +80,7 @@ load '../helpers/setup'
 
 @test "contract: no deprecated GitHub Actions versions (Node.js 20 EOL)" {
     # These minimum versions support Node.js 24 (required after June 2, 2026)
-    # actions/checkout: v5+, actions/upload-artifact: v6+, dorny/test-reporter: v2+
+    # actions/checkout: v5+, actions/upload-artifact: v6+, actions/setup-node: v5+, dorny/test-reporter: v2+
     local workflows_dir="$KODRA_DIR/.github/workflows"
     [ -d "$workflows_dir" ] || skip "No workflows directory"
 
@@ -92,6 +92,11 @@ load '../helpers/setup'
     # Check for deprecated upload-artifact versions
     if grep -rq "actions/upload-artifact@v[1-5]" "$workflows_dir"; then
         fail "Deprecated actions/upload-artifact found (need v6+ for Node.js 24)"
+    fi
+
+    # Check for deprecated setup-node versions
+    if grep -rq "actions/setup-node@v[1-4]" "$workflows_dir"; then
+        fail "Deprecated actions/setup-node found (need v5+ for Node.js 24)"
     fi
 
     # Check for deprecated test-reporter versions
