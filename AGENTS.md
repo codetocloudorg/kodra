@@ -92,7 +92,23 @@ kodra/
 │       ├── starship.toml  # Prompt config
 │       ├── vscode-settings.json
 │       └── tmux.conf      # Tmux theme
-└── applications/          # Optional app installers
+├── applications/          # Optional app installers
+│
+│ # Web / SEO / AI Discovery
+├── index.html             # Landing page (GitHub Pages)
+├── 404.html               # Custom 404 page
+├── sitemap.xml            # XML sitemap with image extensions
+├── robots.txt             # Crawler directives
+├── manifest.json          # PWA manifest
+├── favicon.svg            # SVG favicon
+├── llms.txt               # AI/LLM discovery (summary)
+├── llms-full.txt          # AI/LLM discovery (full documentation)
+├── CNAME                  # Custom domain (kodra.codetocloud.io)
+└── assets/
+    ├── favicon.ico.png    # PNG favicon (from codetocloud.io)
+    ├── kodra-desktop.png  # Screenshot
+    ├── kodra-terminal.png # Screenshot
+    └── kodra-tools.png    # Screenshot
 ```
 
 ## Adding New Features
@@ -232,9 +248,41 @@ fi
 - Don't break existing functionality when adding features
 - Don't use Cursor editor references (use VS Code)
 
+## SEO & AI Discovery
+
+The site at `kodra.codetocloud.io` is served via GitHub Pages. When making changes that affect the website or project documentation:
+
+### Files to Keep Updated
+
+| File | Purpose | When to Update |
+|------|---------|----------------|
+| `index.html` | Landing page with structured data (JSON-LD) | New features, version bumps |
+| `sitemap.xml` | XML sitemap with image extensions | Any content/URL change |
+| `robots.txt` | Crawler directives | New pages or restricted paths |
+| `manifest.json` | PWA manifest | Branding or icon changes |
+| `llms.txt` | AI/LLM summary discovery | New features, commands, or links |
+| `llms-full.txt` | Full AI/LLM documentation | Any significant project change |
+| `404.html` | Custom 404 page | Branding changes |
+
+### SEO Checklist for Changes
+
+- Update `lastmod` in `sitemap.xml` when page content changes
+- Keep structured data (JSON-LD) in `index.html` current — includes SoftwareApplication, Organization, BreadcrumbList, FAQPage, and WebSite schemas
+- Ensure all `og:image` and `twitter:image` references point to existing files in `assets/`
+- Favicon comes from codetocloud.io — stored as `assets/favicon.ico.png`
+- All pages must link back to `https://www.codetocloud.io` (parent company)
+- Update `llms.txt` and `llms-full.txt` when adding new commands, tools, or changing project metadata
+- Keep canonical URLs trailing-slash consistent (`https://kodra.codetocloud.io/`)
+
+### Version Bumps
+
+When bumping versions, update these files: `VERSION`, `README.md`, `index.html` (structured data `softwareVersion` + hero badge), `lib/ui.sh`, `lib/state.sh`, `CHANGELOG.md`, `llms.txt`, `llms-full.txt`
+
 ## Resources
 
 - [Kodra Website](https://kodra.codetocloud.io)
-- [GitHub Repository](https://github.com/codetocloud/kodra)
+- [Code To Cloud (Parent Company)](https://www.codetocloud.io)
+- [GitHub Repository](https://github.com/codetocloudorg/kodra)
+- [LLMs.txt Standard](https://llmstxt.org)
 - [Ghostty Documentation](https://ghostty.org/docs)
 - [Starship Configuration](https://starship.rs/config/)

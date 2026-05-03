@@ -8,52 +8,77 @@
     <title>Kodra - One-Command Azure Developer Environment for Ubuntu | GitHub Copilot Ready</title>
     <meta name="title" content="Kodra - One-Command Azure Developer Environment for Ubuntu | GitHub Copilot Ready">
     <meta name="description" content="Kodra: One-command Ubuntu setup for Azure cloud-native developers. GitHub CLI, Docker, Kubernetes, AI-powered workflows. From fresh install to production in minutes.">
-    <meta name="keywords" content="azure cli, ubuntu developer setup, github copilot cli, kubernetes, docker, bicep, terraform, cloud-native development, developer environment, azd, github cli, wsl, devops tools, one-command install">
-    <meta name="author" content="Code To Cloud">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://kodra.codetocloud.io">
+    <meta name="keywords" content="azure cli, ubuntu developer setup, github copilot cli, kubernetes, docker, bicep, terraform, cloud-native development, developer environment, azd, github cli, wsl, devops tools, one-command install, azure developer environment, linux dev setup, ubuntu developer tools">
+    <meta name="author" content="Code To Cloud Inc.">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://kodra.codetocloud.io/">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kodra.codetocloud.io">
+    <meta property="og:url" content="https://kodra.codetocloud.io/">
     <meta property="og:title" content="Kodra - One-Command Azure Developer Environment for Ubuntu">
     <meta property="og:description" content="Kodra: One-command Ubuntu setup for Azure cloud-native developers. GitHub CLI, Docker, Kubernetes, AI-powered workflows. From fresh install to production in minutes.">
     <meta property="og:image" content="https://kodra.codetocloud.io/assets/kodra-social.png">
+    <meta property="og:image:alt" content="Kodra developer environment running on Ubuntu with Azure tools">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="Kodra">
+    <meta property="og:locale" content="en_US">
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://kodra.codetocloud.io">
+    <meta name="twitter:url" content="https://kodra.codetocloud.io/">
     <meta name="twitter:title" content="Kodra - One-Command Azure Developer Environment">
     <meta name="twitter:description" content="One-command Ubuntu setup for Azure cloud-native developers. GitHub CLI, Docker, Kubernetes, AI-powered workflows.">
     <meta name="twitter:image" content="https://kodra.codetocloud.io/assets/kodra-social.png">
+    <meta name="twitter:image:alt" content="Kodra developer environment running on Ubuntu with Azure tools">
     
-    <!-- Theme -->
+    <!-- Theme & Icons -->
     <meta name="theme-color" content="#0d1117">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="msapplication-TileColor" content="#0d1117">
+    <link rel="icon" type="image/png" href="/assets/favicon.ico.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon.ico.png">
+    <link rel="manifest" href="/manifest.json">
     
-    <!-- Structured Data -->
+    <!-- Structured Data: SoftwareApplication -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
         "name": "Kodra",
         "applicationCategory": "DeveloperApplication",
-        "operatingSystem": "Ubuntu 24.04+, WSL",
+        "applicationSubCategory": "Cloud Development Tools",
+        "operatingSystem": "Ubuntu 24.04+, WSL2",
         "offers": {
             "@type": "Offer",
             "price": "0",
-            "priceCurrency": "USD"
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
         },
         "description": "Kodra: One-command Ubuntu setup for Azure cloud-native developers. GitHub CLI, Docker, Kubernetes, AI-powered workflows. From fresh install to production in minutes.",
         "url": "https://kodra.codetocloud.io",
         "downloadUrl": "https://kodra.codetocloud.io/boot.sh",
         "softwareVersion": "0.5.2",
+        "datePublished": "2025-01-01",
+        "dateModified": "2026-05-02",
+        "license": "https://opensource.org/licenses/MIT",
         "creator": {
             "@type": "Organization",
-            "name": "Code To Cloud",
+            "name": "Code To Cloud Inc.",
+            "url": "https://www.codetocloud.io",
+            "logo": "https://codetocloud.io/assets/images/logo.svg",
+            "sameAs": [
+                "https://www.linkedin.com/company/code-to-cloud",
+                "https://github.com/codetocloudorg"
+            ]
+        },
+        "maintainer": {
+            "@type": "Organization",
+            "name": "Code To Cloud Inc.",
             "url": "https://www.codetocloud.io"
         },
         "featureList": [
@@ -67,7 +92,120 @@
             "Enterprise CI/CD with BATS testing (43 tests)",
             "Security scanning and automated remediation"
         ],
-        "screenshot": "https://kodra.codetocloud.io/assets/kodra-desktop.png"
+        "screenshot": "https://kodra.codetocloud.io/assets/kodra-desktop.png",
+        "softwareRequirements": "Ubuntu 24.04+ or Windows Subsystem for Linux (WSL2)",
+        "fileSize": "< 1MB installer",
+        "permissions": "internet access for package installation"
+    }
+    </script>
+    
+    <!-- Structured Data: Organization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Code To Cloud Inc.",
+        "url": "https://www.codetocloud.io",
+        "logo": "https://codetocloud.io/assets/images/logo.svg",
+        "description": "Fractional CTO and technology advisory for startups. Technology leadership, security, and AI readiness.",
+        "sameAs": [
+            "https://www.linkedin.com/company/code-to-cloud",
+            "https://github.com/codetocloudorg"
+        ],
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Calgary",
+            "addressRegion": "Alberta",
+            "addressCountry": "CA"
+        }
+    }
+    </script>
+    
+    <!-- Structured Data: BreadcrumbList -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Code To Cloud",
+                "item": "https://www.codetocloud.io"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Kodra",
+                "item": "https://kodra.codetocloud.io"
+            }
+        ]
+    }
+    </script>
+    
+    <!-- Structured Data: FAQPage -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is Kodra?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Kodra is a one-command developer environment installer for Ubuntu that sets up a complete Azure cloud-native development workspace including Azure CLI, Docker, Kubernetes, Terraform, GitHub CLI with Copilot, and a beautiful terminal experience with Ghostty and Starship."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How do I install Kodra?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Run a single command: curl -fsSL https://kodra.codetocloud.io/boot.sh | bash. This will set up your entire development environment from a fresh Ubuntu install in minutes."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What operating systems does Kodra support?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Kodra supports Ubuntu 24.04 and newer, including Windows Subsystem for Linux (WSL2). It transforms a vanilla Ubuntu installation into a fully-configured Azure developer workstation."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is Kodra free to use?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, Kodra is completely free and open source under the MIT license. It is maintained by Code To Cloud Inc."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What tools does Kodra install?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Kodra installs Azure CLI, Azure Developer CLI (azd), GitHub CLI with Copilot, Docker CE, kubectl, Helm, k9s, Terraform, Bicep, OpenTofu, Ghostty terminal, Starship prompt, VS Code with cloud extensions, and many more developer productivity tools."
+                }
+            }
+        ]
+    }
+    </script>
+    
+    <!-- Structured Data: WebSite (for sitelinks search) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Kodra",
+        "url": "https://kodra.codetocloud.io",
+        "description": "One-command Azure developer environment for Ubuntu",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Code To Cloud Inc.",
+            "url": "https://www.codetocloud.io"
+        }
     }
     </script>
     
@@ -1119,7 +1257,7 @@
     <section class="hero">
         <div class="hero-badge">
             <span class="hero-badge-dot"></span>
-            v0.5.2 &mdash; Microsoft Edge, dock favorites fix
+            v0.5.2 &mdash; by <a href="https://www.codetocloud.io" style="color: inherit; text-decoration: none; border-bottom: 1px solid rgba(139, 148, 158, 0.3);" title="Code To Cloud - Fractional CTO & Technology Advisory">Code To Cloud</a>
         </div>
         
         <pre class="ascii-art">

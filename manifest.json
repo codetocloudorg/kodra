@@ -1,0 +1,26 @@
+{
+    "name": "Kodra - Azure Developer Environment",
+    "short_name": "Kodra",
+    "description": "One-command Azure developer environment for Ubuntu. GitHub CLI, Docker, Kubernetes, AI-powered workflows.",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#0d1117",
+    "theme_color": "#0d1117",
+    "orientation": "any",
+    "categories": ["developer tools", "productivity", "utilities"],
+    "lang": "en",
+    "icons": [
+        {
+            "src": "/assets/favicon.ico.png",
+            "sizes": "any",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ]
+}

@@ -1,0 +1,231 @@
+# Kodra — Full Documentation for LLMs
+
+> One-command Azure developer environment for Ubuntu. Built by [Code To Cloud Inc.](https://www.codetocloud.io)
+
+## Overview
+
+Kodra is an opinionated Ubuntu setup for engineers who build and deploy on Azure with GitHub CLI and AI agentic workflows. It transforms a vanilla Ubuntu 24.04+ install (or WSL2) into a beautiful, productive cloud-native development workstation in under 5 minutes.
+
+GitHub CLI (`gh`) is the backbone of Kodra's agentic development experience. Combined with Copilot CLI, you can ask questions, generate code, create PRs, and manage repos—all from your terminal.
+
+## Installation
+
+```bash
+# Standard install
+wget -qO- https://kodra.codetocloud.io/boot.sh | bash
+
+# Customized install
+KODRA_SKIP="spotify,discord" ./install.sh
+KODRA_THEME="ghostty-blue" ./install.sh
+KODRA_MINIMAL=1 ./install.sh
+./install.sh --debug
+```
+
+## Why Ubuntu?
+
+- **Massive Community**: 40M+ users, endless tutorials, instant answers
+- **Lower Learning Curve**: Most beginner-friendly Linux distro
+- **Azure Native Support**: First-class support in Azure VMs, WSL, and all major cloud tools
+- **LTS Stability**: 5 years of security updates
+
+## Complete Tool List
+
+### Terminal & Shell
+| Tool | Purpose |
+|------|---------|
+| Ghostty | GPU-accelerated terminal emulator |
+| Starship | Cross-shell prompt with cloud context |
+| Nerd Fonts | Developer-focused patched fonts |
+| tmux | Terminal multiplexer |
+| bash/zsh | Shell support for both |
+
+### Cloud & Azure
+| Tool | Purpose |
+|------|---------|
+| Azure CLI (`az`) | Azure resource management |
+| Azure Developer CLI (`azd`) | End-to-end Azure app deployment |
+| Bicep | Azure infrastructure as code |
+| Terraform | Multi-cloud infrastructure |
+| OpenTofu | Open-source Terraform alternative |
+| PowerShell 7 | Cross-platform scripting |
+
+### Containers & Kubernetes
+| Tool | Purpose |
+|------|---------|
+| Docker CE | Container runtime |
+| lazydocker | Docker TUI |
+| kubectl | Kubernetes CLI |
+| Helm | Kubernetes package manager |
+| k9s | Kubernetes TUI |
+| Dev Containers | VS Code remote containers |
+
+### Git & GitHub
+| Tool | Purpose |
+|------|---------|
+| GitHub CLI (`gh`) | GitHub from the terminal |
+| GitHub Copilot CLI | AI-powered shell commands |
+| lazygit | Git TUI |
+| GitHub Desktop | GUI git client |
+| GitLens | VS Code git extension |
+
+### AI & Agentic
+| Tool | Purpose |
+|------|---------|
+| GitHub Copilot CLI | Ask `??` for shell commands |
+| `copilot` command | Interactive AI assistant |
+| VS Code Copilot | AI code completion |
+
+### CLI Productivity
+| Tool | Purpose |
+|------|---------|
+| bat | cat with syntax highlighting |
+| eza | Modern ls replacement |
+| fzf | Fuzzy finder |
+| ripgrep | Fast recursive grep |
+| zoxide | Smart cd replacement |
+| btop | System monitor |
+| fastfetch | System info display |
+| jq / yq | JSON/YAML processor |
+| delta | Better git diffs |
+
+### Editor
+| Tool | Purpose |
+|------|---------|
+| VS Code | Primary editor |
+| Neovim | Terminal editor |
+| 15 extensions | Cloud-native development pack |
+| Tokyo Night | Default color theme |
+
+### Desktop (Ubuntu only, not WSL)
+| Tool | Purpose |
+|------|---------|
+| ULauncher | App launcher (Super+Space) |
+| Window tiling | GNOME tiling extension |
+| Blur effects | Desktop compositing |
+| Dash to Dock | macOS-style dock |
+
+## All Commands
+
+```bash
+kodra theme       # Switch themes (tokyo-night, ghostty-blue, catppuccin, gruvbox, nord, rose-pine)
+kodra wallpaper   # Browse and set wallpapers
+kodra desktop     # Configure dock, tiling, login screen
+kodra repair      # Re-apply all configs without reinstalling
+kodra dock        # Set dock favorites
+kodra motd        # Set terminal banner (banner, minimal, none)
+kodra setup       # Initialize user config (first-time or re-run GitHub, Azure login)
+kodra fetch       # Show system info (beautiful fastfetch)
+kodra doctor      # Check system health
+kodra update      # Update everything
+kodra dev         # Install language runtimes (node, python, go...)
+kodra db          # Start database containers (postgres, mysql, redis...)
+kodra install     # Install additional applications
+kodra uninstall   # Remove applications
+kodra backup      # Backup/export dotfiles and settings
+kodra restore     # Restore backed up dotfiles
+kodra resume      # Resume incomplete installation
+kodra cleanup     # Clear system caches and free space
+kodra refresh     # Hot-reload theme components
+kodra extensions  # Manage GNOME extensions
+kodra power       # Set power profile (performance/balanced/power-saver)
+kodra nightlight  # Toggle night light (blue light filter)
+kodra font        # Change terminal font
+kodra screenshot  # Take screenshots (full/region/window)
+kodra shortcuts   # Display keyboard shortcuts
+kodra menu        # Interactive main menu
+```
+
+## Themes
+
+Six themes that sync across terminal, editor, and desktop:
+
+| Theme | Description |
+|-------|-------------|
+| Tokyo Night | Purple-blue Tokyo city lights (default) |
+| Ghostty Blue | Deep navy with electric cyan |
+| Catppuccin | Warm pastel colorscheme |
+| Gruvbox | Retro earthy warm tones |
+| Nord | Arctic cool blue palette |
+| Rosé Pine | Warm and elegant muted tones |
+
+## Keyboard Shortcuts
+
+### Desktop
+| Shortcut | Action |
+|----------|--------|
+| Super + Space | App launcher (ULauncher) |
+| Super + Return | Open terminal |
+| Super + T | Window tiling grid |
+| Super + ←/→ | Tile left/right half |
+| Shift + Super + 3/4/5 | Screenshots (macOS-style) |
+
+### Shell Aliases
+| Alias | Action |
+|-------|--------|
+| `??` | Ask GitHub Copilot for shell commands |
+| `ghpr` | Create a PR via GitHub CLI |
+| `lg` | Launch lazygit |
+| `lzd` | Launch lazydocker |
+| `gs`, `ga`, `gc`, `gp` | Git shortcuts |
+| `azd-up` | Deploy to Azure |
+| `tf`, `tfi`, `tfp`, `tfa` | Terraform shortcuts |
+
+## Multi-User / System-Wide
+
+```bash
+# Install for all users (admin)
+sudo bash install/system-wide.sh
+
+# Each user initializes their config
+kodra setup
+```
+
+## Architecture
+
+```
+kodra/
+├── bin/kodra              # Main CLI dispatcher
+├── bin/kodra-sub/         # Subcommands
+├── configs/               # Shell, terminal, tmux configs
+├── install/               # Installation scripts
+│   ├── required/          # Core (always runs)
+│   ├── desktop/           # GNOME setup
+│   └── terminal/          # Terminal tools
+├── lib/                   # Shared libraries (ui, utils, state)
+├── themes/                # Theme definitions
+├── wallpapers/            # Theme wallpapers
+└── applications/          # Optional app installers
+```
+
+## Uninstall
+
+```bash
+bash ~/.kodra/uninstall.sh
+```
+
+## Requirements
+
+- Ubuntu 24.04+ or WSL2 (Windows 11)
+- Internet connection for package installation
+- ~2GB disk space for all tools
+
+## Links
+
+- Website: https://kodra.codetocloud.io
+- GitHub: https://github.com/codetocloudorg/kodra
+- Cheat Sheet: https://github.com/codetocloudorg/kodra/blob/main/docs/CHEATSHEET.md
+- Contributing: https://github.com/codetocloudorg/kodra/blob/main/CONTRIBUTING.md
+- Roadmap: https://github.com/codetocloudorg/kodra/blob/main/docs/ROADMAP.md
+- Discord: https://discord.gg/vwfwq2EpXJ
+- WSL Edition: https://kodra.wsl.codetocloud.io
+- Code To Cloud (parent company): https://www.codetocloud.io
+
+## Metadata
+
+- License: MIT
+- Version: 0.5.2
+- Platforms: Ubuntu 24.04+, WSL2
+- Developer: Code To Cloud Inc.
+- Location: Calgary, Alberta, Canada
+- CI/CD: GitHub Actions with 43 BATS tests
+- Security: Automated scanning and remediation
