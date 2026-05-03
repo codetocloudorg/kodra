@@ -78,6 +78,8 @@ show_help() {
         # ── Commands ──
         echo -e "  ${WHITE}Usage:${NC} kodra <command> [options]"
         echo ""
+        echo -e "  ${WHITE}Commands:${NC}"
+        echo ""
         echo -e "  ${ACCENT}${BOLD}Appearance${NC}"
         echo -e "    ${WHITE}theme${NC} [name]        Switch themes (interactive if no name given)"
         echo -e "    ${WHITE}wallpaper${NC} [name]    Change wallpaper (interactive if no name given)"
@@ -148,6 +150,8 @@ show_help() {
         echo "  ========================================================"
         echo ""
         echo "  Usage: kodra <command> [options]"
+        echo ""
+        echo "  Commands:"
         echo ""
         echo "  Appearance"
         echo "    theme [name]        Switch themes (interactive if no name given)"

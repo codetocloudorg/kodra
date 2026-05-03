@@ -1,0 +1,956 @@
+# Kodra-WSL Complete Upgrade Prompt
+# ===================================
+# Use this prompt to bring kodra-wsl (the WSL2 variant) up to the same
+# standard as the main kodra repository (codetocloudorg/kodra).
+#
+# Generated: 2026-05-03
+# Based on: 2 days of work on codetocloudorg/kodra
+# Reference repo: https://github.com/codetocloudorg/kodra (main branch)
+#
+# IMPORTANT CONTEXT:
+# - kodra-wsl runs INSIDE WSL2 on Windows, NOT a full Ubuntu desktop
+# - There is NO desktop environment (no GNOME, no wallpapers, no Ghostty)
+# - Terminal is Windows Terminal, not Ghostty
+# - Shell theming uses Oh My Posh, NOT Starship
+# - No tmux config, no desktop themes, no night-light
+# - Docker CE runs via WSL systemd, not natively
+# - The landing page is at kodra.wsl.codetocloud.io (NOT kodra.codetocloud.io)
+# - Current WSL version: 0.7.1 | Main kodra version: 0.5.2
+# - WSL repo has 7 commands vs main's 15+ commands
+
+# ============================================================================
+# PHASE 1: CLI REDESIGN
+# ============================================================================
+
+## 1.1 — Redesign the CLI help screen (bin/kodra)
+
+The main kodra repo completely redesigned its CLI. Apply the same design to
+kodra-wsl's bin/kodra. Reference file:
+  https://github.com/codetocloudorg/kodra/blob/main/bin/kodra
+
+### Design spec:
+
+The help screen uses a purple-to-cyan gradient ASCII logo with horizontal
+separators (not box borders — box borders break in Ghostty/Windows Terminal
+because █ full-block characters render as double-width).
+
+Structure:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[gradient ASCII KODRA logo - 6 lines]
+[blank line]
+v0.7.1 • WSL Edition • by Code To Cloud
+kodra.wsl.codetocloud.io
+Theme: [current theme or "default"]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[grouped commands with descriptions]
+[tips footer]
+```
+
+### Color constants (add to show_help function):
+```bash
+C_LOGO_1='\033[38;5;135m'   # Purple
+C_LOGO_2='\033[38;5;141m'   # Light purple
+C_LOGO_3='\033[38;5;147m'   # Lavender
+C_LOGO_4='\033[38;5;117m'   # Light blue
+C_LOGO_5='\033[38;5;87m'    # Cyan
+C_DIM='\033[2m'
+C_BOLD='\033[1m'
+C_CYAN='\033[0;36m'
+C_GREEN='\033[0;32m'
+C_YELLOW='\033[0;33m'
+C_WHITE='\033[1;37m'
+NC='\033[0m'
+```
+
+### Command groups for WSL variant:
+```
+  System Health
+    kodra doctor        Check system health and tool status
+    kodra doctor --fix  Auto-reinstall missing tools
+
+  Maintenance
+    kodra update        Update all 25+ installed tools
+    kodra repair        Interactive repair menu
+    kodra repair --all  Repair everything automatically
+
+  Setup
+    kodra setup         Re-run first-time configuration
+    kodra fetch         Show system info (fastfetch)
+
+  Info
+    kodra version       Show version
+    kodra help          Show this help
+```
+
+### Critical rendering rules (LEARNED THE HARD WAY):
+- Use `echo -e` with hardcoded strings, NOT `printf %b` with dynamic padding
+- printf's `%*s` counts BYTES not display columns — breaks with Unicode
+- █ (U+2588 FULL BLOCK) renders DOUBLE WIDTH in many terminal fonts
+- Do NOT use closed box borders (┌┐└┘ or ╭╮╰╯) around ASCII art
+- Use horizontal separators ━━━ only (top and bottom)
+- Detect NO_COLOR env var and non-TTY (`[ ! -t 1 ]`) for plain-text fallback
+- Test in Windows Terminal, Ghostty, and basic xterm
+
+### Tips footer:
+```bash
+echo -e ""
+echo -e "  ${C_DIM}Tips:${NC}"
+echo -e "  ${C_DIM}  Run ${C_CYAN}kodra doctor${NC}${C_DIM} after install to verify everything${NC}"
+echo -e "  ${C_DIM}  Run ${C_CYAN}kodra update${NC}${C_DIM} to keep all tools current${NC}"
+echo -e "  ${C_DIM}  Run ${C_CYAN}kodra repair --all${NC}${C_DIM} to fix any issues${NC}"
+```
+
+## 1.2 — Update lib/ui.sh
+
+Add the reusable `print_kodra_logo()` function with gradient colors.
+Reference: https://github.com/codetocloudorg/kodra/blob/main/lib/ui.sh
+
+The logo function should:
+- Print the KODRA ASCII art with 5-color gradient (purple → cyan)
+- Accept an optional "compact" argument for smaller contexts
+- Use the same C_LOGO_1 through C_LOGO_5 palette
+
+## 1.3 — Update boot.sh banner
+
+Replace any rainbow-colored banner with the purple→cyan gradient.
+Reference: https://github.com/codetocloudorg/kodra/blob/main/boot.sh
+
+
+# ============================================================================
+# PHASE 2: WEBSITE REDESIGN (index.html)
+# ============================================================================
+
+The main kodra site was completely redesigned with a dark terminal-native
+aesthetic. Apply the SAME design to kodra-wsl's index.html, but with
+WSL-specific content.
+
+## 2.1 — Color Palette (CSS Custom Properties)
+
+Replace ALL existing CSS variables with:
+```css
+:root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #111118;
+    --bg-tertiary: #1a1a24;
+    --border-default: rgba(255, 255, 255, 0.07);
+    --border-muted: rgba(255, 255, 255, 0.04);
+
+    --text-primary: #e8e8f0;
+    --text-secondary: #9898a8;
+    --text-muted: #6b6b80;
+
+    --accent-blue: #7c6aff;
+    --accent-green: #00d4aa;
+    --accent-purple: #7c6aff;
+    --accent-cyan: #00d4aa;
+    --accent-orange: #f0a030;
+    --accent-red: #ff6b6b;
+
+    --gradient-blue: linear-gradient(135deg, #7c6aff 0%, #00d4aa 100%);
+    --gradient-glow: radial-gradient(ellipse at center, rgba(124, 106, 255, 0.12) 0%, transparent 70%);
+}
+```
+
+## 2.2 — Typography
+
+Replace any existing font imports with:
+```html
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" rel="stylesheet">
+```
+
+- Body font: `font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;`
+- Code/headings: `font-family: 'JetBrains Mono', monospace;`
+- All h1, h2, section titles: JetBrains Mono weight 700
+
+## 2.3 — Meta Tags / SEO
+
+Update the <head> section with (adapt for WSL):
+```html
+<title>Kodra WSL — One-Command Azure Dev Environment for WSL2</title>
+<meta name="description" content="One command installs 25+ cloud-native tools on WSL2 Ubuntu. Azure CLI, Docker, Kubernetes, GitHub Copilot — ready in 10 minutes.">
+<meta name="keywords" content="WSL2 Azure developer environment, cloud native WSL setup, Docker WSL2 free, kubectl WSL, azd WSL Ubuntu">
+<link rel="canonical" href="https://kodra.wsl.codetocloud.io/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kodra.wsl.codetocloud.io/">
+<meta property="og:title" content="Kodra WSL — One-Command Azure Dev Environment for WSL2">
+<meta property="og:description" content="From fresh WSL2 Ubuntu to azd up in 10 minutes. 25+ cloud-native tools, zero config.">
+<meta property="og:image" content="https://kodra.wsl.codetocloud.io/assets/og-image.png">
+
+<!-- Twitter/X -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kodra WSL — One-Command Azure Dev Environment for WSL2">
+<meta name="twitter:description" content="25+ cloud-native tools in one command for WSL2. Azure CLI, Docker, Kubernetes — ready in 10 min.">
+<meta name="twitter:image" content="https://kodra.wsl.codetocloud.io/assets/og-image.png">
+
+<!-- JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Kodra WSL",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "WSL2, Windows 11, Windows 10",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "url": "https://kodra.wsl.codetocloud.io",
+  "description": "One-command WSL2 setup for Azure cloud-native developers.",
+  "author": { "@type": "Organization", "name": "Code To Cloud", "url": "https://www.codetocloud.io" },
+  "license": "https://opensource.org/licenses/MIT"
+}
+</script>
+```
+
+## 2.4 — Hero Section
+
+### Structure:
+```html
+<section class="hero">
+    <!-- Badge row -->
+    <div class="hero-badges">
+        <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            v0.7.1
+        </div>
+        <div class="hero-badge hero-badge-accent">
+            wsl2-native
+        </div>
+        <div class="hero-badge">
+            by <a href="https://www.codetocloud.io">Code To Cloud</a>
+        </div>
+    </div>
+
+    <!-- ASCII art with aria-hidden -->
+    <h1 class="sr-only">Kodra WSL — One-Command Azure Dev Environment for WSL2</h1>
+    <pre class="ascii-art" aria-hidden="true">
+██╗  ██╗ ██████╗ ██████╗ ██████╗  █████╗
+██║ ██╔╝██╔═══██╗██╔══██╗██╔══██╗██╔══██╗
+█████╔╝ ██║   ██║██║  ██║██████╔╝███████║
+██╔═██╗ ██║   ██║██║  ██║██╔══██╗██╔══██║
+██║  ██╗╚██████╔╝██████╔╝██║  ██║██║  ██║
+╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+    </pre>
+
+    <!-- Headline: outcome first -->
+    <h2 class="hero-title">
+        Fresh WSL2. <span class="gradient">azd up</span> in 10 min.
+    </h2>
+
+    <p class="hero-subtitle">
+        One command installs 25+ cloud-native tools and configures your
+        entire Azure dev environment inside WSL2. Docker, Kubernetes,
+        Terraform, GitHub Copilot — zero config drift.
+    </p>
+    <p class="hero-agentic">🤖 This is agentic engineering — done for you.</p>
+
+    <!-- CTA buttons -->
+    <div class="hero-cta">
+        <a href="#install" class="btn btn-primary">Get Started</a>
+        <a href="https://github.com/codetocloudorg/kodra-wsl" class="btn btn-secondary">View on GitHub</a>
+    </div>
+
+    <!-- Terminal install block with traffic lights -->
+    <div class="terminal" id="install">
+        <div class="terminal-header">
+            <div class="terminal-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+            </div>
+            <span class="terminal-title">powershell / bash</span>
+        </div>
+        <div class="terminal-body">
+            <div class="terminal-line">
+                <span class="terminal-prompt">$</span>
+                <span class="terminal-command">wget -qO- https://kodra.wsl.codetocloud.io/boot.sh | bash</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-row">
+        <div class="stat">
+            <span class="stat-value">25+</span>
+            <span class="stat-label">tools installed</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value">~10</span>
+            <span class="stat-label">min setup</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value">WSL2</span>
+            <span class="stat-label">native</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value">MIT</span>
+            <span class="stat-label">license</span>
+        </div>
+    </div>
+</section>
+```
+
+### Hero CSS (copy from main kodra, key pieces):
+```css
+.hero::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+    z-index: 0;
+}
+.hero > * { position: relative; z-index: 1; }
+
+.sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0;
+    margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0);
+    white-space: nowrap; border-width: 0;
+}
+
+.hero-badges { display: flex; align-items: center; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.hero-badge-accent { background: rgba(124, 106, 255, 0.15) !important; border-color: rgba(124, 106, 255, 0.3) !important; color: #7c6aff !important; }
+
+.terminal-header {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(0, 0, 0, 0.3); border-radius: 12px 12px 0 0;
+}
+.terminal-dots { display: flex; gap: 6px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+.dot-red { background: #ff5f56; }
+.dot-yellow { background: #ffbd2e; }
+.dot-green { background: #27c93f; }
+
+.stats-row { display: flex; justify-content: center; gap: 3rem; margin-top: 2.5rem; padding: 1.5rem 0; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+.stat-value { display: block; font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 700; color: var(--accent-blue); }
+.stat-label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+```
+
+## 2.5 — Navigation
+
+Structure:
+```
+features | tools | wsl-setup | docs | discord | [★ GitHub] | [Get Started]
+```
+
+- "wsl-setup" links to #install
+- "docs" links to the GitHub README
+- GitHub link includes live star count badge (fetched from API)
+- "Get Started" is a CTA button with accent color
+
+### GitHub stars JS:
+```javascript
+fetch('https://api.github.com/repos/codetocloudorg/kodra-wsl')
+  .then(r => r.json())
+  .then(data => {
+    const el = document.getElementById('github-stars');
+    if (el && data.stargazers_count !== undefined) {
+      el.textContent = data.stargazers_count;
+      el.style.display = 'inline-flex';
+    }
+  })
+  .catch(() => {});
+```
+
+### Star badge CSS:
+```css
+.star-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px; padding: 2px 8px; font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace; color: rgba(255, 255, 255, 0.7); margin-left: 4px;
+}
+.star-badge::before { content: '★'; color: #f0c040; }
+```
+
+## 2.6 — Copy Buttons on All Code Blocks
+
+Add to every `<pre>`, `.code-block`, and `.install-command`:
+```javascript
+document.querySelectorAll('pre, .code-block, .install-command').forEach(block => {
+  if (block.querySelector('.copy-btn')) return;
+  const btn = document.createElement('button');
+  btn.textContent = 'copy';
+  btn.className = 'copy-btn';
+  btn.setAttribute('aria-label', 'Copy to clipboard');
+  btn.addEventListener('click', () => {
+    const code = block.querySelector('code')
+      ? block.querySelector('code').innerText.trim()
+      : block.innerText.replace(/copy(ed!)?$/m, '').trim();
+    navigator.clipboard.writeText(code);
+    btn.textContent = 'copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+  });
+  block.style.position = 'relative';
+  block.appendChild(btn);
+});
+```
+
+```css
+.copy-btn {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.6); padding: 4px 10px; border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; cursor: pointer;
+    transition: all 0.2s ease; z-index: 10;
+}
+.copy-btn:hover { background: rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.9); }
+.copy-btn.copied { background: rgba(0, 212, 170, 0.2); border-color: rgba(0, 212, 170, 0.4); color: #00d4aa; }
+```
+
+## 2.7 — Section Icons: Replace Emojis with Bracket Codes
+
+Replace ALL emoji section headers with monospaced bracket codes:
+
+| Old Emoji | New Bracket Code | CSS Class |
+|-----------|-----------------|-----------|
+| ☁️ Cloud/Azure | [ AZURE ] | bracket-code--azure |
+| 🐳 Docker/K8s | [ K8S ] | bracket-code--k8s |
+| 🤖 AI/Copilot | [ AI ] | bracket-code--ai |
+| 💻 CLI/Terminal | [ CLI ] | bracket-code--cli |
+| 🔧 Dev Tools | [ DEV ] | bracket-code--dev |
+| 🔒 Security | [ SEC ] | bracket-code--sec |
+| 🩺 Doctor/Health | [ HEALTH ] | bracket-code--dev |
+| 🔄 Update/Repair | [ MAINT ] | bracket-code--k8s |
+
+```css
+.bracket-code {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 600;
+    letter-spacing: 0.1em; padding: 4px 10px; border-radius: 4px;
+    display: inline-block; margin-bottom: 0.75rem;
+}
+.bracket-code--azure { background: rgba(124, 106, 255, 0.12); color: #7c6aff; }
+.bracket-code--k8s { background: rgba(0, 212, 170, 0.12); color: #00d4aa; }
+.bracket-code--ai { background: rgba(240, 160, 48, 0.12); color: #f0a030; }
+.bracket-code--cli { background: rgba(255, 107, 107, 0.12); color: #ff6b6b; }
+.bracket-code--dev { background: rgba(0, 212, 170, 0.12); color: #00d4aa; }
+.bracket-code--sec { background: rgba(255, 107, 107, 0.12); color: #ff6b6b; }
+```
+
+## 2.8 — CLI Commands Table
+
+Replace any command list with a proper monospaced table:
+
+```html
+<div class="commands-table-wrapper">
+    <table class="commands-table">
+        <thead>
+            <tr><th>Command</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>kodra doctor</code></td><td>Check system health and tool status</td></tr>
+            <tr><td><code>kodra doctor --fix</code></td><td>Auto-reinstall missing tools</td></tr>
+            <tr><td><code>kodra update</code></td><td>Update all 25+ installed tools</td></tr>
+            <tr><td><code>kodra repair</code></td><td>Interactive repair menu</td></tr>
+            <tr><td><code>kodra repair --all</code></td><td>Repair everything automatically</td></tr>
+            <tr><td><code>kodra setup</code></td><td>Re-run first-time configuration</td></tr>
+            <tr><td><code>kodra fetch</code></td><td>Show system info</td></tr>
+            <tr><td><code>kodra version</code></td><td>Show current version</td></tr>
+            <tr><td><code>kodra help</code></td><td>Show all commands</td></tr>
+        </tbody>
+    </table>
+</div>
+```
+
+```css
+.commands-table-wrapper { max-width: 640px; margin: 2rem auto; overflow-x: auto; }
+.commands-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; }
+.commands-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid rgba(255,255,255,0.1); color: var(--text-muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; }
+.commands-table td { padding: 0.6rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.commands-table td:first-child { color: var(--accent-blue); white-space: nowrap; }
+.commands-table td:last-child { color: var(--text-secondary); }
+.commands-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+```
+
+## 2.9 — Tool Categories with Color-Coded Pills
+
+Tools installed by kodra-wsl should be listed with category color borders:
+
+```css
+.tool-category-cloud { border-left: 3px solid #7c6aff; }     /* Azure CLI, azd, Bicep, Terraform, OpenTofu */
+.tool-category-container { border-left: 3px solid #00d4aa; }  /* Docker, kubectl, Helm, k9s, lazydocker */
+.tool-category-terminal { border-left: 3px solid #ff6b6b; }   /* Oh My Posh, fzf, lazygit, zoxide, eza, bat, btop */
+.tool-category-ai { border-left: 3px solid #f0a030; }         /* GitHub CLI, Copilot CLI */
+```
+
+## 2.10 — How It Works (Clean Step Numbers)
+
+Replace emoji numbers (1️⃣ 2️⃣ 3️⃣) with:
+```html
+<span class="step-number">1</span>
+```
+
+```css
+.step-number {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; font-weight: 700;
+    color: var(--accent-blue); background: rgba(124, 106, 255, 0.1);
+    border: 1px solid rgba(124, 106, 255, 0.2);
+    width: 32px; height: 32px; border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem;
+}
+```
+
+WSL-specific steps:
+1. Open PowerShell → Run install command
+2. Tools install automatically (Docker, Azure CLI, kubectl, etc.)
+3. Run `kodra doctor` to verify → Start building
+
+## 2.11 — Footer
+
+4-column layout: Brand | Product | Resources | Company
+
+- Brand: Kodra WSL logo + tagline + GitHub/Discord social links
+- Product: Features, Tools, How It Works, FAQ, Main Kodra link
+- Resources: Documentation, Report Issue, Contributing
+- Company: Code To Cloud, Discord, GitHub
+- Footer bottom: © [dynamic year] Code To Cloud. Released under MIT License.
+
+Link to main kodra in the Product column:
+```html
+<li><a href="https://kodra.codetocloud.io">Kodra (Full Ubuntu)</a></li>
+```
+
+## 2.12 — WSL-Specific Content Differences
+
+Key content that differs from main kodra:
+
+| Topic | Main Kodra | WSL Variant |
+|-------|-----------|-------------|
+| Install command | `wget -qO- kodra.codetocloud.io/boot.sh \| bash` | `wget -qO- kodra.wsl.codetocloud.io/boot.sh \| bash` |
+| Tool count | 40+ | 25+ |
+| Setup time | ~15 min | ~10 min |
+| OS | Ubuntu 24.04 LTS | WSL2 Ubuntu on Windows |
+| Terminal | Ghostty | Windows Terminal |
+| Shell theme | Starship | Oh My Posh |
+| Desktop themes | 6 themes (Ghostty, VS Code, desktop) | No desktop themes |
+| Desktop features | Wallpapers, night-light, dock | N/A |
+| Docker | Docker CE native | Docker CE via WSL systemd |
+| Key commands | 15+ (theme, wallpaper, backup, etc.) | 7 (doctor, repair, update, setup, etc.) |
+| FAQ: "Will it break my setup?" | Backs up dotfiles, `kodra restore` | Backs up shell config only |
+| FAQ: "Can I customize?" | `--skip-azure`, `--skip-docker`, `--minimal` | Fewer flags |
+
+DO NOT include references to:
+- Ghostty terminal
+- Starship prompt
+- Desktop wallpapers
+- Night light
+- GNOME dock
+- tmux
+- Desktop themes (tokyo-night, ghostty-blue, etc.)
+
+DO include WSL-specific content:
+- WSL systemd configuration
+- Docker CE auto-start via wsl.conf
+- Windows Terminal font setup (JetBrainsMono Nerd Font)
+- Oh My Posh prompt theming
+- PowerShell 7 integration
+- WSL-specific repair commands
+
+
+# ============================================================================
+# PHASE 3: PLAYWRIGHT TEST SUITE
+# ============================================================================
+
+Port the Playwright test suite from main kodra. Reference files:
+  https://github.com/codetocloudorg/kodra/blob/main/package.json
+  https://github.com/codetocloudorg/kodra/blob/main/playwright.config.js
+  https://github.com/codetocloudorg/kodra/blob/main/tests/website/browser-compatibility.spec.js
+  https://github.com/codetocloudorg/kodra/blob/main/tests/website/world-class-audit.spec.js
+
+## 3.1 — Create package.json
+```json
+{
+  "name": "kodra-wsl-website",
+  "version": "0.7.1",
+  "private": true,
+  "description": "Kodra WSL — One-Command Azure Dev Environment for WSL2",
+  "scripts": {
+    "serve": "npx serve . -l 8080 -s",
+    "test": "npx playwright test",
+    "test:chromium": "npx playwright test --project=chromium",
+    "test:edge": "npx playwright test --project=edge",
+    "test:webkit": "npx playwright test --project=webkit",
+    "test:mobile": "npx playwright test --project=mobile-chrome --project=mobile-safari",
+    "test:headed": "npx playwright test --headed",
+    "test:report": "npx playwright show-report playwright-report"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
+    "@playwright/test": "^1.48.0",
+    "serve": "^14.2.0"
+  }
+}
+```
+
+## 3.2 — Create playwright.config.js
+
+Same as main kodra config — 7 browser projects:
+- chromium, edge, webkit, firefox
+- mobile-chrome (Pixel 5), mobile-safari (iPhone 13), ipad (iPad Pro 11)
+- webServer: `npx serve . -l 8080 -s`
+- baseURL: `http://localhost:8080`
+- testDir: `./tests/website`
+
+Reference: https://github.com/codetocloudorg/kodra/blob/main/playwright.config.js
+
+## 3.3 — Create tests/website/browser-compatibility.spec.js
+
+Adapt from main kodra. This is a SINGLE PAGE site so TEST_PAGES = ['/'].
+
+Test sections to include:
+1. **Scroll Functionality** — mouse wheel, bidirectional, programmatic, keyboard
+2. **CSS Property Validation** — html/body overflow safe, no blocking pseudo-elements
+3. **Footer Rendering** — check footer grid at desktop/tablet/mobile
+4. **Safari Compatibility** — flexbox gap, backdrop-filter prefix
+5. **Mobile Touch Targets** — buttons >= 44px
+6. **Navigation** — nav links work, mobile toggle works
+7. **Responsive Layout** — hero, features, tools adapt at breakpoints
+8. **Link Validation** — internal links resolve, external links have target="_blank"
+9. **Image Loading** — all images load without 404
+10. **Terminal Block** — install command visible, copy button functional
+
+Use the EXACT CSS class names from the redesigned HTML (section 2 above).
+
+## 3.4 — Create tests/website/world-class-audit.spec.js
+
+Adapt from main kodra. Test sections:
+
+1. **Accessibility (WCAG 2.1 AA)** — axe-core scan, color contrast, image alt text, landmark regions, heading hierarchy, focus order
+2. **Performance (Core Web Vitals)** — FCP < 3000ms, LCP < 5000ms (local), CLS < 0.25, page weight < 2MB
+3. **SEO** — title (<=60 chars, contains "Kodra WSL"), description (<=160 chars), viewport, canonical, OG tags, JSON-LD (SoftwareApplication type), robots.txt, sitemap.xml
+4. **Security** — all external resources use HTTPS, inline scripts audit
+5. **Visual Regression** — screenshot baselines at desktop/tablet/mobile
+6. **Content Validation** — WSL-specific:
+   - Install command contains "kodra.wsl.codetocloud.io"
+   - Page mentions "WSL2" or "WSL"
+   - Tool list includes: Azure CLI, Docker, kubectl, Terraform
+   - FAQ section exists
+   - Stats row shows "25+" tools
+   - GitHub link points to kodra-wsl repo
+
+Reference: https://github.com/codetocloudorg/kodra/blob/main/tests/website/world-class-audit.spec.js
+
+
+# ============================================================================
+# PHASE 4: MISSING FILES TO CREATE
+# ============================================================================
+
+## 4.1 — llms.txt (AI/LLM Discovery)
+
+Create `llms.txt` for AI model discovery. Reference format:
+  https://github.com/codetocloudorg/kodra/blob/main/llms.txt
+
+Content should cover:
+- Project name: Kodra WSL
+- Version: 0.7.1
+- Description: WSL2 variant of Kodra
+- All 7 commands documented
+- All 25+ tools listed
+- Install command
+- Links to repo, main kodra, codetocloud.io
+
+## 4.2 — llms-full.txt
+
+Full AI documentation. Reference format:
+  https://github.com/codetocloudorg/kodra/blob/main/llms-full.txt
+
+Comprehensive coverage of all commands, flags, tools, architecture.
+
+## 4.3 — manifest.json (PWA)
+
+Reference: https://github.com/codetocloudorg/kodra/blob/main/manifest.json
+Adapt name/description for WSL variant.
+
+## 4.4 — 404.html
+
+Reference: https://github.com/codetocloudorg/kodra/blob/main/404.html
+Same dark aesthetic, link back to homepage.
+
+## 4.5 — AGENTS.md
+
+Create an AI agent guide for the WSL repo. Reference:
+  https://github.com/codetocloudorg/kodra/blob/main/AGENTS.md
+
+Adapt for WSL-specific file structure and commands. Include:
+- File organization (bin/, lib/, install structure)
+- Shell script conventions (same as main: set -e, snake_case, etc.)
+- WSL-specific considerations (no desktop, systemd, wsl.conf)
+- Testing commands
+- What NOT to do (no sudo, no hardcoded paths, no eval)
+
+## 4.6 — SECURITY.md
+
+Reference: https://github.com/codetocloudorg/kodra/blob/main/SECURITY.md
+Copy and adapt for kodra-wsl.
+
+## 4.7 — CONTRIBUTING.md
+
+Reference: https://github.com/codetocloudorg/kodra/blob/main/CONTRIBUTING.md
+Copy and adapt for kodra-wsl.
+
+## 4.8 — CODE_OF_CONDUCT.md
+
+Reference: https://github.com/codetocloudorg/kodra/blob/main/CODE_OF_CONDUCT.md
+Copy directly.
+
+## 4.9 — OG Image (assets/og-image.png)
+
+Create a 1200x630 OG image. Same approach as main kodra:
+1. Create `assets/og-image.html` with the design
+2. Use Playwright to screenshot it to PNG
+
+Design spec (same as main but for WSL):
+- Dark background (#0a0a0f)
+- "Kodra WSL" in gradient text
+- v0.7.1 badge
+- Tagline: "From fresh WSL2 to azd up in 10 minutes"
+- Terminal preview: `$ wget -qO- kodra.wsl.codetocloud.io/boot.sh | bash`
+- Dot-grid background pattern
+- kodra.wsl.codetocloud.io in footer
+
+## 4.10 — assets/ Directory
+
+Create `assets/` with:
+- `og-image.html` (source for OG image)
+- `og-image.png` (generated 1200x630)
+- `favicon.ico.png` (copy from main kodra or codetocloud.io)
+
+## 4.11 — CNAME
+
+If the site is served via GitHub Pages at a custom domain:
+```
+kodra.wsl.codetocloud.io
+```
+
+
+# ============================================================================
+# PHASE 5: CI/CD PIPELINE
+# ============================================================================
+
+## 5.1 — .github/workflows/website-tests.yml
+
+```yaml
+name: Website Tests
+on:
+  push:
+    branches: [main]
+    paths: ['index.html', '404.html', 'assets/**', 'tests/website/**']
+  pull_request:
+    branches: [main]
+    paths: ['index.html', '404.html', 'assets/**', 'tests/website/**']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npx playwright install --with-deps
+      - run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+```
+
+## 5.2 — .github/workflows/ci.yml (Shell Script Validation)
+
+Create a basic CI that validates shell scripts on every push:
+
+```yaml
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ShellCheck
+        run: sudo apt-get install -y shellcheck
+      - name: Check shell scripts
+        run: |
+          find . -name "*.sh" -not -path "./.git/*" -not -path "./node_modules/*" | while read f; do
+            echo "Checking $f..."
+            shellcheck "$f" || true
+          done
+      - name: Syntax check all scripts
+        run: |
+          ERRORS=0
+          for f in $(find . -name "*.sh" -not -path "./.git/*" -not -path "./node_modules/*"); do
+            bash -n "$f" || ERRORS=$((ERRORS + 1))
+          done
+          exit $ERRORS
+```
+
+
+# ============================================================================
+# PHASE 6: .gitignore UPDATES
+# ============================================================================
+
+Add these entries:
+```
+node_modules/
+test-results/
+playwright-report/
+playwright/.cache/
+*.log
+.DS_Store
+```
+
+
+# ============================================================================
+# PHASE 7: SITEMAP AND ROBOTS.TXT
+# ============================================================================
+
+## 7.1 — Update sitemap.xml
+
+Ensure it contains:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://kodra.wsl.codetocloud.io/</loc>
+        <lastmod>2026-05-03</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+</urlset>
+```
+
+## 7.2 — Update robots.txt
+
+```
+User-agent: *
+Allow: /
+
+Sitemap: https://kodra.wsl.codetocloud.io/sitemap.xml
+```
+
+
+# ============================================================================
+# PHASE 8: COPY CONVENTIONS AND STANDARDS
+# ============================================================================
+
+## CLI naming rules:
+- In code blocks: always lowercase `kodra`
+- In prose: always "Kodra" (capitalized brand name)
+- Never "KODRA" or "kodra" mid-sentence
+- The install output says "Run `kodra doctor` to verify" — keep this everywhere
+
+## "Agentic" usage rules:
+- Use MAX 3 times on the page:
+  1. Badge row: `wsl2-native` badge (or `agentic-first`)
+  2. Last line of hero subtitle: "This is agentic engineering — done for you."
+  3. Footer tagline: keep as-is
+- NEVER use "agentic" in <title> tag
+- NEVER lead a section with it
+
+## Shell script standards (for any scripts modified):
+```bash
+#!/usr/bin/env bash
+set -e
+KODRA_DIR="${KODRA_DIR:-$HOME/.kodra}"
+
+# Functions use snake_case
+# Local variables use lowercase
+# Global variables use UPPERCASE
+# Check commands with `command -v`, not `which`
+# Use `local` for function variables
+# Scripts must be idempotent (safe to run multiple times)
+```
+
+## Do NOT:
+- Reference GitHub Copilot in commit messages as a development tool
+- Use Cursor editor references (use VS Code)
+- Use `sudo` unless absolutely necessary
+- Hardcode paths (use $HOME, $KODRA_DIR)
+- Use `eval` with user input
+- Store credentials in config files
+- Add light mode as default (dark-first always)
+- Use rounded pastel UI cards
+- Use purple gradients on white backgrounds
+
+
+# ============================================================================
+# PHASE 9: VERSION BUMP CHECKLIST
+# ============================================================================
+
+When bumping version, update ALL of these files:
+- VERSION
+- README.md
+- index.html (JSON-LD softwareVersion + hero badge)
+- lib/ui.sh (if version is displayed)
+- CHANGELOG.md
+- llms.txt
+- llms-full.txt
+- package.json
+
+
+# ============================================================================
+# EXECUTION ORDER
+# ============================================================================
+
+Recommended order of operations:
+
+1. Phase 6 (.gitignore) — 2 min
+2. Phase 1 (CLI redesign) — do bin/kodra, lib/ui.sh, boot.sh
+3. Phase 4.5-4.8 (AGENTS.md, SECURITY.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md) — copy from main
+4. Phase 2 (Website redesign) — the big one, do all subsections
+5. Phase 4.1-4.4 (llms.txt, manifest.json, 404.html) — create new files
+6. Phase 4.9-4.10 (OG image + assets) — create and generate
+7. Phase 7 (sitemap + robots.txt) — update
+8. Phase 3 (Playwright tests) — create and run
+9. Phase 5 (CI/CD) — create workflows
+10. Phase 4.11 (CNAME) — last, after DNS is configured
+
+Use multiple agents in parallel where possible. The website redesign (Phase 2)
+can be split across agents editing different sections. SEO files (Phase 4)
+can run in parallel with the website work. Tests (Phase 3) should be created
+AFTER the website is redesigned so selectors match.
+
+VERIFY all tests pass before committing: `npx playwright test --project=chromium`
+
+# ============================================================================
+# REFERENCE FILES (grab these from main kodra repo)
+# ============================================================================
+
+All reference files are at: https://github.com/codetocloudorg/kodra/blob/main/
+
+Key files to reference or copy:
+- bin/kodra (CLI help design)
+- lib/ui.sh (logo function + gradient palette)
+- boot.sh (banner colors)
+- index.html (full redesigned website — use as template)
+- package.json (Playwright deps)
+- playwright.config.js (browser config)
+- tests/website/browser-compatibility.spec.js (adapt for WSL)
+- tests/website/world-class-audit.spec.js (adapt for WSL)
+- .github/workflows/website-tests.yml (CI pipeline)
+- llms.txt (AI discovery format)
+- llms-full.txt (full AI docs format)
+- manifest.json (PWA manifest)
+- 404.html (error page)
+- AGENTS.md (AI agent guide)
+- SECURITY.md
+- CONTRIBUTING.md
+- CODE_OF_CONDUCT.md
+- assets/og-image.html (OG image source)
+- sitemap.xml (format reference)
+- robots.txt (format reference)
+
+# END OF PROMPT
