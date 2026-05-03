@@ -49,7 +49,24 @@ BOX_DOT='·'
 # Box width for consistent alignment (safe for 80-col terminals)
 BOX_WIDTH=60
 
-# Display the animated rainbow Kodra logo and tagline
+# Kodra gradient palette (purple → cyan) for logo
+C_LOGO_1='\033[38;5;141m'   # Purple
+C_LOGO_2='\033[38;5;135m'   # Purple-blue
+C_LOGO_3='\033[38;5;111m'   # Blue
+C_LOGO_4='\033[38;5;75m'    # Blue-cyan
+C_LOGO_5='\033[38;5;51m'    # Cyan
+
+# Print the gradient Kodra logo (reusable)
+print_kodra_logo() {
+    echo -e "    ${C_LOGO_1}██╗  ██╗${C_LOGO_2} ██████╗ ${C_LOGO_3}██████╗ ${C_LOGO_4}██████╗ ${C_LOGO_5} █████╗${C_RESET}"
+    echo -e "    ${C_LOGO_1}██║ ██╔╝${C_LOGO_2}██╔═══██╗${C_LOGO_3}██╔══██╗${C_LOGO_4}██╔══██╗${C_LOGO_5}██╔══██╗${C_RESET}"
+    echo -e "    ${C_LOGO_1}█████╔╝ ${C_LOGO_2}██║   ██║${C_LOGO_3}██║  ██║${C_LOGO_4}██████╔╝${C_LOGO_5}███████║${C_RESET}"
+    echo -e "    ${C_LOGO_1}██╔═██╗ ${C_LOGO_2}██║   ██║${C_LOGO_3}██║  ██║${C_LOGO_4}██╔══██╗${C_LOGO_5}██╔══██║${C_RESET}"
+    echo -e "    ${C_LOGO_1}██║  ██╗${C_LOGO_2}╚██████╔╝${C_LOGO_3}██████╔╝${C_LOGO_4}██║  ██║${C_LOGO_5}██║  ██║${C_RESET}"
+    echo -e "    ${C_LOGO_1}╚═╝  ╚═╝${C_LOGO_2} ╚═════╝ ${C_LOGO_3}╚═════╝ ${C_LOGO_4}╚═╝  ╚═╝${C_LOGO_5}╚═╝  ╚═╝${C_RESET}"
+}
+
+# Display the animated Kodra logo and tagline
 show_banner() {
     # Get version from VERSION file
     local version="0.5.2"
@@ -62,12 +79,12 @@ show_banner() {
     
     # Animated banner reveal
     local lines=(
-        "\033[38;5;196m    ██╗  ██╗\033[38;5;208m ██████╗ \033[38;5;226m██████╗ \033[38;5;46m██████╗ \033[38;5;51m █████╗ \033[0m"
-        "\033[38;5;196m    ██║ ██╔╝\033[38;5;208m██╔═══██╗\033[38;5;226m██╔══██╗\033[38;5;46m██╔══██╗\033[38;5;51m██╔══██╗\033[0m"
-        "\033[38;5;196m    █████╔╝ \033[38;5;208m██║   ██║\033[38;5;226m██║  ██║\033[38;5;46m██████╔╝\033[38;5;51m███████║\033[0m"
-        "\033[38;5;196m    ██╔═██╗ \033[38;5;208m██║   ██║\033[38;5;226m██║  ██║\033[38;5;46m██╔══██╗\033[38;5;51m██╔══██║\033[0m"
-        "\033[38;5;196m    ██║  ██╗\033[38;5;208m╚██████╔╝\033[38;5;226m██████╔╝\033[38;5;46m██║  ██║\033[38;5;51m██║  ██║\033[0m"
-        "\033[38;5;196m    ╚═╝  ╚═╝\033[38;5;208m ╚═════╝ \033[38;5;226m╚═════╝ \033[38;5;46m╚═╝  ╚═╝\033[38;5;51m╚═╝  ╚═╝\033[0m"
+        "    ${C_LOGO_1}██╗  ██╗${C_LOGO_2} ██████╗ ${C_LOGO_3}██████╗ ${C_LOGO_4}██████╗ ${C_LOGO_5} █████╗${C_RESET}"
+        "    ${C_LOGO_1}██║ ██╔╝${C_LOGO_2}██╔═══██╗${C_LOGO_3}██╔══██╗${C_LOGO_4}██╔══██╗${C_LOGO_5}██╔══██╗${C_RESET}"
+        "    ${C_LOGO_1}█████╔╝ ${C_LOGO_2}██║   ██║${C_LOGO_3}██║  ██║${C_LOGO_4}██████╔╝${C_LOGO_5}███████║${C_RESET}"
+        "    ${C_LOGO_1}██╔═██╗ ${C_LOGO_2}██║   ██║${C_LOGO_3}██║  ██║${C_LOGO_4}██╔══██╗${C_LOGO_5}██╔══██║${C_RESET}"
+        "    ${C_LOGO_1}██║  ██╗${C_LOGO_2}╚██████╔╝${C_LOGO_3}██████╔╝${C_LOGO_4}██║  ██║${C_LOGO_5}██║  ██║${C_RESET}"
+        "    ${C_LOGO_1}╚═╝  ╚═╝${C_LOGO_2} ╚═════╝ ${C_LOGO_3}╚═════╝ ${C_LOGO_4}╚═╝  ╚═╝${C_LOGO_5}╚═╝  ╚═╝${C_RESET}"
     )
     
     for line in "${lines[@]}"; do
@@ -75,14 +92,7 @@ show_banner() {
         sleep 0.03
     done
     
-    echo -e "                                                    ${C_GRAY}v${version}${C_RESET}"
-    echo ""
-    sleep 0.1
-    echo -e "    ${C_DIM}${BOX_TL}$(printf '%0.s─' $(seq 1 $BOX_WIDTH))${BOX_TR}${C_RESET}"
-    local sub_pad=$(( (BOX_WIDTH - 43) / 2 ))  # 43 = 41 (text) + 2 (bookend spaces)
-    local sub_pad_r=$(( BOX_WIDTH - 43 - sub_pad ))
-    printf "    ${C_DIM}${BOX_V}${C_RESET} %*s${C_PURPLE}${C_BOLD}A  C O D E  T O  C L O U D  P R O J E C T${C_RESET}%*s ${C_DIM}${BOX_V}${C_RESET}\n" "$sub_pad" "" "$sub_pad_r" ""
-    echo -e "    ${C_DIM}${BOX_BL}$(printf '%0.s─' $(seq 1 $BOX_WIDTH))${BOX_BR}${C_RESET}"
+    echo -e "    ${C_GRAY}v${version}${C_RESET}  ${C_DIM}·${C_RESET}  ${C_GRAY}A Code To Cloud Project${C_RESET}  ${C_DIM}·${C_RESET}  ${C_GRAY}kodra.codetocloud.io${C_RESET}"
     echo ""
     sleep 0.1
     echo -e "    ${C_CYAN}${BOX_BULLET}${C_RESET} ${C_WHITE}Agentic Azure engineering${C_RESET}"

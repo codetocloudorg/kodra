@@ -22,69 +22,165 @@ else
     VERSION="0.5.0"
 fi
 
-# Colors
-BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
+# Colors - Kodra gradient palette (purple → cyan)
+C1='\033[38;5;141m'   # Purple
+C2='\033[38;5;135m'   # Purple-blue
+C3='\033[38;5;111m'   # Blue
+C4='\033[38;5;75m'    # Blue-cyan
+C5='\033[38;5;51m'    # Cyan
+DIM='\033[38;5;243m'
+DIMMER='\033[38;5;238m'
+WHITE='\033[38;5;255m'
+ACCENT='\033[38;5;141m'
 NC='\033[0m'
+BOLD='\033[1m'
+
+# Print the Kodra logo with purple→cyan gradient
+print_logo() {
+    echo -e "  ${C1}██╗  ██╗${C2} ██████╗ ${C3}██████╗ ${C4}██████╗ ${C5} █████╗${NC}"
+    echo -e "  ${C1}██║ ██╔╝${C2}██╔═══██╗${C3}██╔══██╗${C4}██╔══██╗${C5}██╔══██╗${NC}"
+    echo -e "  ${C1}█████╔╝ ${C2}██║   ██║${C3}██║  ██║${C4}██████╔╝${C5}███████║${NC}"
+    echo -e "  ${C1}██╔═██╗ ${C2}██║   ██║${C3}██║  ██║${C4}██╔══██╗${C5}██╔══██║${NC}"
+    echo -e "  ${C1}██║  ██╗${C2}╚██████╔╝${C3}██████╔╝${C4}██║  ██║${C5}██║  ██║${NC}"
+    echo -e "  ${C1}╚═╝  ╚═╝${C2} ╚═════╝ ${C3}╚═════╝ ${C4}╚═╝  ╚═╝${C5}╚═╝  ╚═╝${NC}"
+}
+
+# Print the Kodra logo without colors (for piped output / NO_COLOR)
+print_logo_plain() {
+    echo "  ██╗  ██╗ ██████╗ ██████╗ ██████╗  █████╗"
+    echo "  ██║ ██╔╝██╔═══██╗██╔══██╗██╔══██╗██╔══██╗"
+    echo "  █████╔╝ ██║   ██║██║  ██║██████╔╝███████║"
+    echo "  ██╔═██╗ ██║   ██║██║  ██║██╔══██╗██╔══██║"
+    echo "  ██║  ██╗╚██████╔╝██████╔╝██║  ██║██║  ██║"
+    echo "  ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝"
+}
 
 show_help() {
-    echo -e "\033[38;5;196m    ██╗  ██╗\033[38;5;208m ██████╗ \033[38;5;226m██████╗ \033[38;5;46m██████╗ \033[38;5;51m █████╗ \033[0m"
-    echo -e "\033[38;5;196m    ██║ ██╔╝\033[38;5;208m██╔═══██╗\033[38;5;226m██╔══██╗\033[38;5;46m██╔══██╗\033[38;5;51m██╔══██╗\033[0m"
-    echo -e "\033[38;5;196m    █████╔╝ \033[38;5;208m██║   ██║\033[38;5;226m██║  ██║\033[38;5;46m██████╔╝\033[38;5;51m███████║\033[0m"
-    echo -e "\033[38;5;196m    ██╔═██╗ \033[38;5;208m██║   ██║\033[38;5;226m██║  ██║\033[38;5;46m██╔══██╗\033[38;5;51m██╔══██║\033[0m"
-    echo -e "\033[38;5;196m    ██║  ██╗\033[38;5;208m╚██████╔╝\033[38;5;226m██████╔╝\033[38;5;46m██║  ██║\033[38;5;51m██║  ██║\033[0m"
-    echo -e "\033[38;5;196m    ╚═╝  ╚═╝\033[38;5;208m ╚═════╝ \033[38;5;226m╚═════╝ \033[38;5;46m╚═╝  ╚═╝\033[38;5;51m╚═╝  ╚═╝\033[0m"
-    echo -e "                                                     v$VERSION"
+    # Detect if we should use colors
+    local use_color=true
+    if [ -n "$NO_COLOR" ] || [ ! -t 1 ]; then
+        use_color=false
+    fi
+
     echo ""
-    echo -e "    \033[38;5;147m☁️  A  C O D E  T O  C L O U D  P R O J E C T  ☁️\033[0m"
-    echo -e "    \033[38;5;245mkodra.codetocloud.io\033[0m"
-    echo -e "    \033[38;5;240mDeveloped by Code To Cloud\033[0m"
+    if [ "$use_color" = true ]; then
+        print_logo
+        echo -e "  ${DIM}v${VERSION}${NC}  ${DIMMER}·${NC}  ${DIM}A Code To Cloud Project${NC}  ${DIMMER}·${NC}  ${DIM}kodra.codetocloud.io${NC}"
+    else
+        print_logo_plain
+        echo "  v${VERSION}  ·  A Code To Cloud Project  ·  kodra.codetocloud.io"
+    fi
     echo ""
-    echo "Usage: kodra <command> [options]"
-    echo ""
-    echo "Commands:"
-    echo "  theme [name]      Switch themes (interactive if no name given)"
-    echo "  wallpaper [name]  Change wallpaper (interactive if no name given)"
-    echo "  desktop [cmd]     Configure desktop (setup, refresh, dock, extensions)"
-    echo "  motd [style]      Set terminal banner (banner, minimal, none)"
-    echo "  setup             Run first-time setup (GitHub, Azure, Git)"
-    echo "  fetch             Show beautiful system info"
-    echo "  dev [setup]       Install language runtimes (node, python, go...)"
-    echo "  db <database>     Start database containers (postgres, mysql, redis...)"
-    echo "  update            Update Kodra and installed packages"
-    echo "  install <app>     Install an additional application"
-    echo "  uninstall <app>   Remove an application"
-    echo "  repair            Re-apply all configs without reinstalling"
-    echo "  backup [cmd]      Backup/export dotfiles and dconf settings"
-    echo "  restore [cmd]     Restore backed up dotfiles"
-    echo "  resume [cmd]      Resume incomplete installation"
-    echo "  doctor            Check system health"
-    echo "  menu              Interactive main menu"
-    echo "  shortcuts         Display keyboard shortcuts"
-    echo "  power [profile]   Set power profile (performance/balanced/power-saver)"
-    echo "  nightlight        Toggle night light (blue light filter)"
-    echo "  font [name]       Change terminal font"
-    echo "  screenshot [type] Take screenshots (full/region/window)"
-    echo "  cleanup [what]    Clear system caches and free space"
-    echo "  refresh [what]    Hot-reload theme components without logout"
-    echo "  extensions [cmd]  Manage GNOME extensions"
-    echo "  migrate [cmd]     Run version migrations (list, run, status)"
-    echo "  ci-report [opts]  Pull CI logs and generate remediation reports"
-    echo "  lock              Lock the screen"
-    echo "  suspend           Suspend the system"
-    echo "  restart           Restart the system"
-    echo "  shutdown          Shutdown the system"
-    echo "  welcome           Show first-run welcome screen"
-    echo "  version           Show version information"
-    echo "  help              Show this help message"
-    echo ""
-    echo "Examples:"
-    echo "  kodra theme              # Interactive theme picker"
-    echo "  kodra theme tokyo-night  # Switch to tokyo-night theme"
-    echo "  kodra desktop refresh    # Re-apply desktop settings after update"
-    echo "  kodra repair             # Fix configs without reinstalling apps"
-    echo "  kodra install discord    # Install Discord"
-    echo "  kodra update             # Update everything"
+
+    if [ "$use_color" = true ]; then
+        echo -e "  ${WHITE}Usage:${NC} kodra <command> [options]"
+        echo ""
+        echo -e "  ${ACCENT}${BOLD}Appearance${NC}"
+        echo -e "    ${WHITE}theme${NC} [name]        Switch themes (interactive if no name given)"
+        echo -e "    ${WHITE}wallpaper${NC} [name]    Change wallpaper (interactive if no name given)"
+        echo -e "    ${WHITE}font${NC} [name]         Change terminal font"
+        echo -e "    ${WHITE}motd${NC} [style]        Set terminal banner (banner, minimal, none)"
+        echo -e "    ${WHITE}nightlight${NC}          Toggle night light (blue light filter)"
+        echo ""
+        echo -e "  ${ACCENT}${BOLD}Development${NC}"
+        echo -e "    ${WHITE}dev${NC} [setup]         Install language runtimes (node, python, go...)"
+        echo -e "    ${WHITE}db${NC} <database>       Start database containers (postgres, mysql, redis...)"
+        echo -e "    ${WHITE}ci-report${NC} [opts]    Pull CI logs and generate remediation reports"
+        echo ""
+        echo -e "  ${ACCENT}${BOLD}Desktop${NC}"
+        echo -e "    ${WHITE}desktop${NC} [cmd]       Configure desktop (setup, refresh, dock, extensions)"
+        echo -e "    ${WHITE}extensions${NC} [cmd]    Manage GNOME extensions"
+        echo -e "    ${WHITE}shortcuts${NC}           Display keyboard shortcuts"
+        echo -e "    ${WHITE}screenshot${NC} [type]   Take screenshots (full/region/window)"
+        echo -e "    ${WHITE}fetch${NC}               Show beautiful system info"
+        echo ""
+        echo -e "  ${ACCENT}${BOLD}System${NC}"
+        echo -e "    ${WHITE}update${NC}              Update Kodra and installed packages"
+        echo -e "    ${WHITE}install${NC} <app>       Install an additional application"
+        echo -e "    ${WHITE}uninstall${NC} <app>     Remove an application"
+        echo -e "    ${WHITE}repair${NC}              Re-apply all configs without reinstalling"
+        echo -e "    ${WHITE}cleanup${NC} [what]      Clear system caches and free space"
+        echo -e "    ${WHITE}refresh${NC} [what]      Hot-reload theme components without logout"
+        echo -e "    ${WHITE}power${NC} [profile]     Set power profile (performance/balanced/power-saver)"
+        echo ""
+        echo -e "  ${ACCENT}${BOLD}Data${NC}"
+        echo -e "    ${WHITE}backup${NC} [cmd]        Backup/export dotfiles and dconf settings"
+        echo -e "    ${WHITE}restore${NC} [cmd]       Restore backed up dotfiles"
+        echo -e "    ${WHITE}resume${NC} [cmd]        Resume incomplete installation"
+        echo -e "    ${WHITE}migrate${NC} [cmd]       Run version migrations (list, run, status)"
+        echo ""
+        echo -e "  ${ACCENT}${BOLD}Info${NC}"
+        echo -e "    ${WHITE}setup${NC}               Run first-time setup (GitHub, Azure, Git)"
+        echo -e "    ${WHITE}doctor${NC}              Check system health"
+        echo -e "    ${WHITE}menu${NC}                Interactive main menu"
+        echo -e "    ${WHITE}welcome${NC}             Show first-run welcome screen"
+        echo -e "    ${WHITE}version${NC}             Show version information"
+        echo -e "    ${WHITE}help${NC}                Show this help message"
+        echo ""
+        echo -e "  ${ACCENT}${BOLD}Power${NC}"
+        echo -e "    ${WHITE}lock${NC}                Lock the screen"
+        echo -e "    ${WHITE}suspend${NC}             Suspend the system"
+        echo -e "    ${WHITE}restart${NC}             Restart the system"
+        echo -e "    ${WHITE}shutdown${NC}            Shutdown the system"
+        echo ""
+        echo -e "  ${DIMMER}────────────────────────────────────────────────────────${NC}"
+        echo -e "  ${DIM}→ Run ${WHITE}kodra menu${DIM} for guided, interactive usage${NC}"
+        echo -e "  ${DIM}→ Run ${WHITE}kodra doctor${DIM} if something feels off${NC}"
+    else
+        echo "  Usage: kodra <command> [options]"
+        echo ""
+        echo "  Appearance"
+        echo "    theme [name]        Switch themes (interactive if no name given)"
+        echo "    wallpaper [name]    Change wallpaper (interactive if no name given)"
+        echo "    font [name]         Change terminal font"
+        echo "    motd [style]        Set terminal banner (banner, minimal, none)"
+        echo "    nightlight          Toggle night light (blue light filter)"
+        echo ""
+        echo "  Development"
+        echo "    dev [setup]         Install language runtimes (node, python, go...)"
+        echo "    db <database>       Start database containers (postgres, mysql, redis...)"
+        echo "    ci-report [opts]    Pull CI logs and generate remediation reports"
+        echo ""
+        echo "  Desktop"
+        echo "    desktop [cmd]       Configure desktop (setup, refresh, dock, extensions)"
+        echo "    extensions [cmd]    Manage GNOME extensions"
+        echo "    shortcuts           Display keyboard shortcuts"
+        echo "    screenshot [type]   Take screenshots (full/region/window)"
+        echo "    fetch               Show beautiful system info"
+        echo ""
+        echo "  System"
+        echo "    update              Update Kodra and installed packages"
+        echo "    install <app>       Install an additional application"
+        echo "    uninstall <app>     Remove an application"
+        echo "    repair              Re-apply all configs without reinstalling"
+        echo "    cleanup [what]      Clear system caches and free space"
+        echo "    refresh [what]      Hot-reload theme components without logout"
+        echo "    power [profile]     Set power profile (performance/balanced/power-saver)"
+        echo ""
+        echo "  Data"
+        echo "    backup [cmd]        Backup/export dotfiles and dconf settings"
+        echo "    restore [cmd]       Restore backed up dotfiles"
+        echo "    resume [cmd]        Resume incomplete installation"
+        echo "    migrate [cmd]       Run version migrations (list, run, status)"
+        echo ""
+        echo "  Info"
+        echo "    setup               Run first-time setup (GitHub, Azure, Git)"
+        echo "    doctor              Check system health"
+        echo "    menu                Interactive main menu"
+        echo "    welcome             Show first-run welcome screen"
+        echo "    version             Show version information"
+        echo "    help                Show this help message"
+        echo ""
+        echo "  Power"
+        echo "    lock                Lock the screen"
+        echo "    suspend             Suspend the system"
+        echo "    restart             Restart the system"
+        echo "    shutdown            Shutdown the system"
+        echo ""
+        echo "  --------------------------------------------------------"
+        echo "  -> Run kodra menu for guided, interactive usage"
+        echo "  -> Run kodra doctor if something feels off"
+    fi
     echo ""
 }
 
