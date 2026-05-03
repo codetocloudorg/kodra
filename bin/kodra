@@ -32,47 +32,89 @@ DIM='\033[38;5;243m'
 DIMMER='\033[38;5;238m'
 WHITE='\033[38;5;255m'
 ACCENT='\033[38;5;141m'
+GREEN='\033[38;5;114m'
 NC='\033[0m'
 BOLD='\033[1m'
 
-# Print the Kodra logo with purple→cyan gradient
-print_logo() {
-    echo -e "  ${C1}██╗  ██╗${C2} ██████╗ ${C3}██████╗ ${C4}██████╗ ${C5} █████╗${NC}"
-    echo -e "  ${C1}██║ ██╔╝${C2}██╔═══██╗${C3}██╔══██╗${C4}██╔══██╗${C5}██╔══██╗${NC}"
-    echo -e "  ${C1}█████╔╝ ${C2}██║   ██║${C3}██║  ██║${C4}██████╔╝${C5}███████║${NC}"
-    echo -e "  ${C1}██╔═██╗ ${C2}██║   ██║${C3}██║  ██║${C4}██╔══██╗${C5}██╔══██║${NC}"
-    echo -e "  ${C1}██║  ██╗${C2}╚██████╔╝${C3}██████╔╝${C4}██║  ██║${C5}██║  ██║${NC}"
-    echo -e "  ${C1}╚═╝  ╚═╝${C2} ╚═════╝ ${C3}╚═════╝ ${C4}╚═╝  ╚═╝${C5}╚═╝  ╚═╝${NC}"
+# Box drawing
+BT='╭'
+BB='╰'
+BH='─'
+BV='│'
+BTR='╮'
+BBR='╯'
+
+# Header card width (fits 80-col terminals)
+HW=58
+
+# Draw a horizontal border line
+draw_border_top() {
+    if [ "$1" = "plain" ]; then
+        printf "  +"; printf '%0.s-' $(seq 1 $HW); echo "+"
+    else
+        printf "  ${DIMMER}${BT}"; printf '%0.s─' $(seq 1 $HW); echo -e "${BTR}${NC}"
+    fi
+}
+draw_border_bot() {
+    if [ "$1" = "plain" ]; then
+        printf "  +"; printf '%0.s-' $(seq 1 $HW); echo "+"
+    else
+        printf "  ${DIMMER}${BB}"; printf '%0.s─' $(seq 1 $HW); echo -e "${BBR}${NC}"
+    fi
 }
 
-# Print the Kodra logo without colors (for piped output / NO_COLOR)
-print_logo_plain() {
-    echo "  ██╗  ██╗ ██████╗ ██████╗ ██████╗  █████╗"
-    echo "  ██║ ██╔╝██╔═══██╗██╔══██╗██╔══██╗██╔══██╗"
-    echo "  █████╔╝ ██║   ██║██║  ██║██████╔╝███████║"
-    echo "  ██╔═██╗ ██║   ██║██║  ██║██╔══██╗██╔══██║"
-    echo "  ██║  ██╗╚██████╔╝██████╔╝██║  ██║██║  ██║"
-    echo "  ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝"
+# Print a padded line inside the box
+box_line() {
+    local content="$1"
+    local visible_len="$2"
+    local pad=$((HW - visible_len - 2))
+    [ $pad -lt 0 ] && pad=0
+    if [ "$3" = "plain" ]; then
+        printf "  | %s%*s |\n" "$content" "$pad" ""
+    else
+        printf "  ${DIMMER}${BV}${NC} %b%*s ${DIMMER}${BV}${NC}\n" "$content" "$pad" ""
+    fi
+}
+
+# Get current theme name
+get_current_theme() {
+    if [ -f "$HOME/.config/kodra/theme" ]; then
+        cat "$HOME/.config/kodra/theme" 2>/dev/null
+    else
+        echo "default"
+    fi
 }
 
 show_help() {
-    # Detect if we should use colors
     local use_color=true
     if [ -n "$NO_COLOR" ] || [ ! -t 1 ]; then
         use_color=false
     fi
 
-    echo ""
-    if [ "$use_color" = true ]; then
-        print_logo
-        echo -e "  ${DIM}v${VERSION}${NC}  ${DIMMER}·${NC}  ${DIM}A Code To Cloud Project${NC}  ${DIMMER}·${NC}  ${DIM}kodra.codetocloud.io${NC}"
-    else
-        print_logo_plain
-        echo "  v${VERSION}  ·  A Code To Cloud Project  ·  kodra.codetocloud.io"
-    fi
+    local current_theme
+    current_theme=$(get_current_theme)
+
     echo ""
 
     if [ "$use_color" = true ]; then
+        # ── Boxed header card ──
+        draw_border_top
+        box_line "" 0
+        box_line "${C1}██╗  ██╗${C2} ██████╗ ${C3}██████╗ ${C4}██████╗ ${C5} █████╗${NC}" 40
+        box_line "${C1}██║ ██╔╝${C2}██╔═══██╗${C3}██╔══██╗${C4}██╔══██╗${C5}██╔══██╗${NC}" 41
+        box_line "${C1}█████╔╝ ${C2}██║   ██║${C3}██║  ██║${C4}██████╔╝${C5}███████║${NC}" 41
+        box_line "${C1}██╔═██╗ ${C2}██║   ██║${C3}██║  ██║${C4}██╔══██╗${C5}██╔══██║${NC}" 41
+        box_line "${C1}██║  ██╗${C2}╚██████╔╝${C3}██████╔╝${C4}██║  ██║${C5}██║  ██║${NC}" 41
+        box_line "${C1}╚═╝  ╚═╝${C2} ╚═════╝ ${C3}╚═════╝ ${C4}╚═╝  ╚═╝${C5}╚═╝  ╚═╝${NC}" 41
+        box_line "" 0
+        box_line "${WHITE}v${VERSION}${NC}  ${DIMMER}·${NC}  ${DIM}A Code To Cloud Project${NC}" $((3 + ${#VERSION} + 3 + 23))
+        box_line "${DIM}kodra.codetocloud.io${NC}" 20
+        box_line "" 0
+        box_line "${DIM}Theme:${NC} ${GREEN}${current_theme}${NC}  ${DIMMER}·${NC}  ${DIM}Install:${NC} ${DIM}${KODRA_DIR}${NC}" $((7 + ${#current_theme} + 3 + 10 + ${#KODRA_DIR}))
+        draw_border_bot
+        echo ""
+
+        # ── Commands ──
         echo -e "  ${WHITE}Usage:${NC} kodra <command> [options]"
         echo ""
         echo -e "  ${ACCENT}${BOLD}Appearance${NC}"
@@ -123,10 +165,25 @@ show_help() {
         echo -e "    ${WHITE}restart${NC}             Restart the system"
         echo -e "    ${WHITE}shutdown${NC}            Shutdown the system"
         echo ""
-        echo -e "  ${DIMMER}────────────────────────────────────────────────────────${NC}"
+        echo -e "  ${DIMMER}────────────────────────────────────────────────────────────${NC}"
         echo -e "  ${DIM}→ Run ${WHITE}kodra menu${DIM} for guided, interactive usage${NC}"
         echo -e "  ${DIM}→ Run ${WHITE}kodra doctor${DIM} if something feels off${NC}"
     else
+        # ── Plain text fallback ──
+        draw_border_top plain
+        box_line "██╗  ██╗ ██████╗ ██████╗ ██████╗  █████╗" 40 plain
+        box_line "██║ ██╔╝██╔═══██╗██╔══██╗██╔══██╗██╔══██╗" 41 plain
+        box_line "█████╔╝ ██║   ██║██║  ██║██████╔╝███████║" 41 plain
+        box_line "██╔═██╗ ██║   ██║██║  ██║██╔══██╗██╔══██║" 41 plain
+        box_line "██║  ██╗╚██████╔╝██████╔╝██║  ██║██║  ██║" 41 plain
+        box_line "╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝" 41 plain
+        box_line "" 0 plain
+        box_line "v${VERSION}  ·  A Code To Cloud Project" $((3 + ${#VERSION} + 3 + 23)) plain
+        box_line "kodra.codetocloud.io" 20 plain
+        box_line "" 0 plain
+        box_line "Theme: ${current_theme}  ·  Install: ${KODRA_DIR}" $((7 + ${#current_theme} + 3 + 10 + ${#KODRA_DIR})) plain
+        draw_border_bot plain
+        echo ""
         echo "  Usage: kodra <command> [options]"
         echo ""
         echo "  Appearance"
@@ -177,7 +234,7 @@ show_help() {
         echo "    restart             Restart the system"
         echo "    shutdown            Shutdown the system"
         echo ""
-        echo "  --------------------------------------------------------"
+        echo "  ----------------------------------------------------------"
         echo "  -> Run kodra menu for guided, interactive usage"
         echo "  -> Run kodra doctor if something feels off"
     fi
