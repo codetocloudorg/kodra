@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    width: 1200px;
+    height: 630px;
+    background: #0a0a0f;
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #e8e8f0;
+    position: relative;
+    overflow: hidden;
+}
+body::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+body::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,106,255,0.15) 0%, transparent 70%);
+}
+.content { position: relative; z-index: 1; text-align: center; }
+.logo { font-size: 4rem; font-weight: 700; margin-bottom: 1rem; }
+.logo span { background: linear-gradient(135deg, #7c6aff, #00d4aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.version { font-size: 0.9rem; color: #6b6b80; margin-bottom: 2rem; }
+.version span { background: rgba(124,106,255,0.15); color: #7c6aff; padding: 4px 12px; border-radius: 4px; border: 1px solid rgba(124,106,255,0.3); }
+.tagline { font-size: 1.4rem; color: #9898a8; max-width: 800px; line-height: 1.5; }
+.tagline strong { color: #e8e8f0; }
+.terminal-preview {
+    margin-top: 2rem;
+    background: #111118;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    padding: 1rem 2rem;
+    font-size: 0.95rem;
+}
+.terminal-preview .prompt { color: #00d4aa; }
+.terminal-preview .cmd { color: #e8e8f0; }
+.brand { position: absolute; bottom: 30px; font-size: 0.8rem; color: #6b6b80; }
+.brand a { color: #7c6aff; text-decoration: none; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="content">
+    <div class="logo"><span>Kodra</span></div>
+    <div class="version"><span>v0.5.2</span> One-Command Azure Dev Environment</div>
+    <div class="tagline">From <strong>fresh Ubuntu</strong> to <strong>azd up</strong> in 15 minutes</div>
+    <div class="terminal-preview">
+        <span class="prompt">$</span> <span class="cmd">wget -qO- kodra.codetocloud.io/install.sh | bash</span>
+    </div>
+</div>
+<div class="brand">kodra.codetocloud.io — by <a href="#">Code To Cloud</a></div>
+</body>
+</html>
