@@ -33,7 +33,7 @@ jobs:
           - ubuntu: "24.04"
             codename: "noble"
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Create test container
         run: |
@@ -203,7 +203,7 @@ jobs:
 
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-install-logs-ubuntu-${{ matrix.ubuntu }}
           path: |
@@ -268,7 +268,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Run minimal install
         run: |
@@ -314,7 +314,7 @@ jobs:
 
       - name: Upload minimal install logs
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-minimal-install-logs
           path: test-output/minimal-install-log.txt
@@ -343,7 +343,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Run system-wide install with multiple users
         run: |
@@ -403,7 +403,7 @@ jobs:
 
       - name: Upload system-wide logs
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-system-wide-logs
           path: test-output/system-wide-log.txt
