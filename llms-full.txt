@@ -1,10 +1,10 @@
 # Kodra — Full Documentation for LLMs
 
-> One-command Azure developer environment for Ubuntu Desktop & WSL2. Built by [Code To Cloud Inc.](https://www.codetocloud.io)
+> One-command Azure developer environment for Ubuntu Desktop, WSL2 & macOS. Built by [Code To Cloud Inc.](https://www.codetocloud.io)
 
 ## Overview
 
-Kodra is an opinionated Ubuntu setup for engineers who build and deploy on Azure with GitHub CLI and AI agentic workflows. It transforms a vanilla Ubuntu 24.04+ install (or WSL2) into a beautiful, productive cloud-native development workstation in under 5 minutes. The unified website at kodra.codetocloud.io serves both Ubuntu Desktop and WSL2 audiences with a platform toggle.
+Kodra is an opinionated developer setup for engineers who build and deploy on Azure with GitHub CLI and AI agentic workflows. It transforms a vanilla Ubuntu 24.04+ install, WSL2, or macOS (Apple Silicon) into a beautiful, productive cloud-native development workstation in under 5 minutes. The unified website at kodra.codetocloud.io serves Ubuntu Desktop, WSL2, and macOS audiences with a platform toggle.
 
 GitHub CLI (`gh`) is the backbone of Kodra's agentic development experience. Combined with Copilot CLI, you can ask questions, generate code, create PRs, and manage repos—all from your terminal.
 
@@ -18,6 +18,11 @@ wget -qO- https://kodra.codetocloud.io/boot.sh | bash
 ### WSL2 (Windows)
 ```bash
 wget -qO- https://kodra.wsl.codetocloud.io/boot.sh | bash
+```
+
+### macOS (Apple Silicon)
+```bash
+curl -fsSL https://raw.githubusercontent.com/codetocloudorg/kodra-macos/main/install.sh | bash
 ```
 
 ### Customized install
@@ -34,6 +39,13 @@ KODRA_MINIMAL=1 ./install.sh
 - **Lower Learning Curve**: Most beginner-friendly Linux distro
 - **Azure Native Support**: First-class support in Azure VMs, WSL, and all major cloud tools
 - **LTS Stability**: 5 years of security updates
+
+## Why macOS?
+
+- **Homebrew Native**: Every tool installed through Homebrew or native .pkg installers
+- **Colima + Docker CLI**: Run containers without Docker Desktop licensing
+- **Apple Silicon**: ARM-native builds for all tools, no Rosetta overhead
+- **macOS Defaults**: Sensible Dock, Finder, keyboard tweaks, and dark mode
 
 ## Complete Tool List
 
@@ -212,7 +224,7 @@ bash ~/.kodra/uninstall.sh
 
 ## Requirements
 
-- Ubuntu 24.04+ or WSL2 (Windows 11)
+- Ubuntu 24.04+, WSL2 (Windows 11), or macOS 14+ (Apple Silicon)
 - Internet connection for package installation
 - ~2GB disk space for all tools
 
@@ -220,8 +232,10 @@ bash ~/.kodra/uninstall.sh
 
 - Website: https://kodra.codetocloud.io
 - Website (WSL view): https://kodra.codetocloud.io/#wsl
+- Website (macOS view): https://kodra.codetocloud.io/#macos
 - GitHub (Desktop): https://github.com/codetocloudorg/kodra
 - GitHub (WSL): https://github.com/codetocloudorg/kodra-wsl
+- GitHub (macOS): https://github.com/codetocloudorg/kodra-macos
 - Cheat Sheet: https://github.com/codetocloudorg/kodra/blob/main/docs/CHEATSHEET.md
 - Contributing: https://github.com/codetocloudorg/kodra/blob/main/CONTRIBUTING.md
 - Roadmap: https://github.com/codetocloudorg/kodra/blob/main/docs/ROADMAP.md
@@ -232,7 +246,7 @@ bash ~/.kodra/uninstall.sh
 
 - License: MIT
 - Version: 0.5.3
-- Platforms: Ubuntu 24.04+ Desktop, WSL2 (Windows 11)
+- Platforms: Ubuntu 24.04+ Desktop, WSL2 (Windows 11), macOS 14+ (Apple Silicon)
 - Developer: Code To Cloud Inc.
 - Location: Calgary, Alberta, Canada
 - CI/CD: GitHub Actions with 43 BATS tests

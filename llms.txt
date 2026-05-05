@@ -1,8 +1,8 @@
 # Kodra
 
-> One-command Azure developer environment for Ubuntu Desktop & WSL2
+> One-command Azure developer environment for Ubuntu Desktop, WSL2 & macOS
 
-Kodra transforms a fresh Ubuntu 24.04+ install (or WSL2) into a fully-configured Azure cloud-native development workstation in minutes. One unified website with a platform toggle for both Ubuntu Desktop and WSL2. Built by [Code To Cloud Inc.](https://www.codetocloud.io)
+Kodra transforms a fresh Ubuntu 24.04+ install, WSL2, or macOS into a fully-configured Azure cloud-native development workstation in minutes. One unified website with a platform toggle for Ubuntu Desktop, WSL2, and macOS. Built by [Code To Cloud Inc.](https://www.codetocloud.io)
 
 ## Quick Start
 
@@ -14,6 +14,11 @@ wget -qO- https://kodra.codetocloud.io/boot.sh | bash
 ### WSL2 (Windows)
 ```bash
 wget -qO- https://kodra.wsl.codetocloud.io/boot.sh | bash
+```
+
+### macOS (Apple Silicon)
+```bash
+curl -fsSL https://raw.githubusercontent.com/codetocloudorg/kodra-macos/main/install.sh | bash
 ```
 
 ## What Kodra Installs
@@ -42,8 +47,10 @@ wget -qO- https://kodra.wsl.codetocloud.io/boot.sh | bash
 
 - Website: https://kodra.codetocloud.io
 - Website (WSL view): https://kodra.codetocloud.io/#wsl
+- Website (macOS view): https://kodra.codetocloud.io/#macos
 - GitHub (Desktop): https://github.com/codetocloudorg/kodra
 - GitHub (WSL): https://github.com/codetocloudorg/kodra-wsl
+- GitHub (macOS): https://github.com/codetocloudorg/kodra-macos
 - Documentation: https://github.com/codetocloudorg/kodra/blob/main/docs/CHEATSHEET.md
 - Discord: https://discord.gg/vwfwq2EpXJ
 - Parent Company: https://www.codetocloud.io
@@ -51,6 +58,6 @@ wget -qO- https://kodra.wsl.codetocloud.io/boot.sh | bash
 ## Details
 
 - License: MIT
-- Platforms: Ubuntu 24.04+ Desktop, WSL2 (Windows 11)
+- Platforms: Ubuntu 24.04+ Desktop, WSL2 (Windows 11), macOS 14+ (Apple Silicon)
 - Version: 0.5.3
 - Developed by: Code To Cloud Inc. (Calgary, Alberta, Canada)

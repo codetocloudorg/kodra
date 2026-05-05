@@ -1,7 +1,7 @@
 {
-    "name": "Kodra - Azure Developer Environment for Ubuntu & WSL",
+    "name": "Kodra - Azure Developer Environment for Ubuntu, WSL & macOS",
     "short_name": "Kodra",
-    "description": "One-command Azure developer environment for Ubuntu Desktop and WSL2. GitHub CLI, Docker, Kubernetes, AI-powered workflows.",
+    "description": "One-command Azure developer environment for Ubuntu Desktop, WSL2, and macOS. GitHub CLI, Docker, Kubernetes, AI-powered workflows.",
     "start_url": "/",
     "scope": "/",
     "display": "standalone",
