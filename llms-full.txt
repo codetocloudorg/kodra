@@ -1,20 +1,27 @@
 # Kodra — Full Documentation for LLMs
 
-> One-command Azure developer environment for Ubuntu. Built by [Code To Cloud Inc.](https://www.codetocloud.io)
+> One-command Azure developer environment for Ubuntu Desktop & WSL2. Built by [Code To Cloud Inc.](https://www.codetocloud.io)
 
 ## Overview
 
-Kodra is an opinionated Ubuntu setup for engineers who build and deploy on Azure with GitHub CLI and AI agentic workflows. It transforms a vanilla Ubuntu 24.04+ install (or WSL2) into a beautiful, productive cloud-native development workstation in under 5 minutes.
+Kodra is an opinionated Ubuntu setup for engineers who build and deploy on Azure with GitHub CLI and AI agentic workflows. It transforms a vanilla Ubuntu 24.04+ install (or WSL2) into a beautiful, productive cloud-native development workstation in under 5 minutes. The unified website at kodra.codetocloud.io serves both Ubuntu Desktop and WSL2 audiences with a platform toggle.
 
 GitHub CLI (`gh`) is the backbone of Kodra's agentic development experience. Combined with Copilot CLI, you can ask questions, generate code, create PRs, and manage repos—all from your terminal.
 
 ## Installation
 
+### Ubuntu Desktop
 ```bash
-# Standard install
 wget -qO- https://kodra.codetocloud.io/boot.sh | bash
+```
 
-# Customized install
+### WSL2 (Windows)
+```bash
+wget -qO- https://kodra.wsl.codetocloud.io/boot.sh | bash
+```
+
+### Customized install
+```bash
 KODRA_SKIP="spotify,discord" ./install.sh
 KODRA_THEME="ghostty-blue" ./install.sh
 KODRA_MINIMAL=1 ./install.sh
@@ -212,19 +219,20 @@ bash ~/.kodra/uninstall.sh
 ## Links
 
 - Website: https://kodra.codetocloud.io
-- GitHub: https://github.com/codetocloudorg/kodra
+- Website (WSL view): https://kodra.codetocloud.io/#wsl
+- GitHub (Desktop): https://github.com/codetocloudorg/kodra
+- GitHub (WSL): https://github.com/codetocloudorg/kodra-wsl
 - Cheat Sheet: https://github.com/codetocloudorg/kodra/blob/main/docs/CHEATSHEET.md
 - Contributing: https://github.com/codetocloudorg/kodra/blob/main/CONTRIBUTING.md
 - Roadmap: https://github.com/codetocloudorg/kodra/blob/main/docs/ROADMAP.md
 - Discord: https://discord.gg/vwfwq2EpXJ
-- WSL Edition: https://kodra.wsl.codetocloud.io
 - Code To Cloud (parent company): https://www.codetocloud.io
 
 ## Metadata
 
 - License: MIT
-- Version: 0.5.2
-- Platforms: Ubuntu 24.04+, WSL2
+- Version: 0.5.3
+- Platforms: Ubuntu 24.04+ Desktop, WSL2 (Windows 11)
 - Developer: Code To Cloud Inc.
 - Location: Calgary, Alberta, Canada
 - CI/CD: GitHub Actions with 43 BATS tests

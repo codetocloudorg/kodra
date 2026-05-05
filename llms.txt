@@ -1,13 +1,19 @@
 # Kodra
 
-> One-command Azure developer environment for Ubuntu
+> One-command Azure developer environment for Ubuntu Desktop & WSL2
 
-Kodra transforms a fresh Ubuntu 24.04+ install (or WSL2) into a fully-configured Azure cloud-native development workstation in minutes. Built by [Code To Cloud Inc.](https://www.codetocloud.io)
+Kodra transforms a fresh Ubuntu 24.04+ install (or WSL2) into a fully-configured Azure cloud-native development workstation in minutes. One unified website with a platform toggle for both Ubuntu Desktop and WSL2. Built by [Code To Cloud Inc.](https://www.codetocloud.io)
 
 ## Quick Start
 
+### Ubuntu Desktop
 ```bash
 wget -qO- https://kodra.codetocloud.io/boot.sh | bash
+```
+
+### WSL2 (Windows)
+```bash
+wget -qO- https://kodra.wsl.codetocloud.io/boot.sh | bash
 ```
 
 ## What Kodra Installs
@@ -16,11 +22,11 @@ wget -qO- https://kodra.codetocloud.io/boot.sh | bash
 - GitHub CLI with Copilot CLI for AI-powered terminal workflows
 - Docker CE, lazydocker, Dev Containers support
 - Kubernetes: kubectl, Helm, k9s
-- Modern terminal: Ghostty, Starship prompt, Nerd Fonts
+- Modern terminal: Ghostty (Desktop) / Windows Terminal (WSL), Starship prompt, Nerd Fonts
 - VS Code with Tokyo Night theme and 15 cloud-native extensions
 - CLI tools: bat, eza, fzf, ripgrep, zoxide, btop, fastfetch, jq, yq
 - Git: lazygit, GitLens, GitHub Desktop
-- Desktop: ULauncher, window tiling, blur effects, macOS-style dock
+- Desktop (Ubuntu only): ULauncher, window tiling, blur effects, macOS-style dock
 
 ## Key Commands
 
@@ -35,15 +41,16 @@ wget -qO- https://kodra.codetocloud.io/boot.sh | bash
 ## Links
 
 - Website: https://kodra.codetocloud.io
-- GitHub: https://github.com/codetocloudorg/kodra
+- Website (WSL view): https://kodra.codetocloud.io/#wsl
+- GitHub (Desktop): https://github.com/codetocloudorg/kodra
+- GitHub (WSL): https://github.com/codetocloudorg/kodra-wsl
 - Documentation: https://github.com/codetocloudorg/kodra/blob/main/docs/CHEATSHEET.md
 - Discord: https://discord.gg/vwfwq2EpXJ
-- WSL Edition: https://kodra.wsl.codetocloud.io
 - Parent Company: https://www.codetocloud.io
 
 ## Details
 
 - License: MIT
-- Platforms: Ubuntu 24.04+, WSL2
-- Version: 0.5.2
+- Platforms: Ubuntu 24.04+ Desktop, WSL2 (Windows 11)
+- Version: 0.5.3
 - Developed by: Code To Cloud Inc. (Calgary, Alberta, Canada)

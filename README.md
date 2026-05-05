@@ -40,7 +40,7 @@ We chose Ubuntu as our foundation for good reasons:
 | ☁️ **Azure Native Support** | First-class support in Azure VMs, WSL, and all major cloud tools |
 | 🔒 **LTS Stability** | 5 years of security updates—no surprise breakages mid-project |
 
-> **🎉 NEW:** WSL edition is now available for Windows developers! All CLI tools, Azure integrations, and GitHub Copilot—right in Windows Terminal. [Get started →](https://kodra.wsl.codetocloud.io)
+> **🎉 NEW:** WSL edition is now available for Windows developers! All CLI tools, Azure integrations, and GitHub Copilot—right in Windows Terminal. [Get started →](https://kodra.codetocloud.io/#wsl)
 
 ## Quick Start
 
