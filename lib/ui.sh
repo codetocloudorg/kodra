@@ -69,7 +69,7 @@ print_kodra_logo() {
 # Display the animated Kodra logo and tagline
 show_banner() {
     # Get version from VERSION file
-    local version="0.5.2"
+    local version="0.5.3"
     if [ -f "$KODRA_DIR/VERSION" ]; then
         version=$(cat "$KODRA_DIR/VERSION" | tr -d '\n')
     fi
