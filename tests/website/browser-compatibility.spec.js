@@ -333,7 +333,7 @@ test.describe('Responsive Layout', () => {
   test('feature cards stack on mobile', async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.mobile);
     await page.goto('/');
-    const grid = page.locator('.features-grid');
+    const grid = page.locator('.features-grid:visible');
     await grid.scrollIntoViewIfNeeded();
     const cols = await grid.evaluate(el =>
       getComputedStyle(el).gridTemplateColumns
@@ -346,7 +346,7 @@ test.describe('Responsive Layout', () => {
   test('tools grid adapts to viewport', async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.desktop);
     await page.goto('/');
-    const grid = page.locator('.tools-grid');
+    const grid = page.locator('.tools-grid:visible');
     await grid.scrollIntoViewIfNeeded();
 
     const desktopCols = await grid.evaluate(el =>
@@ -463,7 +463,7 @@ test.describe('Terminal Component', () => {
     await expect(terminal.locator('.terminal-dots .dot')).toHaveCount(3);
 
     // Check install command is present
-    const command = terminal.locator('.terminal-command');
+    const command = terminal.locator('.terminal-command').first();
     await expect(command).toContainText('kodra.codetocloud.io/boot.sh');
   });
 

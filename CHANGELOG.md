@@ -5,6 +5,20 @@ All notable changes to Kodra will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.3] - 2026-05-05
+
+### Added
+- **Unified landing page** — combined Ubuntu Desktop and WSL2 into a single website with platform toggle
+- Platform toggle switch in hero section to switch between Ubuntu Desktop and WSL2 content
+- WSL2-specific teal/cyan color scheme for visual differentiation
+- Dynamic GitHub link switching based on selected platform
+- URL hash support (`#ubuntu` / `#wsl`) for deep linking to platform-specific content
+- Platform-specific content across all sections: hero, features, tools, commands, shortcuts, FAQ, footer
+
+### Changed
+- Landing page now serves both Ubuntu Desktop and WSL2 audiences from one URL
+- Removed separate WSL website dependency
+
 ## [0.5.2] - 2026-05-02
 
 ### Added
