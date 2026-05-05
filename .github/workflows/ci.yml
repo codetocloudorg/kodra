@@ -188,7 +188,7 @@ jobs:
       # developers see failures inline without opening logs.
       - name: Test report — Unit
         if: always()
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@v3
         with:
           name: Unit Tests
           path: test-results/unit.xml
@@ -197,7 +197,7 @@ jobs:
 
       - name: Test report — Integration
         if: always()
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@v3
         with:
           name: Integration Tests
           path: test-results/integration.xml
@@ -206,7 +206,7 @@ jobs:
 
       - name: Test report — Security
         if: always()
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@v3
         with:
           name: Security Tests
           path: test-results/security.xml
