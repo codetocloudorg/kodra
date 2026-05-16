@@ -31,7 +31,8 @@ curl -fsSL https://kodra.macos.codetocloud.io/boot.sh | bash
 - Ansible automation (macOS)
 - Modern terminal: Ghostty (Desktop) / Windows Terminal (WSL), Starship prompt, Nerd Fonts
 - VS Code with Tokyo Night theme and 15 cloud-native extensions
-- CLI tools: bat, eza, fzf, ripgrep, zoxide, btop, fastfetch, jq, yq
+- CLI tools: bat, eza, fzf, ripgrep, zoxide, btop, fastfetch, jq, yq, delta, httpie
+- macOS extras: direnv, shellcheck, neovim, act (run GitHub Actions locally)
 - Git: lazygit, GitLens, GitHub Desktop
 - Desktop (Ubuntu only): ULauncher, window tiling, blur effects, macOS-style dock
 

@@ -118,6 +118,11 @@ KODRA_MINIMAL=1 ./install.sh
 | fastfetch | System info display |
 | jq / yq | JSON/YAML processor |
 | delta | Better git diffs |
+| httpie | Human-friendly HTTP client |
+| direnv | Per-directory environment variables (macOS) |
+| shellcheck | Shell script linter (macOS) |
+| tldr | Simplified man pages |
+| act | Run GitHub Actions locally (macOS) |
 
 ### Editor
 | Tool | Purpose |

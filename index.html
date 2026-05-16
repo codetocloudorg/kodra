@@ -50,7 +50,7 @@
         "description": "Kodra: Unified one-command setup for Ubuntu Desktop, WSL2, and macOS developers. Azure CLI, Docker, Kubernetes, GitHub Copilot CLI, and AI-powered workflows.",
         "url": "https://kodra.codetocloud.io",
         "downloadUrl": "https://kodra.codetocloud.io/boot.sh",
-        "softwareVersion": "Ubuntu 0.5.3 / WSL 0.7.1 / macOS 0.5.0",
+        "softwareVersion": "Ubuntu 0.5.3 / WSL 0.7.1 / macOS 0.6.0",
         "creator": {
             "@type": "Organization",
             "name": "Code To Cloud",
@@ -59,11 +59,13 @@
         "featureList": [
             "Azure CLI and Azure Developer CLI (azd)",
             "GitHub CLI with Copilot CLI",
-            "Kubernetes tools (kubectl, Helm, k9s)",
-            "Container tools (Docker CE, Colima, lazydocker)",
+            "Kubernetes tools (kubectl, Helm, k9s, OpenShift CLI)",
+            "Container tools (Docker/Colima or Podman, lazydocker, Trivy, dive)",
             "Infrastructure as Code (Terraform, Bicep, OpenTofu)",
-            "Modern terminal (Ghostty, Starship, Oh My Posh, Nerd Fonts)",
-            "VS Code with cloud-native extensions"
+            "Automation (Ansible, PowerShell 7)",
+            "Modern terminal (Ghostty, Starship, tmux, Nerd Fonts)",
+            "VS Code with cloud-native extensions",
+            "Security scanning (Trivy, dive)"
         ],
         "screenshot": "https://kodra.codetocloud.io/assets/kodra-desktop.png"
     }
@@ -1628,7 +1630,7 @@
             <div class="accent-badge wsl-only wsl-inline-flex">wsl2-native</div>
             <div class="hero-badge macos-only macos-inline-flex">
                 <span class="hero-badge-dot"></span>
-                v0.5.0 &mdash; macOS edition
+                v0.6.0 &mdash; macOS edition
             </div>
             <div class="accent-badge macos-only macos-inline-flex">apple-silicon</div>
         </div>
@@ -1702,8 +1704,9 @@
             <div class="stat-pill">MIT License</div>
         </div>
         <div class="stats-bar macos-only macos-flex">
-            <div class="stat-pill">30+ Tools</div>
+            <div class="stat-pill">40+ Tools</div>
             <div class="stat-pill">~10 min Setup</div>
+            <div class="stat-pill">360+ Tests</div>
             <div class="stat-pill">Apple Silicon</div>
             <div class="stat-pill">MIT License</div>
         </div>
@@ -1901,11 +1904,14 @@ version     print installed version</div>
 doctor      verify macOS setup
 doctor --fix auto-reinstall missing tools
 update      refresh tooling
+repair      interactive repair menu
 cleanup     clean caches
 defaults    re-apply macOS settings
+backup      back up dotfiles
+setup       first-time configuration
 shortcuts   show all aliases
 fetch       show environment info
-uninstall   remove kodra
+menu        interactive TUI
 help        show available commands</div>
                 </div>
                 <div class="terminal-shell-card">
@@ -2190,6 +2196,50 @@ help        show available commands</div>
             <div class="tool-item"><div class="tool-icon">🐱</div><div class="tool-name">GitHub CLI</div></div>
             <div class="tool-item"><div class="tool-icon">🤖</div><div class="tool-name">Copilot CLI</div></div>
         </div>
+
+        <div class="section-header macos-only macos-block">
+            <span class="section-label">Batteries Included</span>
+            <h2 class="section-title">macOS-ready tools</h2>
+            <p class="section-subtitle">A full cloud toolkit installed via Homebrew, ready for Azure, containers, and terminal-driven development.</p>
+        </div>
+        <div class="tools-grid macos-only macos-grid">
+            <div class="tool-item"><div class="tool-icon">🖥️</div><div class="tool-name">Ghostty</div></div>
+            <div class="tool-item"><div class="tool-icon">📝</div><div class="tool-name">VS Code</div></div>
+            <div class="tool-item"><div class="tool-icon">☁️</div><div class="tool-name">Azure CLI</div></div>
+            <div class="tool-item"><div class="tool-icon">🚀</div><div class="tool-name">azd</div></div>
+            <div class="tool-item"><div class="tool-icon">💪</div><div class="tool-name">Bicep</div></div>
+            <div class="tool-item"><div class="tool-icon">🏗️</div><div class="tool-name">Terraform</div></div>
+            <div class="tool-item"><div class="tool-icon">🧱</div><div class="tool-name">OpenTofu</div></div>
+            <div class="tool-item"><div class="tool-icon">🐳</div><div class="tool-name">Docker / Colima</div></div>
+            <div class="tool-item"><div class="tool-icon">🦭</div><div class="tool-name">Podman</div></div>
+            <div class="tool-item"><div class="tool-icon">☸️</div><div class="tool-name">kubectl</div></div>
+            <div class="tool-item"><div class="tool-icon">⎈</div><div class="tool-name">Helm</div></div>
+            <div class="tool-item"><div class="tool-icon">🐙</div><div class="tool-name">k9s</div></div>
+            <div class="tool-item"><div class="tool-icon">🔴</div><div class="tool-name">OpenShift CLI</div></div>
+            <div class="tool-item"><div class="tool-icon">🤖</div><div class="tool-name">Ansible</div></div>
+            <div class="tool-item"><div class="tool-icon">🧭</div><div class="tool-name">lazydocker</div></div>
+            <div class="tool-item"><div class="tool-icon">🌿</div><div class="tool-name">lazygit</div></div>
+            <div class="tool-item"><div class="tool-icon">🐱</div><div class="tool-name">GitHub CLI</div></div>
+            <div class="tool-item"><div class="tool-icon">🤖</div><div class="tool-name">Copilot CLI</div></div>
+            <div class="tool-item"><div class="tool-icon">🛡️</div><div class="tool-name">Trivy</div></div>
+            <div class="tool-item"><div class="tool-icon">🔍</div><div class="tool-name">dive</div></div>
+            <div class="tool-item"><div class="tool-icon">🦇</div><div class="tool-name">bat</div></div>
+            <div class="tool-item"><div class="tool-icon">📂</div><div class="tool-name">eza</div></div>
+            <div class="tool-item"><div class="tool-icon">🔍</div><div class="tool-name">fzf</div></div>
+            <div class="tool-item"><div class="tool-icon">🔎</div><div class="tool-name">ripgrep</div></div>
+            <div class="tool-item"><div class="tool-icon">📍</div><div class="tool-name">zoxide</div></div>
+            <div class="tool-item"><div class="tool-icon">📊</div><div class="tool-name">btop</div></div>
+            <div class="tool-item"><div class="tool-icon">⚡</div><div class="tool-name">Starship</div></div>
+            <div class="tool-item"><div class="tool-icon">🛰️</div><div class="tool-name">fastfetch</div></div>
+            <div class="tool-item"><div class="tool-icon">🔧</div><div class="tool-name">mise</div></div>
+            <div class="tool-item"><div class="tool-icon">📟</div><div class="tool-name">tmux</div></div>
+            <div class="tool-item"><div class="tool-icon">✏️</div><div class="tool-name">Neovim</div></div>
+            <div class="tool-item"><div class="tool-icon">💠</div><div class="tool-name">PowerShell 7</div></div>
+            <div class="tool-item"><div class="tool-icon">🎬</div><div class="tool-name">act</div></div>
+            <div class="tool-item"><div class="tool-icon">🌐</div><div class="tool-name">httpie</div></div>
+            <div class="tool-item"><div class="tool-icon">📋</div><div class="tool-name">shellcheck</div></div>
+            <div class="tool-item"><div class="tool-icon">📐</div><div class="tool-name">direnv</div></div>
+        </div>
     </section>
 
     <!-- Commands Section -->
@@ -2237,11 +2287,18 @@ help        show available commands</div>
             <div class="command-item"><code class="command-code">kodra doctor</code><span class="command-desc">Check Homebrew, containers, fonts, and shell state</span></div>
             <div class="command-item"><code class="command-code">kodra doctor --fix</code><span class="command-desc">Auto-reinstall missing tools</span></div>
             <div class="command-item"><code class="command-code">kodra update</code><span class="command-desc">Update all tools (brew upgrade)</span></div>
+            <div class="command-item"><code class="command-code">kodra repair</code><span class="command-desc">Interactive repair menu</span></div>
+            <div class="command-item"><code class="command-code">kodra repair --all</code><span class="command-desc">Repair everything automatically</span></div>
             <div class="command-item"><code class="command-code">kodra cleanup</code><span class="command-desc">Clean caches and free space</span></div>
             <div class="command-item"><code class="command-code">kodra defaults</code><span class="command-desc">Re-apply macOS system settings</span></div>
+            <div class="command-item"><code class="command-code">kodra setup</code><span class="command-desc">Re-run first-time configuration</span></div>
+            <div class="command-item"><code class="command-code">kodra backup</code><span class="command-desc">Back up configs and dotfiles</span></div>
+            <div class="command-item"><code class="command-code">kodra restore</code><span class="command-desc">Restore from a backup</span></div>
+            <div class="command-item"><code class="command-code">kodra dev</code><span class="command-desc">Set up language runtimes (via mise)</span></div>
             <div class="command-item"><code class="command-code">kodra shortcuts</code><span class="command-desc">Show all aliases and shortcuts</span></div>
             <div class="command-item"><code class="command-code">kodra fetch</code><span class="command-desc">Print environment and system info</span></div>
-            <div class="command-item"><code class="command-code">kodra uninstall</code><span class="command-desc">Remove all Kodra tools and configs</span></div>
+            <div class="command-item"><code class="command-code">kodra menu</code><span class="command-desc">Interactive TUI menu</span></div>
+            <div class="command-item"><code class="command-code">kodra version</code><span class="command-desc">Show installed version</span></div>
             <div class="command-item"><code class="command-code">kodra help</code><span class="command-desc">List all supported commands</span></div>
         </div>
     </section>
@@ -2310,13 +2367,34 @@ clip.exe &lt; file.txt</code></div>
             <h2 class="section-title">macOS shortcut packs</h2>
             <p class="section-subtitle">Shell aliases to supercharge your cloud development workflow.</p>
         </div>
-        <div class="commands-list macos-only macos-grid" style="max-width: 820px;">
-            <div class="command-item"><code class="command-code">??</code><span class="command-desc">Ask GitHub Copilot for shell commands</span></div>
-            <div class="command-item"><code class="command-code">lg</code><span class="command-desc">Launch lazygit TUI</span></div>
-            <div class="command-item"><code class="command-code">lzd</code><span class="command-desc">Launch lazydocker TUI</span></div>
-            <div class="command-item"><code class="command-code">gs, ga, gc, gp</code><span class="command-desc">Git status, add, commit, push</span></div>
-            <div class="command-item"><code class="command-code">azd-up</code><span class="command-desc">Deploy to Azure with azd</span></div>
-            <div class="command-item"><code class="command-code">tf, tfi, tfp, tfa</code><span class="command-desc">Terraform shortcuts</span></div>
+        <div class="shortcut-grid macos-only macos-grid">
+            <div class="shortcut-card"><h3>🌿 Git</h3><p>Stage, review, and commit without leaving the terminal.</p><code>gs   git status
+ga   git add
+gc   git commit
+gp   git push
+lg   lazygit</code></div>
+            <div class="shortcut-card"><h3>🐳 Docker</h3><p>Inspect containers and jump into the TUI quickly.</p><code>d      docker
+dc     docker compose
+dps    docker ps
+dlogs  docker logs -f
+lzd    lazydocker</code></div>
+            <div class="shortcut-card"><h3>☸️ Kubernetes</h3><p>Cluster visibility without typing the long forms every time.</p><code>k      kubectl
+kgp    kubectl get pods
+kgs    kubectl get svc
+kgd    kubectl get deploy
+kns    set namespace</code></div>
+            <div class="shortcut-card"><h3>☁️ Azure</h3><p>Fast access to auth, subscriptions, and azd deployment flows.</p><code>azl    az login
+azs    az account show
+azls   az account list</code></div>
+            <div class="shortcut-card"><h3>🏗️ Terraform</h3><p>Common Terraform operations in fewer keystrokes.</p><code>tf     terraform
+tfi    terraform init
+tfp    terraform plan
+tfa    terraform apply</code></div>
+            <div class="shortcut-card"><h3>📍 Navigation</h3><p>Modern CLI replacements for faster daily workflows.</p><code>ls     eza (icons)
+ll     eza -la
+lt     eza --tree
+cat    bat
+cd     zoxide</code></div>
         </div>
     </section>
 
