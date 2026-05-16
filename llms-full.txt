@@ -4,7 +4,7 @@
 
 ## Overview
 
-Kodra is an opinionated developer setup for engineers who build and deploy on Azure with GitHub CLI and AI agentic workflows. It transforms a vanilla Ubuntu 24.04+ install, WSL2, or macOS (Apple Silicon) into a beautiful, productive cloud-native development workstation in under 5 minutes. The unified website at kodra.codetocloud.io serves Ubuntu Desktop, WSL2, and macOS audiences with a platform toggle.
+Kodra is an opinionated developer setup for engineers who build and deploy on Azure with GitHub CLI and AI agentic workflows. It transforms a vanilla Ubuntu 24.04+ install, WSL2, or macOS (Apple Silicon / Intel) into a beautiful, productive cloud-native development workstation in under 5 minutes. The unified website at kodra.codetocloud.io serves Ubuntu Desktop, WSL2, and macOS audiences with a platform toggle.
 
 GitHub CLI (`gh`) is the backbone of Kodra's agentic development experience. Combined with Copilot CLI, you can ask questions, generate code, create PRs, and manage repos—all from your terminal.
 
@@ -22,7 +22,7 @@ wget -qO- https://kodra.wsl.codetocloud.io/boot.sh | bash
 
 ### macOS (Apple Silicon)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/codetocloudorg/kodra-macos/main/install.sh | bash
+curl -fsSL https://kodra.macos.codetocloud.io/boot.sh | bash
 ```
 
 ### Customized install
@@ -43,9 +43,10 @@ KODRA_MINIMAL=1 ./install.sh
 ## Why macOS?
 
 - **Homebrew Native**: Every tool installed through Homebrew or native .pkg installers
-- **Colima + Docker CLI**: Run containers without Docker Desktop licensing
-- **Apple Silicon**: ARM-native builds for all tools, no Rosetta overhead
+- **Docker or Podman**: Choose Colima + Docker CLI or Podman stack — both license-free, no Docker Desktop
+- **Apple Silicon**: ARM-native builds for all tools, no Rosetta overhead (Intel also supported)
 - **macOS Defaults**: Sensible Dock, Finder, keyboard tweaks, and dark mode
+- **Ansible**: Red Hat Ansible pre-installed for infrastructure automation
 
 ## Complete Tool List
 
@@ -71,12 +72,23 @@ KODRA_MINIMAL=1 ./install.sh
 ### Containers & Kubernetes
 | Tool | Purpose |
 |------|---------|
-| Docker CE | Container runtime |
+| Docker CE | Container runtime (Ubuntu/WSL) |
+| Colima | Lightweight container runtime for macOS |
+| Podman | Daemonless container engine (macOS alternative) |
+| Podman Desktop | GUI for managing containers, images, and pods |
 | lazydocker | Docker TUI |
 | kubectl | Kubernetes CLI |
 | Helm | Kubernetes package manager |
 | k9s | Kubernetes TUI |
 | Dev Containers | VS Code remote containers |
+| trivy | Container & IaC security scanner |
+| dive | Explore container image layers |
+
+### Cloud Automation
+| Tool | Purpose |
+|------|---------|
+| Ansible | Red Hat Ansible automation (macOS) |
+| OpenShift CLI (`oc`) | Red Hat OpenShift management |
 
 ### Git & GitHub
 | Tool | Purpose |
@@ -224,7 +236,7 @@ bash ~/.kodra/uninstall.sh
 
 ## Requirements
 
-- Ubuntu 24.04+, WSL2 (Windows 11), or macOS 14+ (Apple Silicon)
+- Ubuntu 24.04+, WSL2 (Windows 11), or macOS 14+ (Apple Silicon recommended, Intel supported)
 - Internet connection for package installation
 - ~2GB disk space for all tools
 
@@ -246,7 +258,7 @@ bash ~/.kodra/uninstall.sh
 
 - License: MIT
 - Version: 0.5.3
-- Platforms: Ubuntu 24.04+ Desktop, WSL2 (Windows 11), macOS 14+ (Apple Silicon)
+- Platforms: Ubuntu 24.04+ Desktop, WSL2 (Windows 11), macOS 14+ (Apple Silicon, Intel supported)
 - Developer: Code To Cloud Inc.
 - Location: Calgary, Alberta, Canada
 - CI/CD: GitHub Actions with 43 BATS tests

@@ -50,7 +50,7 @@
         "description": "Kodra: Unified one-command setup for Ubuntu Desktop, WSL2, and macOS developers. Azure CLI, Docker, Kubernetes, GitHub Copilot CLI, and AI-powered workflows.",
         "url": "https://kodra.codetocloud.io",
         "downloadUrl": "https://kodra.codetocloud.io/boot.sh",
-        "softwareVersion": "Ubuntu 0.5.3 / WSL 0.7.1 / macOS 0.1.0",
+        "softwareVersion": "Ubuntu 0.5.3 / WSL 0.7.1 / macOS 0.5.0",
         "creator": {
             "@type": "Organization",
             "name": "Code To Cloud",
@@ -1628,7 +1628,7 @@
             <div class="accent-badge wsl-only wsl-inline-flex">wsl2-native</div>
             <div class="hero-badge macos-only macos-inline-flex">
                 <span class="hero-badge-dot"></span>
-                v0.1.0 &mdash; macOS edition
+                v0.5.0 &mdash; macOS edition
             </div>
             <div class="accent-badge macos-only macos-inline-flex">apple-silicon</div>
         </div>
@@ -1753,12 +1753,12 @@
             <div class="terminal-body macos-only macos-block">
                 <div class="terminal-line">
                     <span class="terminal-prompt">$</span>
-                    <span class="terminal-command">curl -fsSL https://raw.githubusercontent.com/codetocloudorg/kodra-macos/main/install.sh | bash</span>
+                    <span class="terminal-command">curl -fsSL https://kodra.macos.codetocloud.io/boot.sh | bash</span>
                 </div>
                 <div class="terminal-output">
                     ✓ Homebrew packages installed<br>
-                    ✓ Azure CLI + azd configured<br>
-                    ✓ Colima + Docker CLI ready<br>
+                    ✓ Azure CLI + azd + Ansible configured<br>
+                    ✓ Colima + Docker CLI ready (or Podman)<br>
                     ✓ Ghostty + Starship prompt set up<br>
                     ✓ VS Code extensions installed<br>
                     <br>
@@ -1883,9 +1883,10 @@ version     print installed version</div>
                     </div>
                     <div class="terminal-shell-body"><span class="info">$ kodra doctor</span>
 <span class="good">✓</span> homebrew healthy
-<span class="good">✓</span> colima + docker running
+<span class="good">✓</span> colima + docker running (or podman)
 <span class="good">✓</span> ghostty + starship configured
-<span class="good">✓</span> kubectl / helm / k9s ready</div>
+<span class="good">✓</span> kubectl / helm / k9s ready
+<span class="good">✓</span> ansible installed</div>
                 </div>
                 <div class="terminal-shell-card">
                     <div class="gallery-chrome">
@@ -1898,9 +1899,13 @@ version     print installed version</div>
                     </div>
                     <div class="terminal-shell-body"><span class="info">$ kodra help</span>
 doctor      verify macOS setup
+doctor --fix auto-reinstall missing tools
 update      refresh tooling
+cleanup     clean caches
+defaults    re-apply macOS settings
+shortcuts   show all aliases
 fetch       show environment info
-version     print installed version
+uninstall   remove kodra
 help        show available commands</div>
                 </div>
                 <div class="terminal-shell-card">
@@ -1919,7 +1924,7 @@ help        show available commands</div>
 <span class="good">✓</span> azure cli authenticated</div>
                 </div>
             </div>
-            <p class="screenshot-caption macos-only macos-block">Ghostty • Starship • Colima + Docker CLI • no Docker Desktop required</p>
+            <p class="screenshot-caption macos-only macos-block">Ghostty • Starship • Colima or Podman • Ansible • no Docker Desktop required</p>
         </div>
 
         <!-- Lightbox -->
@@ -2055,8 +2060,8 @@ help        show available commands</div>
                     <p>Every tool installed through Homebrew or native .pkg installers. Clean, predictable, and easy to maintain.</p>
                 </div>
                 <div class="why-platform-card">
-                    <h3>🐳 Colima + Docker CLI</h3>
-                    <p>Run containers with Colima backing the Docker CLI. No Docker Desktop license, no background daemon bloat.</p>
+                    <h3>🐳 Containers (No Docker Desktop)</h3>
+                    <p>Choose Docker (Colima) or Podman stack during install. Both are license-free, with no background daemon bloat.</p>
                 </div>
                 <div class="why-platform-card">
                     <h3>👻 Ghostty Terminal</h3>
@@ -2073,6 +2078,10 @@ help        show available commands</div>
                 <div class="why-platform-card">
                     <h3>🎨 macOS Defaults</h3>
                     <p>Sensible Dock, Finder, and keyboard tweaks. Dark mode, fast key repeat, screenshots folder, and more.</p>
+                </div>
+                <div class="why-platform-card">
+                    <h3>🤖 Ansible Automation</h3>
+                    <p>Red Hat Ansible pre-installed for infrastructure automation, configuration management, and cloud provisioning.</p>
                 </div>
             </div>
         </div>
@@ -2116,14 +2125,15 @@ help        show available commands</div>
             <p class="section-subtitle">Homebrew-powered, Apple Silicon optimized, and ready for Azure, containers, and fast terminal-driven development.</p>
         </div>
         <div class="features-grid macos-only macos-grid">
-            <div class="feature-card"><div class="feature-icon">☁️</div><h3 class="feature-title">Cloud & Azure</h3><p class="feature-description">Azure CLI, azd, Bicep, Terraform, and OpenTofu ready on your Mac via Homebrew.</p></div>
-            <div class="feature-card"><div class="feature-icon">🐳</div><h3 class="feature-title">Containers</h3><p class="feature-description">Colima backs the Docker CLI natively&mdash;no Docker Desktop required, no licensing headaches.</p></div>
+            <div class="feature-card"><div class="feature-icon">☁️</div><h3 class="feature-title">Cloud & Azure</h3><p class="feature-description">Azure CLI, azd, Bicep, Terraform, OpenTofu, and Ansible ready on your Mac via Homebrew.</p></div>
+            <div class="feature-card"><div class="feature-icon">🐳</div><h3 class="feature-title">Containers</h3><p class="feature-description">Choose Docker (Colima) or Podman&mdash;both license-free, no Docker Desktop required.</p></div>
             <div class="feature-card"><div class="feature-icon">🐙</div><h3 class="feature-title">GitHub CLI</h3><p class="feature-description">The <code>gh</code> CLI with Copilot for PRs, issues, repos, and AI-powered terminal commands.</p></div>
-            <div class="feature-card"><div class="feature-icon">☸️</div><h3 class="feature-title">Kubernetes</h3><p class="feature-description">kubectl, Helm, and k9s for managing AKS clusters from your Mac.</p></div>
+            <div class="feature-card"><div class="feature-icon">☸️</div><h3 class="feature-title">Kubernetes</h3><p class="feature-description">kubectl, Helm, k9s, and OpenShift CLI for managing clusters from your Mac.</p></div>
             <div class="feature-card"><div class="feature-icon">⚡</div><h3 class="feature-title">Modern Terminal</h3><p class="feature-description">Ghostty terminal with Starship prompt and Nerd Fonts. GPU-accelerated and beautiful.</p></div>
             <div class="feature-card"><div class="feature-icon">🔧</div><h3 class="feature-title">Runtime Manager</h3><p class="feature-description">mise manages Node, Python, Go, and other runtimes. Fast, polyglot, and version-pinned.</p></div>
             <div class="feature-card"><div class="feature-icon">🤖</div><h3 class="feature-title">Agentic AI</h3><p class="feature-description">GitHub Copilot CLI powers agentic workflows. Type <code>??</code> to ask AI anything from your terminal.</p></div>
-            <div class="feature-card"><div class="feature-icon">🏢</div><h3 class="feature-title">Enterprise CI/CD</h3><p class="feature-description">GitHub Actions and Azure DevOps workflows sit naturally beside your local Mac toolchain.</p></div>
+            <div class="feature-card"><div class="feature-icon">🛡️</div><h3 class="feature-title">Security Scanning</h3><p class="feature-description">Trivy for container and IaC scanning, dive for image layer analysis.</p></div>
+            <div class="feature-card"><div class="feature-icon">🏢</div><h3 class="feature-title">Enterprise CI/CD</h3><p class="feature-description">GitHub Actions (with <code>act</code> for local runs) and Azure DevOps beside your Mac toolchain.</p></div>
         </div>
     </section>
     <section id="tools">
@@ -2224,10 +2234,14 @@ help        show available commands</div>
             <p class="section-subtitle">Verify, update, and manage your cloud dev environment from the terminal.</p>
         </div>
         <div class="commands-list macos-only macos-grid" style="max-width: 820px;">
-            <div class="command-item"><code class="command-code">kodra doctor</code><span class="command-desc">Check Homebrew, Docker, fonts, and shell state</span></div>
-            <div class="command-item"><code class="command-code">kodra update</code><span class="command-desc">Refresh packages and cloud tools via Homebrew</span></div>
+            <div class="command-item"><code class="command-code">kodra doctor</code><span class="command-desc">Check Homebrew, containers, fonts, and shell state</span></div>
+            <div class="command-item"><code class="command-code">kodra doctor --fix</code><span class="command-desc">Auto-reinstall missing tools</span></div>
+            <div class="command-item"><code class="command-code">kodra update</code><span class="command-desc">Update all tools (brew upgrade)</span></div>
+            <div class="command-item"><code class="command-code">kodra cleanup</code><span class="command-desc">Clean caches and free space</span></div>
+            <div class="command-item"><code class="command-code">kodra defaults</code><span class="command-desc">Re-apply macOS system settings</span></div>
+            <div class="command-item"><code class="command-code">kodra shortcuts</code><span class="command-desc">Show all aliases and shortcuts</span></div>
             <div class="command-item"><code class="command-code">kodra fetch</code><span class="command-desc">Print environment and system info</span></div>
-            <div class="command-item"><code class="command-code">kodra version</code><span class="command-desc">Show installed macOS edition version</span></div>
+            <div class="command-item"><code class="command-code">kodra uninstall</code><span class="command-desc">Remove all Kodra tools and configs</span></div>
             <div class="command-item"><code class="command-code">kodra help</code><span class="command-desc">List all supported commands</span></div>
         </div>
     </section>
@@ -2354,8 +2368,8 @@ clip.exe &lt; file.txt</code></div>
             <p class="section-subtitle">Three steps from fresh Mac to productive Azure development.</p>
         </div>
         <div class="macos-only macos-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 3rem;">
-            <div style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 12px; padding: 2rem; text-align: center;"><div style="width: 64px; height: 64px; background: rgba(161, 161, 170, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem;">1️⃣</div><h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Open Terminal &rarr; Run Command</h3><p style="color: var(--text-secondary); font-size: 0.95rem;">Open Terminal.app and run the one-line installer. Kodra handles Homebrew and everything else.</p><code style="display: block; margin-top: 1rem; background: var(--bg-tertiary); padding: 0.75rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--accent-cyan);">curl -fsSL https://raw.githubusercontent.com/codetocloudorg/kodra-macos/main/install.sh | bash</code></div>
-            <div style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 12px; padding: 2rem; text-align: center;"><div style="width: 64px; height: 64px; background: rgba(212, 212, 216, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem;">2️⃣</div><h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Tools Install Automatically</h3><p style="color: var(--text-secondary); font-size: 0.95rem;">Kodra installs Ghostty, Starship, Azure tools, Colima + Docker, and configures macOS defaults.</p><div style="margin-top: 1rem; color: var(--accent-green); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">✓ Finished in ~10 minutes</div></div>
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 12px; padding: 2rem; text-align: center;"><div style="width: 64px; height: 64px; background: rgba(161, 161, 170, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem;">1️⃣</div><h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Open Terminal &rarr; Run Command</h3><p style="color: var(--text-secondary); font-size: 0.95rem;">Open Terminal.app and run the one-line installer. Kodra handles Homebrew and everything else.</p><code style="display: block; margin-top: 1rem; background: var(--bg-tertiary); padding: 0.75rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--accent-cyan);">curl -fsSL https://kodra.macos.codetocloud.io/boot.sh | bash</code></div>
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 12px; padding: 2rem; text-align: center;"><div style="width: 64px; height: 64px; background: rgba(212, 212, 216, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem;">2️⃣</div><h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Choose Your Stack</h3><p style="color: var(--text-secondary); font-size: 0.95rem;">Pick Docker (Colima) or Podman for containers. Kodra installs Ghostty, Starship, Azure tools, Ansible, and configures macOS defaults.</p><div style="margin-top: 1rem; color: var(--accent-green); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">✓ Finished in ~10 minutes</div></div>
             <div style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 12px; padding: 2rem; text-align: center;"><div style="width: 64px; height: 64px; background: rgba(63, 185, 80, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem;">3️⃣</div><h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Open Ghostty &rarr; Start Building</h3><p style="color: var(--text-secondary); font-size: 0.95rem;">Launch Ghostty, run <code>kodra doctor</code>, confirm everything is healthy, and start shipping.</p><div style="margin-top: 1rem; color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">$ kodra doctor</div></div>
         </div>
     </section>
@@ -2386,8 +2400,8 @@ clip.exe &lt; file.txt</code></div>
         </div>
 
         <div style="margin-top: 3rem; display: flex; flex-direction: column; gap: 1rem;" class="macos-only macos-flex">
-            <details style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 8px; padding: 1rem 1.5rem;"><summary style="cursor: pointer; font-weight: 600; font-size: 1rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center;">What macOS versions are supported?<span style="color: var(--text-muted); font-size: 1.25rem;">+</span></summary><p style="margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">Kodra macOS requires macOS 14 (Sonoma) or newer on Apple Silicon (M1/M2/M3/M4). Intel Macs are not officially supported.</p></details>
-            <details style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 8px; padding: 1rem 1.5rem;"><summary style="cursor: pointer; font-weight: 600; font-size: 1rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center;">Does it require Docker Desktop?<span style="color: var(--text-muted); font-size: 1.25rem;">+</span></summary><p style="margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">No. Kodra macOS uses Colima to back the Docker CLI with a lightweight Linux VM. Docker Desktop is not needed and not installed.</p></details>
+            <details style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 8px; padding: 1rem 1.5rem;"><summary style="cursor: pointer; font-weight: 600; font-size: 1rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center;">What macOS versions are supported?<span style="color: var(--text-muted); font-size: 1.25rem;">+</span></summary><p style="margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">Kodra macOS requires macOS 14 (Sonoma) or newer. Apple Silicon (M1/M2/M3/M4) is recommended, and Intel Macs are supported.</p></details>
+            <details style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 8px; padding: 1rem 1.5rem;"><summary style="cursor: pointer; font-weight: 600; font-size: 1rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center;">Does it require Docker Desktop?<span style="color: var(--text-muted); font-size: 1.25rem;">+</span></summary><p style="margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">No. Kodra macOS lets you choose Docker (Colima) or Podman for containers. Both are license-free and don&rsquo;t require Docker Desktop.</p></details>
             <details style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 8px; padding: 1rem 1.5rem;"><summary style="cursor: pointer; font-weight: 600; font-size: 1rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center;">Will it change my macOS settings?<span style="color: var(--text-muted); font-size: 1.25rem;">+</span></summary><p style="margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">Kodra applies sensible macOS defaults like dark mode, fast key repeat, and Dock tweaks. These are common developer preferences and can be reverted.</p></details>
             <details style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 8px; padding: 1rem 1.5rem;"><summary style="cursor: pointer; font-weight: 600; font-size: 1rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center;">How is this different from Kodra Ubuntu?<span style="color: var(--text-muted); font-size: 1.25rem;">+</span></summary><p style="margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">The Ubuntu edition themes the full Linux desktop with GNOME extensions. The macOS edition focuses on terminal tooling, Homebrew packages, and macOS-native configuration.</p></details>
             <details style="background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: 8px; padding: 1rem 1.5rem;"><summary style="cursor: pointer; font-weight: 600; font-size: 1rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center;">Is it free and open source?<span style="color: var(--text-muted); font-size: 1.25rem;">+</span></summary><p style="margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">Yes. Kodra macOS is completely free under the MIT license, and the code is available on GitHub.</p></details>
